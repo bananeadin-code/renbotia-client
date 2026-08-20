@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- ═══ SEO base ═══
+         Enfoque: México (nacional) con señales locales sutiles hacia Durango.
+         NOTA: cambia el dominio https://www.renbotia.com por el definitivo cuando
+         lo compres (aparece aquí, en canonical, OG, sitemap.xml y src/lib/seo.js). -->
+    <title>RenBotIA — Bot de WhatsApp con IA para negocios en México</title>
+    <meta
+      name="description"
+      content="Atención automatizada por WhatsApp para despachos, agencias y negocios en México. Un asistente con IA entrenado con tu información: responde dudas, agenda citas y capta clientes 24/7."
+    />
+    <meta
+      name="keywords"
+      content="bot de WhatsApp con IA, atención automatizada WhatsApp, chatbot para negocios México, asistente virtual WhatsApp, automatizar atención al cliente, agendar citas por WhatsApp"
+    />
+    <link rel="canonical" href="https://www.renbotia.com/" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="RenBotIA" />
+    <meta name="theme-color" content="#059669" />
+
+    <!-- Señales geográficas (sutiles): país México y región Durango -->
+    <meta name="geo.region" content="MX-DGO" />
+    <meta name="geo.placename" content="Durango, México" />
+    <meta name="geo.position" content="24.0277;-104.6532" />
+    <meta name="ICBM" content="24.0277, -104.6532" />
+    <meta name="language" content="Spanish" />
+
+    <!-- Aplica el tema ANTES de pintar para evitar parpadeo (FOUC).
+         Lee la preferencia guardada o cae al tema del sistema. -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('theme');
+          var dark =
+            t === 'dark' ||
+            ((!t || t === 'system') &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.classList.toggle('dark', dark);
+        } catch (e) {}
+      })();
+    </script>
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="RenBotIA" />
+    <meta property="og:locale" content="es_MX" />
+    <meta property="og:title" content="RenBotIA — Bot de WhatsApp con IA para negocios en México" />
+    <meta
+      property="og:description"
+      content="Asistente de WhatsApp con IA para despachos, agencias y negocios en México. Responde, agenda y capta clientes 24/7."
+    />
+    <meta property="og:url" content="https://www.renbotia.com/" />
+    <meta property="og:image" content="https://www.renbotia.com/og-cover.svg" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="RenBotIA — Bot de WhatsApp con IA para negocios en México" />
+    <meta
+      name="twitter:description"
+      content="Asistente de WhatsApp con IA para negocios en México. Responde, agenda y capta clientes 24/7."
+    />
+    <meta name="twitter:image" content="https://www.renbotia.com/og-cover.svg" />
+
+    <!-- Datos estructurados: negocio local + servicio. Se rastrea sin ejecutar JS. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.renbotia.com/#organization",
+            "name": "RenBotIA",
+            "url": "https://www.renbotia.com/",
+            "description": "Asistentes de WhatsApp con inteligencia artificial para negocios en México.",
+            "areaServed": [
+              { "@type": "Country", "name": "México" },
+              { "@type": "AdministrativeArea", "name": "Durango" }
+            ]
+          },
+          {
+            "@type": "ProfessionalService",
+            "@id": "https://www.renbotia.com/#localbusiness",
+            "name": "RenBotIA",
+            "image": "https://www.renbotia.com/og-cover.svg",
+            "url": "https://www.renbotia.com/",
+            "priceRange": "$$",
+            "description": "Bots de WhatsApp con IA entrenados con la información de tu negocio: responden dudas, agendan citas y captan clientes las 24 horas.",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Durango",
+              "addressRegion": "Durango",
+              "addressCountry": "MX"
+            },
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": 24.0277,
+              "longitude": -104.6532
+            },
+            "areaServed": [
+              { "@type": "Country", "name": "México" },
+              { "@type": "AdministrativeArea", "name": "Durango" }
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.renbotia.com/#website",
+            "url": "https://www.renbotia.com/",
+            "name": "RenBotIA",
+            "inLanguage": "es-MX",
+            "publisher": { "@id": "https://www.renbotia.com/#organization" }
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://www.renbotia.com/#app",
+            "name": "RenBotIA",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Web",
+            "url": "https://www.renbotia.com/",
+            "inLanguage": "es-MX",
+            "description": "Asistente de WhatsApp con IA para negocios en México: entrénalo con tu información y responde, agenda y capta clientes 24/7.",
+            "publisher": { "@id": "https://www.renbotia.com/#organization" },
+            "offers": [
+              {
+                "@type": "Offer",
+                "name": "Free",
+                "price": "0",
+                "priceCurrency": "MXN",
+                "description": "50,000 tokens de prueba, sin límite de días."
+              },
+              {
+                "@type": "Offer",
+                "name": "Pro",
+                "price": "429",
+                "priceCurrency": "MXN",
+                "description": "1,000,000 tokens al mes."
+              },
+              {
+                "@type": "Offer",
+                "name": "Elite",
+                "price": "999",
+                "priceCurrency": "MXN",
+                "description": "5,000,000 tokens al mes + gestión de trabajo e imágenes."
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module" crossorigin src="/assets/index-DGwyeR_y.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CP4TIOvM.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

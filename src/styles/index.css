@@ -1,0 +1,218 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Tokens de tema (semánticos) ─────────────────────────────
+   Canales RGB separados por espacio para soportar opacidad Tailwind. */
+:root {
+  --canvas: 248 250 252; /* slate-50  */
+  --surface: 255 255 255; /* white     */
+  --surface-2: 241 245 249; /* slate-100 */
+  --fg: 15 23 42; /* ink-900   */
+  --muted: 100 116 139; /* slate-500 */
+  --subtle: 148 163 184; /* slate-400 */
+  --line: 226 232 240; /* slate-200 */
+  --glow: 16 185 129; /* emerald-500: color del brillo/spotlight */
+}
+
+.dark {
+  --canvas: 9 13 22; /* casi negro azulado */
+  --surface: 18 25 39; /* panel oscuro       */
+  --surface-2: 28 38 56; /* inset/hover        */
+  --fg: 237 242 249; /* casi blanco        */
+  --muted: 148 163 184; /* slate-400          */
+  --subtle: 108 122 145;
+  --line: 39 51 71; /* borde oscuro       */
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-canvas text-fg;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+  h1,
+  h2,
+  h3 {
+    @apply text-fg;
+    letter-spacing: -0.01em;
+  }
+}
+
+@layer utilities {
+  /* Números de métricas/dashboards alineados */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Textura de puntos sutil (secciones/CTA) */
+  .dot-grid {
+    background-image: radial-gradient(rgb(var(--fg) / 0.06) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+  /* Rejilla fina estilo Vercel/Render con desvanecido radial hacia los bordes */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgb(var(--fg) / 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--fg) / 0.05) 1px, transparent 1px);
+    background-size: 56px 56px;
+    -webkit-mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, #000 35%, transparent 100%);
+    mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, #000 35%, transparent 100%);
+  }
+  /* Eyebrow: etiqueta pequeña en mayúsculas sobre los títulos de sección */
+  .eyebrow {
+    @apply inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-brand-600 dark:text-brand-400;
+  }
+  /* Rejilla blanca para paneles SIEMPRE oscuros (auth, CTA), independiente del tema */
+  .panel-grid {
+    background-image:
+      linear-gradient(to right, rgb(255 255 255 / 0.08) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(255 255 255 / 0.08) 1px, transparent 1px);
+    background-size: 46px 46px;
+    -webkit-mask-image: radial-gradient(ellipse 85% 70% at 25% 15%, #000 40%, transparent 100%);
+    mask-image: radial-gradient(ellipse 85% 70% at 25% 15%, #000 40%, transparent 100%);
+  }
+}
+
+/* ── Aurora background (tema claro y oscuro) ── */
+.aurora-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(64px);
+  opacity: 0.5;
+  animation: aurora-float 16s ease-in-out infinite;
+  will-change: transform;
+}
+.dark .aurora-blob {
+  opacity: 0.22;
+  filter: blur(80px);
+}
+@keyframes aurora-float {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(24px, -18px) scale(1.12);
+  }
+}
+
+/* ── Border beam (inspirado en 21st.dev Borders) ── */
+.beam-ring {
+  position: absolute;
+  inset: -1px;
+  border-radius: 1.3rem;
+  overflow: hidden;
+  pointer-events: none;
+}
+.beam-ring::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 200%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0 58%,
+    #6fe0b6 70%,
+    #12a97f 80%,
+    transparent 92% 100%
+  );
+  animation: beam-spin 5s linear infinite;
+}
+@keyframes beam-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+/* ── Spotlight card: brillo que sigue el cursor (inspirado en 21st.dev
+   "Glowing Effect" / "Card Spotlight"). El componente setea --mx/--my. ── */
+.spotlight-card {
+  position: relative;
+  isolation: isolate;
+}
+.spotlight-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(
+    260px circle at var(--mx, 50%) var(--my, 0%),
+    rgb(var(--glow) / 0.55),
+    transparent 60%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: 1;
+}
+.spotlight-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    220px circle at var(--mx, 50%) var(--my, 0%),
+    rgb(var(--glow) / 0.1),
+    transparent 65%
+  );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: 0;
+}
+.spotlight-card:hover::before,
+.spotlight-card:hover::after {
+  opacity: 1;
+}
+
+/* ── Botón con destello (shimmer) para el CTA primario del hero ── */
+.shine-cta {
+  position: relative;
+  overflow: hidden;
+}
+.shine-cta::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 60%;
+  height: 100%;
+  transform: skewX(-20deg);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.35), transparent);
+  animation: shine-sweep 3.4s ease-in-out infinite;
+}
+@keyframes shine-sweep {
+  0% {
+    left: -150%;
+  }
+  55%,
+  100% {
+    left: 150%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora-blob,
+  .beam-ring::before,
+  .shine-cta::after {
+    animation: none;
+  }
+}
+
+/* Fondo tipo WhatsApp para el simulador (se mantiene en ambos temas) */
+.wa-chat-bg {
+  background-color: #efeae2;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='%23000000' fill-opacity='0.03'%3E%3Cpath d='M0 0h20v20H0zM20 20h20v20H20z'/%3E%3C/g%3E%3C/svg%3E");
+}
+.dark .wa-chat-bg {
+  background-color: #0b141a;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M0 0h20v20H0zM20 20h20v20H20z'/%3E%3C/g%3E%3C/svg%3E");
+}

@@ -1,0 +1,18 @@
+# Dependencias
+node_modules/
+
+# Build de Vite
+dist/
+
+# Variables de entorno (las del cliente Vite son públicas, pero igual no se suben)
+.env
+.env.*
+!.env.example
+
+# Logs y temporales
+*.log
+npm-debug.log*
+
+# Sistema
+.DS_Store
+Thumbs.db

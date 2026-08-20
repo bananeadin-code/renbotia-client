@@ -1,0 +1,11 @@
+# RenBotIA — robots.txt
+# Permite el rastreo del sitio público; excluye el área privada (panel/onboarding).
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /login
+Disallow: /registro
+Disallow: /recuperar
+
+Sitemap: https://www.renbotia.com/sitemap.xml
