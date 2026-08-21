@@ -4,6 +4,7 @@ import { useAuthStore } from '../../store/authStore.js';
 import { Button, Input, Alert } from '../../components/ui/index.jsx';
 import { AuthLayout } from '../../components/layout/AuthLayout.jsx';
 import { GoogleButton } from '../../components/auth/GoogleButton.jsx';
+import { OtpForm } from '../../components/auth/OtpForm.jsx';
 import { useSeo } from '../../lib/seo.js';
 
 export default function Login() {
@@ -14,6 +15,8 @@ export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  // Paso pendiente: 2FA de login o verificación de correo (registrado sin verificar).
+  const [pending, setPending] = useState(null); // { mode, email, devCode? }
 
   const from = location.state?.from?.pathname || '/dashboard';
 
@@ -22,8 +25,14 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      await login(form);
-      navigate(from, { replace: true });
+      const res = await login(form);
+      if (res.needs2fa) {
+        setPending({ mode: 'login_2fa', email: res.email, devCode: res.devCode });
+      } else if (res.needsEmailVerification) {
+        setPending({ mode: 'verify_email', email: res.email, devCode: res.devCode });
+      } else {
+        navigate(from, { replace: true });
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'No se pudo iniciar sesión');
     } finally {
@@ -31,23 +40,44 @@ export default function Login() {
     }
   }
 
+  // Paso de código (2FA o verificación de correo).
+  if (pending) {
+    return (
+      <AuthLayout
+        title={pending.mode === 'login_2fa' ? 'Verificación en dos pasos' : 'Verifica tu correo'}
+        subtitle="Escribe el código de 6 dígitos que enviamos a tu correo"
+        footer={
+          <p className="mt-6 text-center text-sm text-muted">
+            <button
+              onClick={() => setPending(null)}
+              className="font-medium text-brand-600 hover:underline"
+            >
+              Volver a iniciar sesión
+            </button>
+          </p>
+        }
+      >
+        <OtpForm
+          email={pending.email}
+          mode={pending.mode}
+          devCode={pending.devCode}
+          onVerified={() => navigate(from, { replace: true })}
+        />
+      </AuthLayout>
+    );
+  }
+
   return (
     <AuthLayout
       title="Inicia sesión"
       subtitle="Entra a tu panel de RenBotIA"
       footer={
-        <>
-          <p className="mt-6 text-center text-sm text-muted">
-            ¿No tienes cuenta?{' '}
-            <Link to="/registro" className="font-medium text-brand-600 hover:underline">
-              Crear cuenta
-            </Link>
-          </p>
-          <p className="mt-4 text-center text-xs text-subtle">
-            Demo: admin@demo.com / legal@demo.com · contraseña{' '}
-            <code className="rounded bg-surface2 px-1 py-0.5">password123</code>
-          </p>
-        </>
+        <p className="mt-6 text-center text-sm text-muted">
+          ¿No tienes cuenta?{' '}
+          <Link to="/registro" className="font-medium text-brand-600 hover:underline">
+            Crear cuenta
+          </Link>
+        </p>
       }
     >
       <GoogleButton

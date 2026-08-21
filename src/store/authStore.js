@@ -19,14 +19,32 @@ export const useAuthStore = create((set, get) => ({
     set({ user, isAuthenticated: true });
   },
 
+  // Registro: ya NO inicia sesión de inmediato. Devuelve un estado pendiente
+  // { needsEmailVerification, email, devCode? } para que el usuario confirme el
+  // código enviado a su correo (verifyEmail).
   async register(body) {
-    const { user, accessToken } = await authApi.register(body);
+    return authApi.register(body);
+  },
+
+  // Login: puede devolver la sesión, o un estado pendiente
+  // { needs2fa | needsEmailVerification, email, devCode? }.
+  async login(body) {
+    const data = await authApi.login(body);
+    if (data.needs2fa || data.needsEmailVerification) return data;
+    get().setSession(data.user, data.accessToken);
+    return { user: data.user };
+  },
+
+  // Confirma el correo con el código e inicia sesión.
+  async verifyEmail(email, code) {
+    const { user, accessToken } = await authApi.verifyEmail({ email, code });
     get().setSession(user, accessToken);
     return user;
   },
 
-  async login(body) {
-    const { user, accessToken } = await authApi.login(body);
+  // Verifica el 2FA del login e inicia sesión (opcional recordar dispositivo).
+  async verify2fa(email, code, rememberDevice) {
+    const { user, accessToken } = await authApi.verify2fa({ email, code, rememberDevice });
     get().setSession(user, accessToken);
     return user;
   },

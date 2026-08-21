@@ -16,9 +16,34 @@ export function setAccessToken(token) {
   accessToken = token;
 }
 
+// Proyecto activo (switcher owner/colaborador). Se envía como header X-Business-Id;
+// el backend valida SIEMPRE el acceso antes de usarlo. Persistido en localStorage.
+const ACTIVE_KEY = 'renbotia:activeBusinessId';
+let activeBusinessId = null;
+try {
+  activeBusinessId = localStorage.getItem(ACTIVE_KEY) || null;
+} catch {
+  /* sin localStorage: usa el negocio por defecto */
+}
+export function setActiveBusinessId(id) {
+  activeBusinessId = id || null;
+  try {
+    if (id) localStorage.setItem(ACTIVE_KEY, id);
+    else localStorage.removeItem(ACTIVE_KEY);
+  } catch {
+    /* noop */
+  }
+}
+export function getActiveBusinessId() {
+  return activeBusinessId;
+}
+
 api.interceptors.request.use((config) => {
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+  if (activeBusinessId) {
+    config.headers['X-Business-Id'] = activeBusinessId;
   }
   return config;
 });

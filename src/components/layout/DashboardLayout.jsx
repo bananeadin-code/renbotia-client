@@ -6,6 +6,7 @@ import { Spinner } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
 import { Logo } from '../ui/Logo.jsx';
 import { ThemeToggle } from '../ui/ThemeToggle.jsx';
+import { ProjectSwitcher } from './ProjectSwitcher.jsx';
 
 const NAV = [
   { to: '/dashboard', label: 'Inicio', end: true, icon: 'home' },
@@ -111,6 +112,9 @@ export function DashboardLayout() {
               <div className="truncate text-xs text-subtle">{user?.email}</div>
             </div>
           </div>
+
+          {/* Switcher de proyecto (solo si el usuario tiene más de uno). */}
+          <ProjectSwitcher />
 
           <nav className="space-y-1">
             {nav.map((item) => (

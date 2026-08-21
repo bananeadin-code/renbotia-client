@@ -24,6 +24,7 @@ const Legal = lazy(() => import('./pages/public/Legal.jsx'));
 const Login = lazy(() => import('./pages/public/Login.jsx'));
 const Register = lazy(() => import('./pages/public/Register.jsx'));
 const ForgotPassword = lazy(() => import('./pages/public/ForgotPassword.jsx'));
+const ResetPassword = lazy(() => import('./pages/public/ResetPassword.jsx'));
 const AcceptInvitation = lazy(() => import('./pages/public/AcceptInvitation.jsx'));
 
 // Onboarding
@@ -76,6 +77,7 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/registro" element={<Register />} />
       <Route path="/recuperar" element={<ForgotPassword />} />
+      <Route path="/restablecer" element={<ResetPassword />} />
       <Route path="/aceptar-invitacion" element={<AcceptInvitation />} />
 
       {/* Onboarding (requiere sesión, pero no negocio) */}

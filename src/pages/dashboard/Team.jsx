@@ -44,7 +44,11 @@ export default function Team() {
     setInviting(true);
     try {
       const res = await membersApi.invite(email.trim());
-      toast.success('Invitación enviada.');
+      toast.success(
+        res.registered
+          ? 'Invitación enviada. La persona ya tiene cuenta y abrirá el enlace para unirse.'
+          : 'Invitación enviada. La persona debe crear una cuenta con ese correo y abrir el enlace.'
+      );
       setEmail('');
       if (res.devLink) setDevLink(res.devLink);
       await load();

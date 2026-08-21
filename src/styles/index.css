@@ -40,6 +40,38 @@
     @apply text-fg;
     letter-spacing: -0.01em;
   }
+
+  /* ── Scrollbars personalizados (acordes a la marca y al tema) ──
+     Firefox usa scrollbar-width/color; Chromium/Safari usan ::-webkit-*.
+     El pulgar toma el tono del tema y brilla en verde RenBotIA al pasar. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--subtle) / 0.55) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 11px;
+    height: 11px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: rgb(var(--subtle) / 0.55);
+    border-radius: 9999px;
+    /* Borde transparente = "aire" alrededor del pulgar (efecto pill flotante) */
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    transition: background-color 0.2s ease;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(var(--glow) / 0.8);
+  }
+  ::-webkit-scrollbar-thumb:active {
+    background-color: rgb(var(--glow));
+  }
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
 }
 
 @layer utilities {

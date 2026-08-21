@@ -114,10 +114,9 @@ export default function OnboardingWizard() {
     setFaqs(faqs.filter((_, idx) => idx !== i));
   }
 
-  const canNext =
-    (step === 0 && business.name.trim().length >= 2) ||
-    (step === 1 && planKey) ||
-    step === 2;
+  // El paso "Tu negocio" es OMITIBLE (se completa luego en el panel); el plan sí
+  // debe elegirse; el paso del bot también es opcional.
+  const canNext = step === 0 || (step === 1 && Boolean(planKey)) || step === 2;
 
   async function handleFinish() {
     setError('');
@@ -127,7 +126,8 @@ export default function OnboardingWizard() {
         .filter((f) => f.question.trim() && f.answer.trim())
         .slice(0, limits.maxFaqs ?? undefined);
       const botConfig = {
-        botName: bot.botName || business.name,
+        // Si se omite todo, va undefined (el schema exige min(1) cuando se envía).
+        botName: bot.botName || business.name || undefined,
         tone: limits.tone ? bot.tone : 'neutral', // Free siempre neutral
         faqs: cleanFaqs,
         businessInfo: { hours: bot.hours, location: bot.location },
@@ -211,9 +211,12 @@ export default function OnboardingWizard() {
           {step === 0 && (
             <div className="space-y-4">
               <h2 className="text-lg font-bold text-fg">Cuéntanos de tu negocio</h2>
+              <p className="text-sm text-muted">
+                Todo esto es opcional: puedes <strong>omitirlo</strong> y completarlo después desde
+                el panel. Elegir plan es el único paso necesario.
+              </p>
               <Input
                 label="Nombre del negocio"
-                required
                 value={business.name}
                 onChange={(e) => setBusiness({ ...business, name: e.target.value })}
                 placeholder="Ej. Bufete Herrera & Asociados"
@@ -269,6 +272,10 @@ export default function OnboardingWizard() {
           {step === 2 && (
             <div className="space-y-4">
               <h2 className="text-lg font-bold text-fg">Configura tu bot</h2>
+              <p className="text-sm text-muted">
+                Opcional: puedes dejarlo vacío y entrenar tu bot más tarde desde{' '}
+                <strong>Entrenamiento</strong> en el panel.
+              </p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Input
                   label="Nombre del bot"
@@ -346,7 +353,7 @@ export default function OnboardingWizard() {
           )}
 
           {/* Navegación */}
-          <div className="mt-8 flex justify-between">
+          <div className="mt-8 flex items-center justify-between gap-2">
             <Button
               variant="ghost"
               onClick={() => setStep((s) => Math.max(0, s - 1))}
@@ -355,9 +362,17 @@ export default function OnboardingWizard() {
               Atrás
             </Button>
             {step < STEPS.length - 1 ? (
-              <Button onClick={() => setStep((s) => s + 1)} disabled={!canNext}>
-                Continuar
-              </Button>
+              <div className="flex items-center gap-2">
+                {/* El paso "Tu negocio" se puede omitir para hacerlo después. */}
+                {step === 0 && (
+                  <Button variant="ghost" onClick={() => setStep(1)}>
+                    Omitir por ahora
+                  </Button>
+                )}
+                <Button onClick={() => setStep((s) => s + 1)} disabled={!canNext}>
+                  Continuar
+                </Button>
+              </div>
             ) : (
               <Button onClick={handleFinish} disabled={submitting}>
                 {submitting

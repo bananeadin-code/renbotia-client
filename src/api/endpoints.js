@@ -16,6 +16,10 @@ export const authApi = {
   me: () => unwrap(api.get('/auth/me')),
   forgotPassword: (email) => unwrap(api.post('/auth/forgot-password', { email })),
   resetPassword: (body) => api.post('/auth/reset-password', body),
+  // Verificación de correo (registro) y 2FA de login por código.
+  verifyEmail: (body) => unwrap(api.post('/auth/verify-email', body)),
+  verify2fa: (body) => unwrap(api.post('/auth/verify-2fa', body)),
+  resendCode: (body) => unwrap(api.post('/auth/resend-code', body)),
 };
 
 export const onboardingApi = {
@@ -31,6 +35,8 @@ export const businessApi = {
   me: () => unwrap(api.get('/business/me')),
   update: (body) => unwrap(api.patch('/business/me', body)),
   audit: () => unwrap(api.get('/business/audit')),
+  // Proyectos accesibles (propio + colaboración) para el switcher.
+  projects: () => unwrap(api.get('/business/projects')),
   // Verificación de propiedad del número de WhatsApp (OTP).
   sendWhatsappCode: (phone) => unwrap(api.post('/business/whatsapp/send-code', { phone })),
   verifyWhatsapp: (code) => unwrap(api.post('/business/whatsapp/verify', { code })),
