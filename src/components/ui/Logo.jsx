@@ -11,32 +11,21 @@ export function LogoMark({ size = 32, className = '' }) {
       className={className}
       aria-hidden="true"
     >
-      <rect width="32" height="32" rx="8.5" fill="url(#bf-grad)" />
-      {/* Brillo superior sutil para dar profundidad (acabado "app icon") */}
-      <rect width="32" height="32" rx="8.5" fill="url(#bf-gloss)" />
-      {/* Burbuja de chat */}
+      {/* Burbuja de chat (círculo + cola inferior izquierda), degradado esmeralda.
+          Fondo transparente → se ve limpia en tema claro y oscuro. */}
+      <g fill="url(#bf-grad)">
+        <circle cx="17" cy="14.8" r="10.8" />
+        <path d="M11 19.5C8.6 23 7.7 26 8.2 27.8C10.8 26.2 13.2 24.8 15.2 23.2Z" />
+      </g>
+      {/* Destello de IA (estrella cóncava de 4 puntas) centrado en la burbuja */}
       <path
-        d="M9 11.5A2.5 2.5 0 0 1 11.5 9h9A2.5 2.5 0 0 1 23 11.5v5a2.5 2.5 0 0 1-2.5 2.5H14l-3.6 3v-3h-.4A2.5 2.5 0 0 1 9 16.5z"
-        fill="white"
-        fillOpacity="0.96"
-      />
-      {/* Destello de IA centrado en la burbuja */}
-      <path
-        d="M16 9.6c.4 2.6 1.8 4 4.4 4.4-2.6.4-4 1.8-4.4 4.4-.4-2.6-1.8-4-4.4-4.4 2.6-.4 4-1.8 4.4-4.4Z"
-        fill="url(#bf-spark)"
+        d="M17 7.4C17.6 12.3 19.6 14.3 24.5 14.9C19.6 15.5 17.6 17.5 17 22.4C16.4 17.5 14.4 15.5 9.5 14.9C14.4 14.3 16.4 12.3 17 7.4Z"
+        fill="#fbfaf5"
       />
       <defs>
-        <linearGradient id="bf-grad" x1="0" y1="0" x2="32" y2="32">
-          <stop stopColor="#12a97f" />
-          <stop offset="1" stopColor="#0c6f55" />
-        </linearGradient>
-        <linearGradient id="bf-gloss" x1="16" y1="0" x2="16" y2="20">
-          <stop stopColor="#ffffff" stopOpacity="0.18" />
-          <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
-        </linearGradient>
-        <linearGradient id="bf-spark" x1="12" y1="10" x2="20" y2="18">
-          <stop stopColor="#10a074" />
-          <stop offset="1" stopColor="#0b6d52" />
+        <linearGradient id="bf-grad" x1="7" y1="5" x2="27" y2="27" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#22b98a" />
+          <stop offset="1" stopColor="#0a6b4f" />
         </linearGradient>
       </defs>
     </svg>

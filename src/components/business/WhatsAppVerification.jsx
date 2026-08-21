@@ -14,6 +14,7 @@ import { Icon } from '../ui/Icon.jsx';
  */
 export function WhatsAppVerification() {
   const business = useBusinessStore((s) => s.business);
+  const smsEnabled = useBusinessStore((s) => s.smsEnabled);
   const verified = Boolean(business?.whatsappVerified && business?.whatsappNumber);
 
   const [phone, setPhone] = useState(business?.whatsappNumber || '');
@@ -61,6 +62,23 @@ export function WhatsAppVerification() {
     } finally {
       setVerifying(false);
     }
+  }
+
+  // Sin proveedor de SMS y sin número ya verificado: el número se confirma al
+  // conectar WhatsApp con Meta, así que mostramos una nota en vez del formulario.
+  if (!smsEnabled && !verified) {
+    return (
+      <Card>
+        <div className="mb-1 flex items-center gap-2">
+          <Icon name="message" size={18} className="text-brand-600" />
+          <h2 className="font-semibold text-fg">Número de WhatsApp del bot</h2>
+        </div>
+        <p className="text-sm text-muted">
+          Tu número quedará confirmado y dedicado al bot cuando conectes WhatsApp con la API de
+          Meta. Estamos habilitando la conexión; muy pronto podrás vincular tu número aquí.
+        </p>
+      </Card>
+    );
   }
 
   return (

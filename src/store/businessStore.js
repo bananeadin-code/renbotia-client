@@ -14,18 +14,20 @@ export const useBusinessStore = create((set, get) => ({
   role: null, // rol del usuario en el negocio: 'owner' | 'colaborador'
   hasBusiness: null, // null = aún no se sabe
   projects: [], // [{ id, name, role }]
+  smsEnabled: false, // ¿hay proveedor de SMS para verificar el número?
   loading: false,
 
   async load(_retry = false) {
     set({ loading: true });
     try {
-      const [{ business, role }, subData] = await Promise.all([
+      const [{ business, role, smsEnabled }, subData] = await Promise.all([
         businessApi.me(),
         subscriptionApi.me(),
       ]);
       set({
         business,
         role,
+        smsEnabled: Boolean(smsEnabled),
         subscription: subData.subscription,
         balance: subData.balance,
         hasBusiness: true,
