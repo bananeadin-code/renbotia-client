@@ -9,6 +9,21 @@ import { Icon } from '../../components/ui/Icon.jsx';
 
 const INVITE_KEY = 'renbotia:inviteToken';
 
+const readStoredToken = () => {
+  try {
+    return localStorage.getItem(INVITE_KEY) || '';
+  } catch {
+    return '';
+  }
+};
+const clearStoredToken = () => {
+  try {
+    localStorage.removeItem(INVITE_KEY);
+  } catch {
+    /* noop */
+  }
+};
+
 /**
  * Aceptar una invitación a colaborar. Si el usuario está autenticado, acepta al
  * instante; si no, guarda el token y lo manda a iniciar sesión / crear cuenta con
@@ -16,7 +31,9 @@ const INVITE_KEY = 'renbotia:inviteToken';
  */
 export default function AcceptInvitation() {
   const [params] = useSearchParams();
-  const token = params.get('token') || '';
+  // El token puede venir en la URL o, si se perdió al iniciar sesión (2FA), del
+  // localStorage donde lo guardamos antes de mandar a autenticarse.
+  const token = params.get('token') || readStoredToken();
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const loadBusiness = useBusinessStore((s) => s.load);
@@ -35,7 +52,7 @@ export default function AcceptInvitation() {
       return;
     }
     if (!isAuthenticated) {
-      // Guarda el token para retomar tras autenticarse.
+      // Guarda el token para retomar tras autenticarse (login con 2FA, registro…).
       try {
         localStorage.setItem(INVITE_KEY, token);
       } catch {
@@ -49,12 +66,14 @@ export default function AcceptInvitation() {
     membersApi
       .accept(token)
       .then(async (res) => {
+        // El aceptar YA fue exitoso: limpiamos el token y NO dejamos que un fallo
+        // al recargar el negocio lo convierta en error (la invitación ya se usó).
+        clearStoredToken();
         try {
-          localStorage.removeItem(INVITE_KEY);
+          await loadBusiness();
         } catch {
-          /* noop */
+          /* no bloquea: ya eres miembro; el panel recargará al entrar */
         }
-        await loadBusiness();
         setMessage(`Te uniste a ${res.businessName || 'el negocio'}.`);
         setStatus('done');
       })

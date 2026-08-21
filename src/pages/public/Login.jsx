@@ -18,7 +18,11 @@ export default function Login() {
   // Paso pendiente: 2FA de login o verificación de correo (registrado sin verificar).
   const [pending, setPending] = useState(null); // { mode, email, devCode? }
 
-  const from = location.state?.from?.pathname || '/dashboard';
+  // Preserva la ruta COMPLETA de origen (incluye ?token=… de una invitación).
+  const fromState = location.state?.from;
+  const from = fromState
+    ? `${fromState.pathname}${fromState.search || ''}`
+    : '/dashboard';
 
   async function handleSubmit(e) {
     e.preventDefault();
