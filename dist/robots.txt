@@ -8,4 +8,4 @@ Disallow: /login
 Disallow: /registro
 Disallow: /recuperar
 
-Sitemap: https://www.renbotia.com/sitemap.xml
+Sitemap: https://renbotia.com/sitemap.xml

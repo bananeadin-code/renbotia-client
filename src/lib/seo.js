@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 
-// Dominio público del sitio. CÁMBIALO por el definitivo cuando compres el .com
-// (también aparece en index.html, sitemap.xml y robots.txt).
-export const SITE_URL = 'https://www.renbotia.com';
+// Dominio público del sitio (definitivo). También aparece en index.html,
+// sitemap.xml y robots.txt.
+export const SITE_URL = 'https://renbotia.com';
 export const SITE_NAME = 'RenBotIA';
 
 // URL de tu Google Business Profile (perfil de empresa en Google/Maps). Pégala

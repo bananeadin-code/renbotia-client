@@ -17,8 +17,28 @@ const INDUSTRIES = [
 ];
 
 export default function Profile() {
-  const { user } = useAuthStore();
+  const { user, updateUser } = useAuthStore();
   const { business } = useBusinessStore();
+
+  // Verificación en dos pasos (2FA por correo)
+  const [twoFA, setTwoFA] = useState(Boolean(user?.twoFactorEnabled));
+  const [savingTwoFA, setSavingTwoFA] = useState(false);
+
+  async function toggleTwoFA(next) {
+    const prev = twoFA;
+    setTwoFA(next); // optimista
+    setSavingTwoFA(true);
+    try {
+      const { user: updated } = await authApi.setTwoFactor(next);
+      updateUser({ twoFactorEnabled: updated.twoFactorEnabled });
+      toast.success(next ? 'Verificación en dos pasos activada.' : 'Verificación en dos pasos desactivada.');
+    } catch (err) {
+      setTwoFA(prev); // revertir si falla
+      toast.error(err.response?.data?.message || 'No se pudo actualizar.');
+    } finally {
+      setSavingTwoFA(false);
+    }
+  }
 
   // Datos del negocio
   const [biz, setBiz] = useState({
@@ -52,12 +72,8 @@ export default function Profile() {
   async function requestPasswordChange() {
     setPwMsg('');
     try {
-      const data = await authApi.forgotPassword(user.email);
-      setPwMsg(
-        data?.resetToken
-          ? 'Se generó un enlace de recuperación (simulado). Ve a "Recuperar contraseña" para fijar una nueva.'
-          : 'Se generó un enlace de recuperación (simulado).'
-      );
+      await authApi.forgotPassword(user.email);
+      setPwMsg('Te enviamos un enlace a tu correo para elegir una nueva contraseña.');
     } catch {
       setPwMsg('No se pudo iniciar el cambio de contraseña.');
     }
@@ -120,11 +136,40 @@ export default function Profile() {
       {/* Bitácora de auditoría */}
       <ActivityLog />
 
+      {/* Seguridad: verificación en dos pasos */}
+      <Card>
+        <h2 className="mb-1 font-semibold text-fg">Verificación en dos pasos</h2>
+        <p className="mb-4 text-sm text-muted">
+          Al iniciar sesión con correo y contraseña te pediremos un código de 6 dígitos enviado a tu
+          correo. (No aplica al entrar con Google.)
+        </p>
+        <div className="flex items-center justify-between gap-4 rounded-lg border border-line bg-surface2 px-4 py-3">
+          <span className="text-sm font-medium text-fg">{twoFA ? 'Activada' : 'Desactivada'}</span>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={twoFA}
+            aria-label="Verificación en dos pasos"
+            disabled={savingTwoFA}
+            onClick={() => toggleTwoFA(!twoFA)}
+            className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition disabled:opacity-50 ${
+              twoFA ? 'bg-brand-600' : 'border border-line bg-canvas'
+            }`}
+          >
+            <span
+              className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition ${
+                twoFA ? 'translate-x-5' : 'translate-x-0.5'
+              }`}
+            />
+          </button>
+        </div>
+      </Card>
+
       {/* Contraseña */}
       <Card>
         <h2 className="mb-2 font-semibold text-fg">Contraseña</h2>
         <p className="text-sm text-muted">
-          Iniciamos un flujo de cambio de contraseña (simulado, sin email real).
+          Te enviaremos un enlace a tu correo para elegir una nueva contraseña.
         </p>
         {pwMsg && (
           <div className="mt-3">

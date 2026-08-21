@@ -141,6 +141,78 @@ export const POSTS = [
       },
     ],
   },
+  {
+    slug: 'whatsapp-negocios-durango-guia-local',
+    title: 'WhatsApp para negocios en Durango: atiende mejor sin contratar más personal',
+    description:
+      'Los negocios locales de Durango compiten hoy con marcas de todo el país. Así puedes dar atención inmediata por WhatsApp con un asistente de IA, sin crecer tu equipo.',
+    date: '2026-08-11',
+    readingMin: 6,
+    tags: ['WhatsApp', 'Durango', 'Negocios locales'],
+    body: [
+      {
+        type: 'p',
+        text: 'En Durango, como en el resto del país, la mayoría de los clientes prefieren escribir por WhatsApp antes que llamar. El problema no es la falta de mensajes: es alcanzar a responderlos todos, a tiempo y sin descuidar el negocio. Un asistente con inteligencia artificial atiende esas conversaciones al instante, aunque tengas el local lleno o ya hayas cerrado.',
+      },
+      { type: 'h2', text: 'La cercanía es tu ventaja, si respondes a tiempo' },
+      {
+        type: 'p',
+        text: 'Un negocio local compite con cadenas nacionales que invierten fuerte en publicidad, pero tiene algo que ellas hacen mal: el trato cercano y la respuesta rápida. Cuando un cliente escribe y le contestan en segundos, con información correcta y en su mismo idioma, la experiencia se siente personal. Automatizar tu WhatsApp no te quita esa cercanía: la vuelve constante, a cualquier hora.',
+      },
+      { type: 'h2', text: 'Qué puede atender el asistente por ti' },
+      {
+        type: 'ul',
+        items: [
+          'Responder precios, horarios, ubicación y servicios con la información real de tu negocio.',
+          'Agendar citas o tomar reservaciones revisando tu disponibilidad.',
+          'Registrar prospectos y dejártelos organizados para dar seguimiento.',
+          'Pasar la conversación a una persona cuando el caso lo amerita.',
+        ],
+      },
+      { type: 'h2', text: 'Empezar es más simple de lo que parece' },
+      {
+        type: 'p',
+        text: 'No necesitas conocimientos técnicos. Cargas tus preguntas frecuentes y los datos de tu negocio, eliges el tono con el que quieres que hable y lo pruebas en un simulador antes de conectarlo a WhatsApp real. Con RenBotIA puedes empezar gratis y ver cómo responde con tu propia información, desde Durango o donde estés.',
+      },
+    ],
+  },
+  {
+    slug: 'responder-whatsapp-fuera-de-horario',
+    title: 'Cómo responder los WhatsApp que llegan fuera de horario (sin perder al cliente)',
+    description:
+      'La mayoría de los mensajes que se pierden llegan de noche o en fin de semana. Un asistente de IA los atiende al instante y te deja al cliente listo para el día siguiente.',
+    date: '2026-08-18',
+    readingMin: 5,
+    tags: ['WhatsApp', 'Atención al cliente', 'Automatización'],
+    body: [
+      {
+        type: 'p',
+        text: 'Piensa en cuántos mensajes te llegan cuando ya cerraste: en la noche, un domingo, o mientras estás atendiendo a alguien más. Muchos de esos clientes no esperan: si nadie contesta, buscan a la competencia. Ahí es donde más ventas se escapan, y casi nunca te enteras.',
+      },
+      { type: 'h2', text: 'El silencio también comunica (algo malo)' },
+      {
+        type: 'p',
+        text: 'Cuando un cliente escribe y no recibe respuesta en un rato, la percepción es que el negocio está desatendido, aunque no sea cierto. Una respuesta inmediata —aunque sea para decir "con gusto te ayudo, ¿qué necesitas?"— mantiene viva la conversación y la intención de compra.',
+      },
+      { type: 'h2', text: 'Un asistente que nunca duerme' },
+      {
+        type: 'p',
+        text: 'Un bot de WhatsApp con IA responde 24/7 con la información de tu negocio: resuelve la duda al instante, agenda si hace falta y registra al cliente para que al día siguiente tú solo cierres. No es una respuesta automática fría de "te contestaremos pronto": entiende lo que preguntan y responde con criterio y tu tono.',
+      },
+      {
+        type: 'ul',
+        items: [
+          'Atiende de noche y en fines de semana sin costo de personal extra.',
+          'Evita que el cliente se vaya con la competencia por falta de respuesta.',
+          'Te deja el seguimiento organizado para el horario laboral.',
+        ],
+      },
+      {
+        type: 'p',
+        text: 'Con RenBotIA puedes tener esto funcionando en minutos y probarlo gratis en el simulador antes de conectarlo a tu WhatsApp. Deja de perder a los clientes que escriben cuando no puedes responder.',
+      },
+    ],
+  },
 ];
 
 export function getPost(slug) {

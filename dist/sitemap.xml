@@ -2,74 +2,74 @@
 <!-- RenBotIA — sitemap. Cambia el dominio por el definitivo cuando lo compres. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://www.renbotia.com/</loc>
+    <loc>https://renbotia.com/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://www.renbotia.com/precios</loc>
+    <loc>https://renbotia.com/precios</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.renbotia.com/blog</loc>
+    <loc>https://renbotia.com/blog</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.renbotia.com/soluciones</loc>
+    <loc>https://renbotia.com/soluciones</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.renbotia.com/soluciones/despachos-legales</loc>
+    <loc>https://renbotia.com/soluciones/despachos-legales</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.renbotia.com/soluciones/despachos-contables</loc>
+    <loc>https://renbotia.com/soluciones/despachos-contables</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.renbotia.com/soluciones/consultoras</loc>
+    <loc>https://renbotia.com/soluciones/consultoras</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.renbotia.com/soluciones/agencias-marketing</loc>
+    <loc>https://renbotia.com/soluciones/agencias-marketing</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.renbotia.com/soluciones/restaurantes</loc>
+    <loc>https://renbotia.com/soluciones/restaurantes</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.renbotia.com/privacidad</loc>
+    <loc>https://renbotia.com/privacidad</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://www.renbotia.com/terminos</loc>
+    <loc>https://renbotia.com/terminos</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://www.renbotia.com/blog/automatizar-atencion-whatsapp-negocio</loc>
+    <loc>https://renbotia.com/blog/automatizar-atencion-whatsapp-negocio</loc>
     <lastmod>2026-07-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.renbotia.com/blog/senales-negocio-necesita-bot-whatsapp</loc>
+    <loc>https://renbotia.com/blog/senales-negocio-necesita-bot-whatsapp</loc>
     <lastmod>2026-07-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.renbotia.com/blog/atencion-cliente-whatsapp-pymes-mexico</loc>
+    <loc>https://renbotia.com/blog/atencion-cliente-whatsapp-pymes-mexico</loc>
     <lastmod>2026-08-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
