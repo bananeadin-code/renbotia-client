@@ -175,15 +175,20 @@ export default function Management() {
         </TabButton>
       </div>
 
-      {moduleOff && tab === 'records' && (
+      {moduleOff && tab !== 'config' && (
         <div className="mt-4">
-          <Alert variant="warning">
-            El módulo está desactivado: el bot no captará trabajo hasta que lo actives en{' '}
-            <button className="font-semibold underline" onClick={() => setTab('config')}>
-              Disponibilidad
-            </button>
-            . Puedes seguir gestionando registros manualmente.
-          </Alert>
+          <div className="flex flex-col gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-2.5">
+              <Icon name="alert" size={18} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                <strong>El módulo está desactivado.</strong> El bot no captará citas ni pedidos
+                hasta que lo actives. (Puedes seguir gestionando registros a mano.)
+              </p>
+            </div>
+            <Button variant="secondary" className="shrink-0" onClick={() => setTab('config')}>
+              Activar módulo
+            </Button>
+          </div>
         </div>
       )}
 

@@ -41,7 +41,10 @@ export function RenChat({
   sendFn,
   cta,
   onClose,
-  heightClass = 'h-[54vh] max-h-[460px]',
+  // Altura del PANEL (no del área de mensajes): siempre cabe en la pantalla para
+  // que no se desborde hacia arriba. El área de mensajes flexiona y hace scroll.
+  // (Tailwind: los espacios dentro de calc() se escriben con guion bajo.)
+  heightClass = 'h-[min(560px,calc(100dvh_-_7rem))]',
 }) {
   const [messages, setMessages] = useState(
     () => loadConversation() || [{ role: 'assistant', content: welcome, time: now() }]
@@ -88,7 +91,9 @@ export function RenChat({
   }
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-3xl border border-line bg-surface shadow-[0_24px_60px_-15px_rgba(0,0,0,0.45)] ring-1 ring-black/5">
+    <div
+      className={`flex flex-col overflow-hidden rounded-3xl border border-line bg-surface shadow-[0_24px_60px_-15px_rgba(0,0,0,0.45)] ring-1 ring-black/5 ${heightClass}`}
+    >
       {/* Cabecera de marca (identidad de Ren) */}
       <div className="flex items-center gap-3 bg-gradient-to-br from-brand-500 to-brand-700 px-4 py-3 text-white">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/95 shadow-sm">
@@ -116,7 +121,7 @@ export function RenChat({
       </div>
 
       {/* Mensajes (burbujas modernas sobre fondo limpio con resplandor) */}
-      <div ref={scrollRef} className={`ren-chat-bg flex-1 space-y-3 overflow-y-auto p-4 ${heightClass}`}>
+      <div ref={scrollRef} className="ren-chat-bg flex-1 min-h-0 space-y-3 overflow-y-auto p-4">
         {messages.map((m, i) => {
           const mine = m.role === 'user';
           return (

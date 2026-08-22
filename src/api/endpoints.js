@@ -21,6 +21,7 @@ export const authApi = {
   verify2fa: (body) => unwrap(api.post('/auth/verify-2fa', body)),
   resendCode: (body) => unwrap(api.post('/auth/resend-code', body)),
   setTwoFactor: (enabled) => unwrap(api.patch('/auth/2fa', { enabled })),
+  updateProfile: (name) => unwrap(api.patch('/auth/profile', { name })),
 };
 
 export const onboardingApi = {

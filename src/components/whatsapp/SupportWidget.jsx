@@ -71,6 +71,11 @@ export function SupportWidget({ mobileRaised = false }) {
 
   const fabPos = mobileRaised ? 'bottom-24 sm:bottom-5' : 'bottom-5';
   const panelPos = mobileRaised ? 'bottom-40 sm:bottom-24' : 'bottom-24';
+  // Altura del panel según el offset inferior, para que SIEMPRE quepa en pantalla
+  // (móvil elevado deja más espacio abajo). Guion bajo = espacio dentro de calc().
+  const panelHeight = mobileRaised
+    ? 'h-[min(560px,calc(100dvh_-_11rem))] sm:h-[min(560px,calc(100dvh_-_7rem))]'
+    : 'h-[min(560px,calc(100dvh_-_7rem))]';
 
   return (
     <>
@@ -91,6 +96,7 @@ export function SupportWidget({ mobileRaised = false }) {
               sendFn={siteAssistantApi.send}
               cta={SITE_CTA}
               onClose={() => setOpen(false)}
+              heightClass={panelHeight}
             />
           </div>
         </>

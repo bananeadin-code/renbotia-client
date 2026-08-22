@@ -20,6 +20,24 @@ export default function Profile() {
   const { user, updateUser } = useAuthStore();
   const { business } = useBusinessStore();
 
+  // Datos personales (nombre editable)
+  const [name, setName] = useState(user?.name || '');
+  const [savingName, setSavingName] = useState(false);
+
+  async function saveName(e) {
+    e.preventDefault();
+    setSavingName(true);
+    try {
+      const { user: updated } = await authApi.updateProfile(name.trim());
+      updateUser({ name: updated.name });
+      toast.success('Nombre actualizado.');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'No se pudo actualizar.');
+    } finally {
+      setSavingName(false);
+    }
+  }
+
   // Verificación en dos pasos (2FA por correo)
   const [twoFA, setTwoFA] = useState(Boolean(user?.twoFactorEnabled));
   const [savingTwoFA, setSavingTwoFA] = useState(false);
@@ -86,14 +104,31 @@ export default function Profile() {
       {/* Datos personales */}
       <Card>
         <h2 className="mb-4 font-semibold text-fg">Datos personales</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Input label="Nombre" value={user?.name || ''} disabled />
-          <Input label="Email" value={user?.email || ''} disabled />
-        </div>
-        <p className="mt-3 text-xs text-subtle">
-          La edición del nombre/email se habilitará más adelante. Rol actual:{' '}
-          <span className="font-medium">{user?.role}</span>.
-        </p>
+        <form onSubmit={saveName} className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input
+              label="Nombre"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              minLength={2}
+              maxLength={80}
+              required
+            />
+            <Input label="Email" value={user?.email || ''} disabled />
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-xs text-subtle">
+              El correo es tu identidad de acceso y no se cambia por aquí. Rol:{' '}
+              <span className="font-medium">{user?.role}</span>.
+            </p>
+            <Button
+              type="submit"
+              disabled={savingName || !name.trim() || name.trim() === (user?.name || '')}
+            >
+              {savingName ? 'Guardando…' : 'Guardar'}
+            </Button>
+          </div>
+        </form>
       </Card>
 
       {/* Datos del negocio */}

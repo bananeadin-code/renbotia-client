@@ -78,9 +78,12 @@ api.interceptors.response.use(
           original.headers.Authorization = `Bearer ${newToken}`;
           return api(original);
         }
-      } catch {
-        // El refresh falló: la sesión expiró de verdad.
-        setAccessToken(null);
+      } catch (refreshErr) {
+        // Solo cerramos sesión si el refresh fue rechazado por AUTENTICACIÓN
+        // (401/403). Un 429 (rate limit) o un error de red son transitorios y NO
+        // deben desconectar al usuario.
+        const rs = refreshErr.response?.status;
+        if (rs === 401 || rs === 403) setAccessToken(null);
       }
     }
     return Promise.reject(error);

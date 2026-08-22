@@ -82,13 +82,15 @@ export function AvailabilityConfig({ config, onSaved }) {
     <div className="space-y-4">
       {msg && <Alert variant={msg.variant}>{msg.text}</Alert>}
 
-      {/* Activación + tipos */}
-      <Card>
+      {/* Activación + tipos. Cuando está apagado, la tarjeta se resalta para que
+          quede claro que hay que activar el módulo. */}
+      <Card className={form.enabled ? '' : 'border-amber-500/40 ring-1 ring-amber-500/20'}>
         <label className="flex cursor-pointer items-center justify-between gap-4">
           <div>
             <div className="font-semibold text-fg">Módulo de Gestión activo</div>
             <div className="text-sm text-muted">
-              Cuando está activo, el bot puede consultar disponibilidad y registrar trabajo.
+              Cuando está activo, el bot puede consultar disponibilidad y registrar trabajo (citas,
+              pedidos, prospectos).
             </div>
           </div>
           <Toggle checked={form.enabled} onChange={(v) => set({ enabled: v })} />
