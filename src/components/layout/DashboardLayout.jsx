@@ -48,7 +48,12 @@ export function DashboardLayout() {
   }
   // Los colaboradores no ven Facturación (es solo del dueño).
   if (role === 'colaborador') nav = nav.filter((n) => n.to !== '/dashboard/facturacion');
-  if (user?.role === 'admin') nav = [...nav, { to: '/dashboard/admin', label: 'Admin', icon: 'shield' }];
+  if (user?.role === 'admin')
+    nav = [
+      ...nav,
+      { to: '/dashboard/asistente-sitio', label: 'Asistente del sitio', icon: 'message' },
+      { to: '/dashboard/admin', label: 'Admin', icon: 'shield' },
+    ];
 
   async function handleLogout() {
     await logout();

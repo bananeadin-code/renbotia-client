@@ -42,6 +42,7 @@ const Billing = lazy(() => import('./pages/dashboard/Billing.jsx'));
 const Profile = lazy(() => import('./pages/dashboard/Profile.jsx'));
 const Team = lazy(() => import('./pages/dashboard/Team.jsx'));
 const AdminPanel = lazy(() => import('./pages/admin/AdminPanel.jsx'));
+const SiteAssistant = lazy(() => import('./pages/dashboard/SiteAssistant.jsx'));
 
 function RouteFallback() {
   return (
@@ -113,6 +114,14 @@ export default function App() {
           element={
             <ProtectedRoute role="admin">
               <AdminPanel />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="asistente-sitio"
+          element={
+            <ProtectedRoute role="admin">
+              <SiteAssistant />
             </ProtectedRoute>
           }
         />

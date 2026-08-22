@@ -72,6 +72,14 @@ export const demoApi = {
   send: (message, history = []) => unwrap(api.post('/demo/message', { message, history })),
 };
 
+export const siteAssistantApi = {
+  // Asistente del sitio (widget flotante). Público + admin.
+  getConfig: () => unwrap(api.get('/site-assistant/config')),
+  send: (message, history = []) => unwrap(api.post('/site-assistant/message', { message, history })),
+  adminGet: () => unwrap(api.get('/admin/site-assistant')),
+  adminUpdate: (body) => unwrap(api.put('/admin/site-assistant', body)),
+};
+
 export const billingApi = {
   // Pago embebido (PaymentElement, sin redirect). createIntent crea el
   // PaymentIntent; confirm lo verifica y entrega el plan/créditos.
