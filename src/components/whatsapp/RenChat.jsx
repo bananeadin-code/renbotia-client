@@ -20,6 +20,20 @@ import { Icon } from '../ui/Icon.jsx';
  */
 const now = () => new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
 
+// La conversación con Ren persiste en el navegador para que CONTINÚE al cambiar
+// de página o recargar. Solo se restaura si hubo conversación real (algún mensaje
+// del usuario); así un cambio en el mensaje de bienvenida no queda "atrapado".
+const STORAGE_KEY = 'ren:conversation';
+function loadConversation() {
+  try {
+    const arr = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+    if (Array.isArray(arr) && arr.some((m) => m.role === 'user')) return arr;
+  } catch {
+    /* sin persistencia disponible */
+  }
+  return null;
+}
+
 export function RenChat({
   name = 'Ren',
   welcome,
@@ -29,16 +43,30 @@ export function RenChat({
   onClose,
   heightClass = 'h-[54vh] max-h-[460px]',
 }) {
-  const [messages, setMessages] = useState([{ role: 'assistant', content: welcome, time: now() }]);
+  const [messages, setMessages] = useState(
+    () => loadConversation() || [{ role: 'assistant', content: welcome, time: now() }]
+  );
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [userTurns, setUserTurns] = useState(0);
   const scrollRef = useRef(null);
+
+  // Cuántos mensajes ha enviado el usuario (deriva de los mensajes → sirve para
+  // mostrar las sugerencias iniciales y el CTA; funciona bien con la persistencia).
+  const userTurns = messages.filter((m) => m.role === 'user').length;
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, loading]);
+
+  // Guarda la conversación (acotada a los últimos 40 mensajes) ante cada cambio.
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-40)));
+    } catch {
+      /* noop */
+    }
+  }, [messages]);
 
   async function send(text) {
     const msg = (text ?? input).trim();
@@ -48,7 +76,6 @@ export function RenChat({
     const userMsg = { role: 'user', content: msg, time: now() };
     setMessages((m) => [...m, userMsg]);
     setLoading(true);
-    setUserTurns((c) => c + 1);
     try {
       const history = [...messages, userMsg].map((m) => ({ role: m.role, content: m.content }));
       const data = await sendFn(msg, history.slice(-8));
