@@ -279,6 +279,15 @@
   }
 }
 
+/* Fondo MODERNO del chat de Ren (NO tipo WhatsApp): superficie limpia con un
+   sutil resplandor de marca arriba. Contrasta con el fondo del sitio para que el
+   panel se vea como un componente que flota, no empalmado. */
+.ren-chat-bg {
+  background:
+    radial-gradient(130% 80% at 50% 0%, rgb(var(--glow) / 0.1), transparent 60%),
+    rgb(var(--surface-2));
+}
+
 /* Fondo tipo WhatsApp para el simulador (se mantiene en ambos temas) */
 .wa-chat-bg {
   background-color: #efeae2;

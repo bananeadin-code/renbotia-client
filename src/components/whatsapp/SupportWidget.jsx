@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { DemoChat } from './DemoChat.jsx';
+import { RenChat } from './RenChat.jsx';
 import { siteAssistantApi } from '../../api/endpoints.js';
 import { LogoMark } from '../ui/Logo.jsx';
 import { Icon } from '../ui/Icon.jsx';
@@ -72,50 +72,28 @@ export function SupportWidget({ mobileRaised = false }) {
   const fabPos = mobileRaised ? 'bottom-24 sm:bottom-5' : 'bottom-5';
   const panelPos = mobileRaised ? 'bottom-40 sm:bottom-24' : 'bottom-24';
 
-  // Cabecera de marca de Ren (reemplaza el header genérico del chat).
-  const header = (
-    <div className="flex items-center gap-3 bg-gradient-to-br from-brand-500 to-brand-700 px-4 py-3 text-white">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/95 shadow-sm">
-        <LogoMark size={26} />
-      </span>
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5">
-          <span className="font-bold leading-none">{name}</span>
-          <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
-            IA
-          </span>
-        </div>
-        <div className="mt-1 flex items-center gap-1.5 text-xs text-white/85">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
-          Asistente de RenBotIA · En línea
-        </div>
-      </div>
-      <button
-        onClick={() => setOpen(false)}
-        aria-label="Cerrar"
-        className="rounded-lg p-1 text-white/80 transition hover:bg-white/15 hover:text-white"
-      >
-        <Icon name="x" size={20} />
-      </button>
-    </div>
-  );
-
   return (
     <>
-      {/* Panel del asistente */}
+      {/* Panel del asistente + fondo oscurecido en móvil (para que no se confunda
+          con el sitio). En escritorio flota en la esquina sin scrim. */}
       {open && (
-        <div className={`ren-pop-in fixed right-4 z-50 w-[min(94vw,400px)] sm:right-6 ${panelPos}`}>
-          <DemoChat
-            heightClass="h-[54vh] max-h-[460px]"
-            botName={name}
-            welcome={cfg.welcomeMessage}
-            starters={cfg.quickReplies || []}
-            sendFn={siteAssistantApi.send}
-            cta={SITE_CTA}
-            header={header}
-            inputLabel={`Escríbele a ${name}`}
+        <>
+          <button
+            aria-label="Cerrar asistente"
+            onClick={() => setOpen(false)}
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm sm:hidden"
           />
-        </div>
+          <div className={`ren-pop-in fixed right-4 z-50 w-[min(94vw,400px)] sm:right-6 ${panelPos}`}>
+            <RenChat
+              name={name}
+              welcome={cfg.welcomeMessage}
+              starters={cfg.quickReplies || []}
+              sendFn={siteAssistantApi.send}
+              cta={SITE_CTA}
+              onClose={() => setOpen(false)}
+            />
+          </div>
+        </>
       )}
 
       {/* Teaser tipo anuncio (una vez por sesión) */}
