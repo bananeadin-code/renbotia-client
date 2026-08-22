@@ -10,6 +10,7 @@ import { Reveal } from '../../components/ui/Reveal.jsx';
 import { AnnouncementBar } from '../../components/landing/AnnouncementBar.jsx';
 import { Faq, FAQS } from '../../components/landing/Faq.jsx';
 import { StickyMobileCTA } from '../../components/landing/StickyMobileCTA.jsx';
+import { SupportWidget } from '../../components/whatsapp/SupportWidget.jsx';
 import { useSeo, SITE_URL } from '../../lib/seo.js';
 
 // Datos estructurados FAQPage: Google puede mostrar estas preguntas directo en
@@ -253,6 +254,7 @@ export default function Landing() {
 
       <PublicFooter />
       <StickyMobileCTA />
+      <SupportWidget mobileRaised />
     </div>
   );
 }

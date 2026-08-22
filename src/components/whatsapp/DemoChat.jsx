@@ -39,6 +39,8 @@ export function DemoChat({
   starters = STARTERS,
   sendFn = demoApi.send,
   cta = DEMO_CTA,
+  header = null,
+  inputLabel = 'Mensaje para el bot de ejemplo',
 }) {
   const [messages, setMessages] = useState([{ role: 'assistant', content: welcome, time: now() }]);
   const [input, setInput] = useState('');
@@ -73,7 +75,7 @@ export function DemoChat({
 
   return (
     <div className={`flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-pop ${className}`}>
-      <ChatHeader botName={botName} typing={loading} />
+      {header || <ChatHeader botName={botName} typing={loading} />}
 
       <div ref={scrollRef} className={`wa-chat-bg flex-1 space-y-2 overflow-y-auto p-4 ${heightClass}`}>
         {messages.map((m, i) => (
@@ -125,7 +127,7 @@ export function DemoChat({
           placeholder="Escribe un mensaje…"
           maxLength={500}
           className="min-w-0 flex-1 rounded-full border border-line bg-canvas px-4 py-2 text-sm text-fg outline-none placeholder:text-subtle focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25"
-          aria-label="Mensaje para el bot de ejemplo"
+          aria-label={inputLabel}
         />
         <button
           type="submit"
