@@ -26,6 +26,26 @@ export const FAQS = [
     q: '¿Puedo cambiar el tono o las respuestas después?',
     a: 'Cuando quieras. Desde el panel de entrenamiento editas FAQs, tono e información, guardas y lo pruebas al instante en el simulador.',
   },
+  {
+    q: '¿Hay un plan gratis?',
+    a: 'Sí. El plan Free incluye 50,000 tokens para que pruebes tu bot sin tarjeta ni límite de días. Cuando lo necesites, subes a Pro o Elite, o compras paquetes de créditos extra.',
+  },
+  {
+    q: '¿En cuánto tiempo queda listo mi bot?',
+    a: 'En minutos. Cargas tus preguntas frecuentes y los datos de tu negocio, eliges el tono y lo pruebas en el simulador. No necesitas conocimientos técnicos ni instalar nada.',
+  },
+  {
+    q: '¿El bot atiende las 24 horas, incluso fuera de mi horario?',
+    a: 'Sí. Responde al instante a cualquier hora, de día o de madrugada, en fines de semana y días festivos, con la información de tu negocio y sin que tengas que estar pendiente del teléfono.',
+  },
+  {
+    q: '¿Puede agendar citas o registrar pedidos?',
+    a: 'Sí, con el plan Elite. El módulo de gestión permite que el bot revise tu disponibilidad real, agende citas, tome reservaciones o registre prospectos, y te los deje organizados.',
+  },
+  {
+    q: '¿Están seguros los datos de mi negocio y de mis clientes?',
+    a: 'Sí. Cada cuenta está aislada y tu información solo se usa para que tu bot responda. Puedes consultar nuestro Aviso de Privacidad, alineado con la ley mexicana (LFPDPPP).',
+  },
 ];
 
 function FaqItem({ item, open, onToggle }) {

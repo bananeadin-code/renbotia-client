@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { useAuthStore } from './store/authStore.js';
 import { useThemeStore } from './store/themeStore.js';
 import { ProtectedRoute } from './router/ProtectedRoute.jsx';
@@ -26,6 +26,7 @@ const Register = lazy(() => import('./pages/public/Register.jsx'));
 const ForgotPassword = lazy(() => import('./pages/public/ForgotPassword.jsx'));
 const ResetPassword = lazy(() => import('./pages/public/ResetPassword.jsx'));
 const AcceptInvitation = lazy(() => import('./pages/public/AcceptInvitation.jsx'));
+const NotFound = lazy(() => import('./pages/public/NotFound.jsx'));
 
 // Onboarding
 const OnboardingWizard = lazy(() => import('./pages/onboarding/OnboardingWizard.jsx'));
@@ -117,7 +118,7 @@ export default function App() {
         />
       </Route>
 
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
     </Suspense>
     <Toaster />

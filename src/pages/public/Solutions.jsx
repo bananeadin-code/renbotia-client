@@ -13,7 +13,7 @@ export default function Solutions() {
     description:
       'Bots de WhatsApp con IA para despachos legales, contadores, consultoras, agencias y restaurantes en México. Encuentra la solución para tu sector.',
     path: '/soluciones',
-    image: `${SITE_URL}/og-cover.svg`,
+    image: `${SITE_URL}/og-cover.png`,
   });
 
   return (

@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import { PublicNav, PublicFooter } from '../../components/layout/PublicNav.jsx';
 import { Button } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
+import { Breadcrumbs } from '../../components/ui/Breadcrumbs.jsx';
 import { getPost, POSTS } from '../../content/blog.js';
 import { useSeo, SITE_URL } from '../../lib/seo.js';
 
@@ -24,7 +25,7 @@ export default function BlogPost() {
     description: post?.description,
     path: post ? `/blog/${post.slug}` : '/blog',
     type: 'article',
-    image: `${SITE_URL}/og-cover.svg`,
+    image: `${SITE_URL}/og-cover.png`,
     jsonLd: post
       ? {
           '@context': 'https://schema.org',
@@ -35,12 +36,12 @@ export default function BlogPost() {
           dateModified: post.date,
           inLanguage: 'es-MX',
           mainEntityOfPage: `${SITE_URL}/blog/${post.slug}`,
-          image: `${SITE_URL}/og-cover.svg`,
+          image: `${SITE_URL}/og-cover.png`,
           author: { '@type': 'Organization', name: 'RenBotIA' },
           publisher: {
             '@type': 'Organization',
             name: 'RenBotIA',
-            logo: { '@type': 'ImageObject', url: `${SITE_URL}/og-cover.svg` },
+            logo: { '@type': 'ImageObject', url: `${SITE_URL}/og-cover.png` },
           },
         }
       : undefined,
@@ -68,14 +69,15 @@ export default function BlogPost() {
     <div className="min-h-screen bg-canvas">
       <PublicNav />
       <main className="mx-auto max-w-2xl px-4 py-12 sm:py-16">
-        <Link
-          to="/blog"
-          className="inline-flex items-center gap-1 text-sm font-medium text-muted hover:text-fg"
-        >
-          <Icon name="chevronRight" size={16} className="rotate-180" /> Blog
-        </Link>
+        <Breadcrumbs
+          items={[
+            { name: 'Inicio', to: '/' },
+            { name: 'Blog', to: '/blog' },
+            { name: post.title },
+          ]}
+        />
 
-        <article className="mt-4">
+        <article className="mt-1">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-subtle">
             <span>{fmtDate(post.date)}</span>
             <span aria-hidden="true">·</span>

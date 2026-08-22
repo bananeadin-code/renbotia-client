@@ -23,7 +23,7 @@ export default function Pricing() {
     description:
       'Planes simples y transparentes para tu bot de WhatsApp con IA: empieza gratis y escala a Pro o Elite según tu volumen. Sin contratos, en pesos mexicanos.',
     path: '/precios',
-    image: `${SITE_URL}/og-cover.svg`,
+    image: `${SITE_URL}/og-cover.png`,
   });
 
   useEffect(() => {

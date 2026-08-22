@@ -20,7 +20,7 @@ export default function Blog() {
     description:
       'Guías y consejos prácticos para automatizar la atención por WhatsApp de tu negocio en México: bots con IA, agendado de citas y experiencia del cliente.',
     path: '/blog',
-    image: `${SITE_URL}/og-cover.svg`,
+    image: `${SITE_URL}/og-cover.png`,
     jsonLd: {
       '@context': 'https://schema.org',
       '@type': 'Blog',

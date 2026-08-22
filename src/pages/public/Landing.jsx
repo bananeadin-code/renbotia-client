@@ -9,6 +9,7 @@ import { SpotlightCard } from '../../components/ui/SpotlightCard.jsx';
 import { Reveal } from '../../components/ui/Reveal.jsx';
 import { AnnouncementBar } from '../../components/landing/AnnouncementBar.jsx';
 import { Faq, FAQS } from '../../components/landing/Faq.jsx';
+import { StickyMobileCTA } from '../../components/landing/StickyMobileCTA.jsx';
 import { useSeo, SITE_URL } from '../../lib/seo.js';
 
 // Datos estructurados FAQPage: Google puede mostrar estas preguntas directo en
@@ -48,7 +49,7 @@ export default function Landing() {
     description:
       'Automatiza la atención por WhatsApp de tu negocio con un asistente de IA entrenado con tu información. Responde dudas, agenda citas y capta clientes 24/7. Empieza gratis.',
     path: '/',
-    image: `${SITE_URL}/og-cover.svg`,
+    image: `${SITE_URL}/og-cover.png`,
     jsonLd: FAQ_JSONLD,
   });
 
@@ -89,7 +90,7 @@ export default function Landing() {
             </div>
             <div className="mt-6 flex items-center gap-2 text-sm text-subtle">
               <Icon name="check" size={16} className="text-brand-500" />
-              Prueba gratis por uso, no por tiempo · Sin tarjeta · Simulador incluido
+              Prueba gratis por uso · Sin tarjeta · Listo en minutos
             </div>
           </div>
 
@@ -251,6 +252,7 @@ export default function Landing() {
       </section>
 
       <PublicFooter />
+      <StickyMobileCTA />
     </div>
   );
 }

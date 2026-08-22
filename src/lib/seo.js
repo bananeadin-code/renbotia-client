@@ -45,13 +45,17 @@ function setCanonical(href) {
  * @param {string} [p.type]       og:type ('website' | 'article').
  * @param {string} [p.image]      URL absoluta de la imagen OG.
  * @param {object} [p.jsonLd]     Datos estructurados schema.org para inyectar.
+ * @param {boolean}[p.noindex]    Si true, marca la página como noindex (404, utilitarias).
  */
-export function useSeo({ title, description, path = '/', type = 'website', image, jsonLd }) {
+export function useSeo({ title, description, path = '/', type = 'website', image, jsonLd, noindex = false }) {
   useEffect(() => {
     const url = `${SITE_URL}${path}`;
     if (title) document.title = title;
     setMeta('name', 'description', description);
     setCanonical(url);
+    // La etiqueta robots del index.html es 'index, follow'; aquí la sobreescribimos
+    // por página cuando no debe indexarse, y la restauramos al desmontar.
+    setMeta('name', 'robots', noindex ? 'noindex, follow' : 'index, follow');
 
     setMeta('property', 'og:title', title);
     setMeta('property', 'og:description', description);
@@ -75,5 +79,5 @@ export function useSeo({ title, description, path = '/', type = 'website', image
     return () => {
       if (script) script.remove();
     };
-  }, [title, description, path, type, image, jsonLd]);
+  }, [title, description, path, type, image, jsonLd, noindex]);
 }

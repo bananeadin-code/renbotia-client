@@ -4,6 +4,7 @@ import { SupportWidget } from '../../components/whatsapp/SupportWidget.jsx';
 import { SpotlightCard } from '../../components/ui/SpotlightCard.jsx';
 import { Button } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
+import { Breadcrumbs } from '../../components/ui/Breadcrumbs.jsx';
 import { getSolution, SOLUTIONS } from '../../content/solutions.js';
 import { useSeo, SITE_URL } from '../../lib/seo.js';
 
@@ -16,7 +17,7 @@ export default function Solution() {
     title: sol ? sol.title : 'Solución no encontrada | RenBotIA',
     description: sol?.description,
     path: sol ? `/soluciones/${sol.slug}` : '/soluciones',
-    image: `${SITE_URL}/og-cover.svg`,
+    image: `${SITE_URL}/og-cover.png`,
     jsonLd: sol?.faqs?.length
       ? {
           '@context': 'https://schema.org',
@@ -55,9 +56,13 @@ export default function Solution() {
       <section className="relative overflow-hidden">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-grid" />
         <div className="relative mx-auto max-w-4xl px-4 pb-4 pt-14 sm:pt-20">
-          <Link to="/soluciones" className="eyebrow inline-flex items-center gap-1.5 hover:underline">
-            <Icon name="chevronRight" size={14} className="rotate-180" /> Soluciones
-          </Link>
+          <Breadcrumbs
+            items={[
+              { name: 'Inicio', to: '/' },
+              { name: 'Soluciones', to: '/soluciones' },
+              { name: sol.slug.replace(/-/g, ' ').replace(/^\w/, (c) => c.toUpperCase()) },
+            ]}
+          />
           <h1 className="mt-3 max-w-3xl text-3xl font-extrabold leading-[1.08] tracking-tight text-fg sm:text-5xl">
             {sol.h1}
           </h1>
