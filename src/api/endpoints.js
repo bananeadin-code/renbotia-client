@@ -73,6 +73,12 @@ export const demoApi = {
   send: (message, history = []) => unwrap(api.post('/demo/message', { message, history })),
 };
 
+export const waitlistApi = {
+  // Lista de espera de planes de pago ("avísame cuando esté").
+  join: (email, planKey) => unwrap(api.post('/waitlist', { email, planKey })),
+  adminList: () => unwrap(api.get('/admin/waitlist')),
+};
+
 export const siteAssistantApi = {
   // Asistente del sitio (widget flotante). Público + admin.
   getConfig: () => unwrap(api.get('/site-assistant/config')),

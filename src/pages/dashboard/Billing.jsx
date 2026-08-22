@@ -25,14 +25,22 @@ export default function Billing() {
   // Pago embebido (modal). checkout = { kind, planKey|packKey, itemName, amountMXN }.
   const [checkout, setCheckout] = useState(null);
   const [savedCard, setSavedCard] = useState(null);
+  // ¿Se pueden comprar planes/créditos? (Stripe live). Beta-seguro: false por defecto.
+  const [paidPlansLive, setPaidPlansLive] = useState(false);
 
   useEffect(() => {
-    Promise.all([planApi.list(), billingApi.payments(), billingApi.getPaymentMethod()])
-      .then(([plansData, payData, pmData]) => {
+    Promise.all([
+      planApi.list(),
+      billingApi.payments(),
+      billingApi.getPaymentMethod(),
+      billingApi.config(),
+    ])
+      .then(([plansData, payData, pmData, cfg]) => {
         setPlans(plansData.plans);
         setPacks(plansData.creditPacks);
         setPayments(payData.payments);
         setSavedCard(pmData.paymentMethod || null);
+        setPaidPlansLive(Boolean(cfg.paidPlansLive));
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -251,20 +259,22 @@ export default function Billing() {
               selectedKey={currentKey}
               onSelect={onSelectPlan}
               ctaFor={ctaFor}
+              paidPlansLive={paidPlansLive}
             />
           )}
         </div>
       )}
 
-      {/* Método de pago guardado + recarga automática */}
-      <PaymentMethod packs={packs} />
+      {/* Método de pago guardado + recarga automática (solo cuando hay cobros live) */}
+      {paidPlansLive && <PaymentMethod packs={packs} />}
 
       {/* Paquetes de créditos */}
       <div>
         <h2 className="mb-1 font-semibold text-fg">Comprar créditos adicionales</h2>
         <p className="mb-3 text-sm text-muted">
-          Se suman a tu balance y no vencen con la renovación. Pago con Stripe (tarjeta de test 4242
-          4242 4242 4242).
+          {paidPlansLive
+            ? 'Se suman a tu balance y no vencen con la renovación. Pago seguro con Stripe.'
+            : 'Los créditos adicionales estarán disponibles cuando activemos los pagos. Muy pronto.'}
         </p>
         {loading ? (
           <div className="flex justify-center py-8">
@@ -281,8 +291,13 @@ export default function Billing() {
                 <div className="text-xs text-subtle">
                   {pack.tokens.toLocaleString('es-MX')} tokens
                 </div>
-                <Button className="mt-4 w-full" onClick={() => buyCredits(pack)}>
-                  Comprar
+                <Button
+                  className="mt-4 w-full"
+                  variant={paidPlansLive ? 'primary' : 'secondary'}
+                  disabled={!paidPlansLive}
+                  onClick={() => paidPlansLive && buyCredits(pack)}
+                >
+                  {paidPlansLive ? 'Comprar' : 'Próximamente'}
                 </Button>
               </Card>
             ))}
