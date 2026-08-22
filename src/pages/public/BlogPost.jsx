@@ -3,6 +3,7 @@ import { PublicNav, PublicFooter } from '../../components/layout/PublicNav.jsx';
 import { Button } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { Breadcrumbs } from '../../components/ui/Breadcrumbs.jsx';
+import { SupportWidget } from '../../components/whatsapp/SupportWidget.jsx';
 import { getPost, POSTS } from '../../content/blog.js';
 import { useSeo, SITE_URL } from '../../lib/seo.js';
 
@@ -153,6 +154,7 @@ export default function BlogPost() {
         )}
       </main>
       <PublicFooter />
+      <SupportWidget />
     </div>
   );
 }
