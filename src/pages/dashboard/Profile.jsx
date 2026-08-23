@@ -38,6 +38,46 @@ export default function Profile() {
     }
   }
 
+  // Cambio de correo (con re-verificación al correo nuevo)
+  const [emailStep, setEmailStep] = useState('idle'); // idle | request | verify
+  const [newEmail, setNewEmail] = useState('');
+  const [emailCode, setEmailCode] = useState('');
+  const [emailDevCode, setEmailDevCode] = useState('');
+  const [emailBusy, setEmailBusy] = useState(false);
+
+  async function requestEmailChange(e) {
+    e.preventDefault();
+    setEmailBusy(true);
+    try {
+      const res = await authApi.requestEmailChange(newEmail.trim());
+      setEmailDevCode(res.devCode || '');
+      setEmailStep('verify');
+      toast.success('Te enviamos un código al correo nuevo.');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'No se pudo enviar el código.');
+    } finally {
+      setEmailBusy(false);
+    }
+  }
+
+  async function confirmEmailChange(e) {
+    e.preventDefault();
+    setEmailBusy(true);
+    try {
+      const { user: updated } = await authApi.verifyEmailChange(emailCode.trim());
+      updateUser({ email: updated.email });
+      toast.success('Correo actualizado.');
+      setEmailStep('idle');
+      setNewEmail('');
+      setEmailCode('');
+      setEmailDevCode('');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Código incorrecto o expirado.');
+    } finally {
+      setEmailBusy(false);
+    }
+  }
+
   // Verificación en dos pasos (2FA por correo)
   const [twoFA, setTwoFA] = useState(Boolean(user?.twoFactorEnabled));
   const [savingTwoFA, setSavingTwoFA] = useState(false);
@@ -105,21 +145,17 @@ export default function Profile() {
       <Card>
         <h2 className="mb-4 font-semibold text-fg">Datos personales</h2>
         <form onSubmit={saveName} className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Input
-              label="Nombre"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              minLength={2}
-              maxLength={80}
-              required
-            />
-            <Input label="Email" value={user?.email || ''} disabled />
-          </div>
+          <Input
+            label="Nombre"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            minLength={2}
+            maxLength={80}
+            required
+          />
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-xs text-subtle">
-              El correo es tu identidad de acceso y no se cambia por aquí. Rol:{' '}
-              <span className="font-medium">{user?.role}</span>.
+              Rol: <span className="font-medium">{user?.role}</span>.
             </p>
             <Button
               type="submit"
@@ -129,6 +165,74 @@ export default function Profile() {
             </Button>
           </div>
         </form>
+      </Card>
+
+      {/* Correo electrónico (cambio con re-verificación) */}
+      <Card>
+        <h2 className="mb-1 font-semibold text-fg">Correo electrónico</h2>
+        <p className="mb-4 text-sm text-muted">
+          Tu correo es tu identidad de acceso. Para cambiarlo, te enviamos un código al{' '}
+          <strong>correo nuevo</strong> para confirmar que es tuyo.
+        </p>
+
+        {emailStep === 'idle' && (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-surface2 px-4 py-3">
+            <span className="min-w-0 truncate text-sm font-medium text-fg">{user?.email}</span>
+            <Button variant="secondary" size="sm" onClick={() => setEmailStep('request')}>
+              Cambiar correo
+            </Button>
+          </div>
+        )}
+
+        {emailStep === 'request' && (
+          <form onSubmit={requestEmailChange} className="space-y-3">
+            <Input
+              label="Nuevo correo"
+              type="email"
+              required
+              value={newEmail}
+              onChange={(e) => setNewEmail(e.target.value)}
+              placeholder="nuevo@correo.com"
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" size="sm" type="button" onClick={() => setEmailStep('idle')}>
+                Cancelar
+              </Button>
+              <Button type="submit" size="sm" disabled={emailBusy || !newEmail.trim()}>
+                {emailBusy ? 'Enviando…' : 'Enviar código'}
+              </Button>
+            </div>
+          </form>
+        )}
+
+        {emailStep === 'verify' && (
+          <form onSubmit={confirmEmailChange} className="space-y-3">
+            <p className="text-sm text-muted">
+              Escribe el código de 6 dígitos que enviamos a <strong>{newEmail}</strong>.
+            </p>
+            {emailDevCode && (
+              <Alert variant="info">
+                Modo desarrollo · código: <b>{emailDevCode}</b>
+              </Alert>
+            )}
+            <Input
+              label="Código"
+              inputMode="numeric"
+              required
+              value={emailCode}
+              onChange={(e) => setEmailCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              placeholder="000000"
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" size="sm" type="button" onClick={() => setEmailStep('idle')}>
+                Cancelar
+              </Button>
+              <Button type="submit" size="sm" disabled={emailBusy || emailCode.length !== 6}>
+                {emailBusy ? 'Confirmando…' : 'Confirmar cambio'}
+              </Button>
+            </div>
+          </form>
+        )}
       </Card>
 
       {/* Datos del negocio */}

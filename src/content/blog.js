@@ -213,6 +213,87 @@ export const POSTS = [
       },
     ],
   },
+  {
+    slug: 'que-preguntas-debe-responder-bot-whatsapp',
+    title: 'Qué preguntas debe responder el bot de WhatsApp de tu negocio',
+    description:
+      'La lista de preguntas frecuentes es el corazón de un buen bot. Estas son las que no pueden faltar para que responda como tu mejor vendedor.',
+    date: '2026-08-22',
+    readingMin: 5,
+    tags: ['WhatsApp', 'Atención al cliente', 'PyMEs'],
+    body: [
+      {
+        type: 'p',
+        text: 'Un bot de WhatsApp es tan bueno como la información con la que lo entrenas. Antes de conectarlo, vale la pena hacer una lista de las preguntas que más te repiten tus clientes: esas son las que el asistente responderá al instante, con las palabras de tu negocio. Aquí te dejamos las categorías que casi ningún negocio debería dejar fuera.',
+      },
+      { type: 'h2', text: 'Las imprescindibles' },
+      {
+        type: 'ul',
+        items: [
+          'Precios y formas de pago: lo primero que pregunta la mayoría.',
+          'Horario de atención y días que abres (o si atiendes 24/7 por WhatsApp).',
+          'Ubicación y cómo llegar, o si ofreces servicio a domicilio.',
+          'Qué productos o servicios ofreces, con una descripción breve de cada uno.',
+        ],
+      },
+      { type: 'h2', text: 'Las que cierran ventas' },
+      {
+        type: 'p',
+        text: 'Más allá de informar, un buen bot ayuda a avanzar hacia la compra. Agrega preguntas sobre disponibilidad ("¿tienen tal producto?"), tiempos de entrega, promociones vigentes y cómo agendar una cita o hacer un pedido. Cuanto más claras sean estas respuestas, menos clientes se quedan a medias.',
+      },
+      { type: 'h2', text: 'Las que te ahorran problemas' },
+      {
+        type: 'ul',
+        items: [
+          'Políticas de cambios, devoluciones o garantías.',
+          'Qué hacer si el cliente tiene una queja (aquí conviene que el bot pase la conversación a una persona).',
+          'Requisitos o documentos necesarios, si tu servicio los pide.',
+        ],
+      },
+      {
+        type: 'p',
+        text: 'Con RenBotIA cargas estas preguntas en minutos y las pruebas en un simulador antes de conectar tu WhatsApp. Y si aparecen preguntas nuevas, las agregas cuando quieras. Empezar es gratis.',
+      },
+    ],
+  },
+  {
+    slug: 'bot-whatsapp-restaurantes-cafeterias',
+    title: 'Bot de WhatsApp para restaurantes y cafeterías: cómo no perder pedidos',
+    description:
+      'En la hora pico nadie alcanza a responder el WhatsApp. Un asistente con IA toma reservaciones y pedidos, y responde el menú y horarios sin que dejes de atender.',
+    date: '2026-08-22',
+    readingMin: 5,
+    tags: ['WhatsApp', 'Restaurantes', 'Negocios locales'],
+    body: [
+      {
+        type: 'p',
+        text: 'Si tienes un restaurante o cafetería, ya lo viviste: a la hora de más movimiento el teléfono no para, y entre atender mesas y la cocina, muchos mensajes de WhatsApp se quedan sin respuesta. Cada uno de esos puede ser una reservación o un pedido que se va con la competencia.',
+      },
+      { type: 'h2', text: 'Lo que un asistente puede atender por ti' },
+      {
+        type: 'ul',
+        items: [
+          'El menú, precios y promociones del día, al instante.',
+          'Horarios, ubicación y si hay servicio a domicilio o para llevar.',
+          'Tomar reservaciones y pedidos, y dejártelos organizados para confirmarlos.',
+          'Responder en la madrugada o cuando ya cerraste, para no perder al cliente.',
+        ],
+      },
+      { type: 'h2', text: 'Sin dejar de sentirse cercano' },
+      {
+        type: 'p',
+        text: 'El bot responde con el tono de tu lugar —cálido, informal, como hablas con tus clientes— y cuando algo se sale de lo común, le pasa la conversación a una persona. No reemplaza tu trato: lo hace constante, incluso en la hora pico.',
+      },
+      {
+        type: 'h2',
+        text: 'Ideal para negocios locales',
+      },
+      {
+        type: 'p',
+        text: 'En una ciudad como Durango, donde mucha gente pide y reserva por WhatsApp e Instagram, responder rápido es lo que hace la diferencia. Con RenBotIA puedes entrenar tu asistente con tu menú y tu forma de atender, y probarlo gratis en el simulador antes de conectarlo.',
+      },
+    ],
+  },
 ];
 
 export function getPost(slug) {

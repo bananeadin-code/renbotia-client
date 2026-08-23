@@ -90,6 +90,20 @@ export function RenChat({
     }
   }
 
+  // Reinicia la conversación (borra la persistencia y vuelve al saludo).
+  function resetConversation() {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      /* noop */
+    }
+    setMessages([{ role: 'assistant', content: welcome, time: now() }]);
+    setInput('');
+    setError('');
+  }
+
+  const hasChat = messages.length > 1;
+
   return (
     <div
       className={`flex flex-col overflow-hidden rounded-3xl border border-line bg-surface shadow-[0_24px_60px_-15px_rgba(0,0,0,0.45)] ring-1 ring-black/5 ${heightClass}`}
@@ -111,6 +125,16 @@ export function RenChat({
             Asistente de RenBotIA · En línea
           </div>
         </div>
+        {hasChat && (
+          <button
+            onClick={resetConversation}
+            aria-label="Nueva conversación"
+            title="Nueva conversación"
+            className="rounded-lg p-1 text-white/80 transition hover:bg-white/15 hover:text-white"
+          >
+            <Icon name="plus" size={20} />
+          </button>
+        )}
         <button
           onClick={onClose}
           aria-label="Cerrar"
