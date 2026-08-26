@@ -16,6 +16,8 @@ import { SpotlightCard } from '../../components/ui/SpotlightCard.jsx';
 import { OnboardingChecklist } from '../../components/dashboard/OnboardingChecklist.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 
+const fmtNum = (n) => (n == null ? '—' : n.toLocaleString('es-MX'));
+
 function StatCard({ label, value, sub, color, icon }) {
   return (
     <Card>
@@ -37,6 +39,11 @@ export default function Dashboard() {
   const { business, subscription, balance, setBalance } = useBusinessStore();
   const [daily, setDaily] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [impact, setImpact] = useState(null);
+
+  useEffect(() => {
+    usageApi.impact().then(setImpact).catch(() => {});
+  }, []);
 
   useEffect(() => {
     usageApi
@@ -115,6 +122,43 @@ export default function Dashboard() {
           )}
         </Card>
       </div>
+
+      {/* Impacto del bot (retención): datos reales + estimación honesta */}
+      <Card>
+        <div className="mb-4 flex items-center justify-between gap-2">
+          <div>
+            <h2 className="font-semibold text-fg">Impacto de tu bot</h2>
+            <p className="text-xs capitalize text-muted">{impact?.month || 'Este mes'}</p>
+          </div>
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600">
+            <Icon name="chart" size={16} />
+          </span>
+        </div>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div>
+            <div className="tabular text-2xl font-extrabold text-fg">{fmtNum(impact?.conversations)}</div>
+            <div className="text-xs text-muted">Conversaciones</div>
+          </div>
+          <div>
+            <div className="tabular text-2xl font-extrabold text-fg">{fmtNum(impact?.botReplies)}</div>
+            <div className="text-xs text-muted">Mensajes que respondió el bot</div>
+          </div>
+          <div>
+            <div className="tabular text-2xl font-extrabold text-fg">{fmtNum(impact?.recordsCaptured)}</div>
+            <div className="text-xs text-muted">Trabajo captado (citas, pedidos…)</div>
+          </div>
+          <div>
+            <div className="tabular text-2xl font-extrabold text-brand-600">
+              ~{fmtNum(impact?.hoursSaved)} h
+            </div>
+            <div className="text-xs text-muted">Tiempo ahorrado (estimado)</div>
+          </div>
+        </div>
+        <p className="mt-3 text-xs text-subtle">
+          Los primeros tres son datos reales de tu bot. El tiempo ahorrado es una estimación (~2
+          minutos por mensaje respondido).
+        </p>
+      </Card>
 
       {/* Barra de consumo */}
       <Card>

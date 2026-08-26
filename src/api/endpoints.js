@@ -57,6 +57,7 @@ export const botConfigApi = {
 
 export const usageApi = {
   summary: (days = 30) => unwrap(api.get(`/usage?days=${days}`)),
+  impact: () => unwrap(api.get('/usage/impact')),
 };
 
 export const chatApi = {
@@ -113,6 +114,7 @@ export const conversationsApi = {
   get: (id) => unwrap(api.get(`/conversations/${id}`)),
   setMode: (id, handoffMode) => unwrap(api.patch(`/conversations/${id}`, { handoffMode })),
   reply: (id, message) => unwrap(api.post(`/conversations/${id}/reply`, { message })),
+  rate: (id, index, rating) => unwrap(api.post(`/conversations/${id}/rate`, { index, rating })),
 };
 
 export const managementApi = {

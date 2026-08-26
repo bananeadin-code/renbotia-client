@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { conversationsApi } from '../../api/endpoints.js';
+import { downloadFile } from '../../api/download.js';
 import { toast } from '../../store/toastStore.js';
 import { Card, Button, Badge, Spinner, Alert } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
@@ -23,6 +24,7 @@ export default function Conversations() {
   const [loadingThread, setLoadingThread] = useState(false);
   const [reply, setReply] = useState('');
   const [sending, setSending] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const scrollRef = useRef(null);
 
   async function loadList() {
@@ -61,6 +63,18 @@ export default function Conversations() {
     loadList();
   }
 
+  // Califica una respuesta del bot (up/down). Si ya estaba en ese valor, lo quita.
+  async function rate(index, rating) {
+    const current = thread?.messages?.[index]?.rating;
+    const next = current === rating ? null : rating;
+    try {
+      const data = await conversationsApi.rate(selectedId, index, next);
+      setThread(data.conversation);
+    } catch {
+      toast.error('No se pudo calificar.');
+    }
+  }
+
   async function sendReply(e) {
     e.preventDefault();
     if (!reply.trim()) return;
@@ -89,11 +103,34 @@ export default function Conversations() {
 
   return (
     <div>
-      <div className="mb-4">
-        <h1 className="text-2xl font-bold text-fg">Conversaciones</h1>
-        <p className="text-sm text-muted">
-          Actividad del bot. Toma el control cuando una conversación lo amerite.
-        </p>
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-fg">Conversaciones</h1>
+          <p className="text-sm text-muted">
+            Actividad del bot. Toma el control cuando una conversación lo amerite.
+          </p>
+        </div>
+        {list.length > 0 && (
+          <Button
+            variant="secondary"
+            size="sm"
+            className="shrink-0"
+            disabled={exporting}
+            onClick={async () => {
+              setExporting(true);
+              try {
+                await downloadFile('/conversations/export', 'conversaciones-renbotia.csv');
+              } catch {
+                toast.error('No se pudo exportar.');
+              } finally {
+                setExporting(false);
+              }
+            }}
+          >
+            <Icon name="download" size={16} />
+            <span className="hidden sm:inline">{exporting ? 'Exportando…' : 'Exportar CSV'}</span>
+          </Button>
+        )}
       </div>
 
       {list.length === 0 ? (
@@ -231,6 +268,35 @@ export default function Conversations() {
                               {timeOf(m.timestamp)}
                             </span>
                           </div>
+                          {/* Calificación de calidad (solo respuestas del bot) */}
+                          {mine && !agent && (
+                            <div className="mt-1 flex items-center justify-end gap-1">
+                              <button
+                                onClick={() => rate(i, 'up')}
+                                aria-label="Buena respuesta"
+                                title="Buena respuesta"
+                                className={`rounded-md p-1 transition ${
+                                  m.rating === 'up'
+                                    ? 'bg-brand-500/15 text-brand-600'
+                                    : 'text-subtle hover:bg-surface2 hover:text-fg'
+                                }`}
+                              >
+                                <Icon name="thumbsUp" size={14} />
+                              </button>
+                              <button
+                                onClick={() => rate(i, 'down')}
+                                aria-label="Respuesta a mejorar"
+                                title="Respuesta a mejorar"
+                                className={`rounded-md p-1 transition ${
+                                  m.rating === 'down'
+                                    ? 'bg-red-500/15 text-red-500'
+                                    : 'text-subtle hover:bg-surface2 hover:text-fg'
+                                }`}
+                              >
+                                <Icon name="thumbsDown" size={14} />
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     );

@@ -44,7 +44,11 @@ export const FAQS = [
   },
   {
     q: '¿Están seguros los datos de mi negocio y de mis clientes?',
-    a: 'Sí. Cada cuenta está aislada y tu información solo se usa para que tu bot responda. Puedes consultar nuestro Aviso de Privacidad, alineado con la ley mexicana (LFPDPPP).',
+    a: 'Sí. Cada cuenta está aislada y tu información solo se usa para que tu bot responda. Puedes consultar nuestro Aviso de Privacidad, alineado con la ley mexicana (LFPDPPP), y exportar tus conversaciones y leads cuando quieras.',
+  },
+  {
+    q: '¿En qué se diferencia del asistente gratis de WhatsApp/Meta?',
+    a: 'El asistente gratis de Meta responde de forma básica, pero no agenda citas, no toma pedidos ni capta prospectos, y no se entrena a fondo con tu negocio. RenBotIA sí: lo entrenas con tus preguntas, tu tono y tu información; agenda citas y capta trabajo (plan Elite); guarda y exporta tus conversaciones y leads; y lo pruebas en un simulador antes de conectarlo. Es tu bot, con tu voz — no uno genérico.',
   },
 ];
 

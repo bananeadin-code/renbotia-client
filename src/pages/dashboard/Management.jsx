@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Button, Card, Badge, Spinner, Alert, Select } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { managementApi } from '../../api/endpoints.js';
+import { downloadFile } from '../../api/download.js';
 import { useBusinessStore } from '../../store/businessStore.js';
 import { toast } from '../../store/toastStore.js';
 import { RecordModal } from '../../components/management/RecordModal.jsx';
@@ -35,7 +36,19 @@ export default function Management() {
   const [filterStatus, setFilterStatus] = useState('');
   const [scope, setScope] = useState('all');
 
+  const [exporting, setExporting] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+
+  async function exportRecordsCsv() {
+    setExporting(true);
+    try {
+      await downloadFile('/management/export', 'registros-renbotia.csv');
+    } catch {
+      toast.error('No se pudo exportar.');
+    } finally {
+      setExporting(false);
+    }
+  }
   const [editing, setEditing] = useState(null);
   const [preset, setPreset] = useState(null); // { date, time } al agendar desde el calendario
   const [version, setVersion] = useState(0); // fuerza recarga del calendario tras cambios
@@ -152,11 +165,19 @@ export default function Management() {
     <div>
       <PageHeader
         action={
-          <Button onClick={openNew} className="shrink-0">
-            <Icon name="plus" size={16} />
-            <span className="hidden sm:inline">Nuevo registro</span>
-            <span className="sm:hidden">Nuevo</span>
-          </Button>
+          <div className="flex shrink-0 items-center gap-2">
+            {records.length > 0 && (
+              <Button variant="secondary" onClick={exportRecordsCsv} disabled={exporting}>
+                <Icon name="download" size={16} />
+                <span className="hidden sm:inline">{exporting ? 'Exportando…' : 'Exportar'}</span>
+              </Button>
+            )}
+            <Button onClick={openNew}>
+              <Icon name="plus" size={16} />
+              <span className="hidden sm:inline">Nuevo registro</span>
+              <span className="sm:hidden">Nuevo</span>
+            </Button>
+          </div>
         }
       />
 
