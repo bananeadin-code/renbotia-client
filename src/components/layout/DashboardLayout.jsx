@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore.js';
 import { useBusinessStore } from '../../store/businessStore.js';
 import { Spinner } from '../ui/index.jsx';
@@ -23,12 +23,32 @@ const NAV = [
  * Layout privado. Carga el negocio del usuario; si no tiene, redirige al
  * onboarding. Sidebar fijo en desktop, drawer en móvil.
  */
+const PAGE_TITLES = {
+  '/dashboard': 'Inicio',
+  '/dashboard/entrenamiento': 'Entrenamiento',
+  '/dashboard/simulador': 'Simulador',
+  '/dashboard/conversaciones': 'Conversaciones',
+  '/dashboard/gestion': 'Gestión de trabajo',
+  '/dashboard/facturacion': 'Facturación',
+  '/dashboard/equipo': 'Equipo',
+  '/dashboard/perfil': 'Perfil',
+  '/dashboard/admin': 'Admin',
+  '/dashboard/asistente-sitio': 'Asistente del sitio',
+};
+
 export function DashboardLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout } = useAuthStore();
   const { hasBusiness, business, subscription, role, load } = useBusinessStore();
   const [checking, setChecking] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Título de pestaña por ruta del panel (evita heredar el <title> de una página
+  // pública como "Precios…"). El panel no se indexa, pero mantiene coherencia.
+  useEffect(() => {
+    document.title = `${PAGE_TITLES[location.pathname] || 'Panel'} | RenBotIA`;
+  }, [location.pathname]);
 
   useEffect(() => {
     load()

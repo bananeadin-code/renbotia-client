@@ -14,6 +14,7 @@ const DISMISS_KEY = 'renbotia:checklistDismissed';
  */
 export function OnboardingChecklist() {
   const business = useBusinessStore((s) => s.business);
+  const smsEnabled = useBusinessStore((s) => s.smsEnabled);
   const [loading, setLoading] = useState(true);
   const [hasFaqs, setHasFaqs] = useState(false);
   const [hasChats, setHasChats] = useState(false);
@@ -59,14 +60,20 @@ export function OnboardingChecklist() {
       to: '/dashboard/simulador',
       icon: 'message',
     },
-    {
+  ];
+
+  // El paso de verificar el número solo aparece cuando esa vía está disponible
+  // (proveedor de SMS) o si ya se verificó — para no dejar una tarea que el
+  // usuario no puede completar todavía (la conexión real llega con WhatsApp/Meta).
+  if (smsEnabled || business?.whatsappVerified) {
+    steps.push({
       done: Boolean(business?.whatsappVerified),
       title: 'Verifica tu número de WhatsApp',
       desc: 'Confirma que el número es tuyo para dejarlo listo.',
       to: '/dashboard/perfil',
       icon: 'card',
-    },
-  ];
+    });
+  }
 
   const doneCount = steps.filter((s) => s.done).length;
 

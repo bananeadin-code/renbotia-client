@@ -532,8 +532,12 @@ export default function BotTraining() {
         </Card>
       )}
 
-      {/* Acciones (sticky en móvil) */}
-      <div className="sticky bottom-0 flex flex-col gap-2 rounded-xl border border-line bg-surface/90 p-3 backdrop-blur sm:flex-row sm:justify-end">
+      {/* Espaciador: da despeje para que la barra fija no tape el final del
+          contenido (Imágenes del bot y demás) al hacer scroll. */}
+      <div className="h-16" aria-hidden="true" />
+
+      {/* Acciones (sticky) */}
+      <div className="sticky bottom-0 flex flex-col gap-2 rounded-xl border border-line bg-surface/95 p-3 backdrop-blur sm:flex-row sm:justify-end">
         <Button variant="secondary" onClick={() => save()} disabled={saving}>
           {saving ? 'Guardando…' : 'Guardar'}
         </Button>
