@@ -8,7 +8,7 @@ export const SITE_NAME = 'RenBotIA';
 // URL de tu Google Business Profile (perfil de empresa en Google/Maps). Pégala
 // aquí cuando lo crees; el enlace en el footer aparece solo si está definida.
 // Enlazarlo desde el sitio refuerza el SEO local (México/Durango).
-export const GOOGLE_BUSINESS_URL = '';
+export const GOOGLE_BUSINESS_URL = 'https://maps.app.goo.gl/7yTyS9S7kztm4b7F8';
 
 /** Crea o actualiza un <meta name="..."> o <meta property="..."> idempotente. */
 function setMeta(attr, key, content) {
