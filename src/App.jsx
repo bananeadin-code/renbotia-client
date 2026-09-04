@@ -37,6 +37,7 @@ const Dashboard = lazy(() => import('./pages/dashboard/Dashboard.jsx'));
 const BotTraining = lazy(() => import('./pages/dashboard/BotTraining.jsx'));
 const Simulator = lazy(() => import('./pages/dashboard/Simulator.jsx'));
 const Conversations = lazy(() => import('./pages/dashboard/Conversations.jsx'));
+const Connections = named(() => import('./pages/dashboard/Connections.jsx'), 'Connections');
 const Management = lazy(() => import('./pages/dashboard/Management.jsx'));
 const Billing = lazy(() => import('./pages/dashboard/Billing.jsx'));
 const Profile = lazy(() => import('./pages/dashboard/Profile.jsx'));
@@ -105,6 +106,7 @@ export default function App() {
         <Route path="entrenamiento" element={<BotTraining />} />
         <Route path="simulador" element={<Simulator />} />
         <Route path="conversaciones" element={<Conversations />} />
+        <Route path="conexiones" element={<Connections />} />
         <Route path="gestion" element={<Management />} />
         <Route path="facturacion" element={<Billing />} />
         <Route path="equipo" element={<Team />} />

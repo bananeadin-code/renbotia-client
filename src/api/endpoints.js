@@ -138,6 +138,13 @@ export const managementApi = {
   },
 };
 
+export const connectionsApi = {
+  // Estado + config para el Embedded Signup de WhatsApp (módulo Conexiones).
+  get: () => unwrap(api.get('/connections')),
+  connectWhatsApp: (body) => unwrap(api.post('/connections/whatsapp', body)),
+  disconnectWhatsApp: () => unwrap(api.post('/connections/whatsapp/disconnect')),
+};
+
 export const membersApi = {
   list: () => unwrap(api.get('/members')),
   invite: (email) => unwrap(api.post('/members/invite', { email })),

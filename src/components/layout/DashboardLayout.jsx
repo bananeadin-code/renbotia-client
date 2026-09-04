@@ -13,6 +13,7 @@ const NAV = [
   { to: '/dashboard/entrenamiento', label: 'Entrenamiento', icon: 'academic' },
   { to: '/dashboard/simulador', label: 'Simulador', icon: 'message' },
   { to: '/dashboard/conversaciones', label: 'Conversaciones', icon: 'inbox' },
+  { to: '/dashboard/conexiones', label: 'Conexiones', icon: 'link' },
   // Gestión se inserta aquí solo para Elite (ver más abajo).
   { to: '/dashboard/facturacion', label: 'Facturación', icon: 'card' },
   { to: '/dashboard/equipo', label: 'Equipo', icon: 'users' },
@@ -28,6 +29,7 @@ const PAGE_TITLES = {
   '/dashboard/entrenamiento': 'Entrenamiento',
   '/dashboard/simulador': 'Simulador',
   '/dashboard/conversaciones': 'Conversaciones',
+  '/dashboard/conexiones': 'Conexiones',
   '/dashboard/gestion': 'Gestión de trabajo',
   '/dashboard/facturacion': 'Facturación',
   '/dashboard/equipo': 'Equipo',
