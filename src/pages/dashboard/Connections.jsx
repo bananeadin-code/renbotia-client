@@ -89,12 +89,25 @@ export function Connections() {
     sessionInfo.current = { phoneNumberId: '', wabaId: '' };
     setConnecting(true);
 
+    // Si el usuario cierra el popup con la "X", FB.login a veces NO llama al
+    // callback → el botón quedaría en "Conectando...". Al volver el foco a la
+    // ventana principal (popup cerrado), reseteamos si no hubo conexión.
+    let settled = false;
+    const onFocus = () => {
+      window.removeEventListener('focus', onFocus);
+      setTimeout(() => {
+        if (!settled) setConnecting(false);
+      }, 1200);
+    };
+    window.addEventListener('focus', onFocus);
+
     window.FB.login(
       async (response) => {
+        settled = true;
+        window.removeEventListener('focus', onFocus);
         const code = response?.authResponse?.code;
         if (!code) {
-          setConnecting(false);
-          toast.error('Conexión cancelada.');
+          setConnecting(false); // cancelado: reset silencioso
           return;
         }
         const { phoneNumberId, wabaId } = sessionInfo.current;
