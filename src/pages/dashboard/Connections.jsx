@@ -166,7 +166,7 @@ export function Connections() {
       <Card className={!connected && data?.embeddedEnabled ? 'border-brand-200 dark:border-brand-900/60' : ''}>
         <div className="flex items-start gap-4">
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-500/10 text-brand-600">
-            <Icon name="message" size={24} />
+            <Icon name="whatsapp" size={24} />
           </span>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
@@ -290,8 +290,9 @@ export function Connections() {
 
       <Card className="border-dashed">
         <div className="flex items-start gap-4 opacity-70">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-surface2 text-subtle">
-            <Icon name="message" size={22} />
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center gap-1 rounded-xl bg-surface2 text-subtle">
+            <Icon name="instagram" size={16} />
+            <Icon name="messenger" size={16} />
           </span>
           <div>
             <div className="flex items-center gap-2">
