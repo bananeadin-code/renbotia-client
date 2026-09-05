@@ -13,6 +13,8 @@
   --subtle: 148 163 184; /* slate-400 */
   --line: 226 232 240; /* slate-200 */
   --glow: 16 185 129; /* emerald-500: color del brillo/spotlight */
+  --glass-border: 255 255 255; /* borde-luz para superficies cristalinas */
+  --glass-alpha: 0.72; /* opacidad de las superficies glass (claro) */
 }
 
 .dark {
@@ -23,6 +25,8 @@
   --muted: 148 163 184; /* slate-400          */
   --subtle: 108 122 145;
   --line: 39 51 71; /* borde oscuro       */
+  --glass-border: 148 163 184; /* borde sutil claro sobre glass oscuro */
+  --glass-alpha: 0.55; /* opacidad de las superficies glass (oscuro) */
 }
 
 @layer base {
@@ -33,6 +37,25 @@
   body {
     @apply bg-canvas text-fg;
     font-feature-settings: 'cv11', 'ss01';
+  }
+  /* Gradiente sutil fijo detrás de TODO: da el "aire" cristalino para que el
+     glassmorfismo se perciba, sin ser marcado. Fijo = no salta al hacer scroll. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(55% 45% at 6% -6%, rgb(var(--glow) / 0.12), transparent 60%),
+      radial-gradient(48% 42% at 100% 4%, rgb(111 224 182 / 0.12), transparent 60%),
+      radial-gradient(45% 40% at 50% 110%, rgb(18 169 127 / 0.07), transparent 60%);
+  }
+  .dark body::before {
+    background:
+      radial-gradient(55% 45% at 6% -6%, rgb(var(--glow) / 0.16), transparent 60%),
+      radial-gradient(48% 42% at 100% 4%, rgb(18 169 127 / 0.12), transparent 60%),
+      radial-gradient(45% 40% at 50% 110%, rgb(52 201 154 / 0.08), transparent 60%);
   }
   h1,
   h2,
@@ -71,6 +94,33 @@
   }
   ::-webkit-scrollbar-corner {
     background: transparent;
+  }
+}
+
+@layer components {
+  /* ── Superficie "cristalina" (glassmorfismo) ──────────────────────────
+     Translúcida + desenfoque + borde de luz sutil + sombra flotante. Pensada
+     para ser DISCRETA ("no marcada"): deja entrever el gradiente del fondo sin
+     sacrificar legibilidad. Degrada con gracia si el navegador no soporta blur. */
+  .glass {
+    background-color: rgb(var(--surface) / var(--glass-alpha));
+    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    border: 1px solid rgb(var(--glass-border) / 0.55);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.45),
+      0 10px 30px -14px rgba(2, 6, 23, 0.2);
+  }
+  .dark .glass {
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.05),
+      0 16px 36px -16px rgba(0, 0, 0, 0.55);
+  }
+  /* Fallback: sin backdrop-filter → superficie sólida y legible. */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass {
+      background-color: rgb(var(--surface));
+    }
   }
 }
 

@@ -94,7 +94,7 @@ export function DashboardLayout() {
   return (
     <div className="min-h-screen bg-canvas">
       {/* Topbar (móvil) */}
-      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-surface px-4 py-3 md:hidden">
+      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-surface/70 backdrop-blur-xl px-4 py-3 md:hidden">
         <button
           onClick={() => setMenuOpen(true)}
           className="rounded-lg p-1 text-fg hover:bg-surface2"
@@ -115,7 +115,7 @@ export function DashboardLayout() {
           />
         )}
         <aside
-          className={`fixed z-40 h-full w-64 transform overflow-y-auto border-r border-line bg-surface p-4 transition-transform md:sticky md:top-0 md:z-0 md:h-screen md:translate-x-0 ${
+          className={`fixed z-40 h-full w-64 transform overflow-y-auto border-r border-line bg-surface/70 backdrop-blur-xl p-4 transition-transform md:sticky md:top-0 md:z-0 md:h-screen md:translate-x-0 ${
             menuOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >

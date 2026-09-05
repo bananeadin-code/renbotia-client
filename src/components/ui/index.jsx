@@ -15,7 +15,8 @@ export function Button({
   const base =
     'inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas disabled:opacity-50 disabled:cursor-not-allowed';
   const variants = {
-    primary: 'bg-brand-600 text-white shadow-card hover:bg-brand-700 hover:shadow-elevated active:translate-y-px',
+    primary:
+      'bg-gradient-to-b from-brand-500 to-brand-600 text-white shadow-card hover:from-brand-500 hover:to-brand-700 hover:shadow-elevated active:translate-y-px',
     secondary: 'bg-surface text-fg border border-line shadow-card hover:bg-surface2',
     ghost: 'text-muted hover:bg-surface2 hover:text-fg',
     danger: 'bg-red-600 text-white shadow-card hover:bg-red-700',
@@ -88,7 +89,7 @@ export function Select({ label, children, className = '', ...props }) {
 
 export function Card({ children, className = '' }) {
   return (
-    <div className={clsx('rounded-xl border border-line bg-surface p-5 shadow-card', className)}>
+    <div className={clsx('glass rounded-2xl p-5', className)}>
       {children}
     </div>
   );
