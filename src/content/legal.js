@@ -108,6 +108,7 @@ export const LEGAL = {
         h: '3. Planes, créditos y pagos',
         p: [
           'Ofrecemos planes de suscripción y paquetes de créditos (tokens de uso), en pesos mexicanos, procesados por nuestro proveedor de pagos (Stripe). Los créditos se consumen conforme al uso del bot. Salvo que la ley disponga lo contrario, los pagos no son reembolsables. Puedes cancelar la renovación cuando quieras; conservarás el acceso hasta que termine el periodo ya pagado.',
+          'Conexión con WhatsApp y costos de Meta: para operar tu bot en WhatsApp conectas tu propia cuenta de WhatsApp Business a través de Meta, usando un número de teléfono dedicado a tu negocio. Las conversaciones de WhatsApp las cobra Meta directamente a tu cuenta, conforme a sus tarifas vigentes (que incluyen un volumen mensual gratuito). Ese costo es independiente de tu plan RenBotIA, no lo cobra ni lo determina RenBotIA, y corresponde a tu relación con Meta.',
         ],
       },
       {

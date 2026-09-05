@@ -225,6 +225,57 @@ export function Connections() {
         </div>
       </Card>
 
+      {!connected && (
+        <Card>
+          <h2 className="font-semibold text-fg">Cómo funciona, en simple</h2>
+          <ol className="mt-4 space-y-4">
+            {[
+              {
+                t: 'Conecta tu número',
+                d: 'Inicias sesión con tu Facebook y confirmas tu número con un código. Es el proceso oficial y seguro de Meta; toma unos minutos.',
+              },
+              {
+                t: 'Tu bot ya está entrenado',
+                d: 'Responde con la información de tu negocio que configuraste aquí.',
+              },
+              {
+                t: 'Listo: atiende solo',
+                d: 'Tu bot contesta a tus clientes en WhatsApp las 24 horas, sin que estés al pendiente.',
+              },
+            ].map((s, i) => (
+              <li key={i} className="flex gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-sm font-bold text-brand-700 dark:text-brand-300">
+                  {i + 1}
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-fg">{s.t}</p>
+                  <p className="text-sm text-muted">{s.d}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          <div className="mt-5 rounded-xl border border-line bg-surface2/50 p-4">
+            <p className="text-sm font-medium text-fg">¿Qué necesitas?</p>
+            <p className="mt-1 text-sm text-muted">
+              Un <strong className="text-fg">número dedicado</strong> para tu negocio: un chip o número que
+              uses solo para el bot y que <strong className="text-fg">no esté activo</strong> en la app de
+              WhatsApp (ni la normal ni Business).
+            </p>
+          </div>
+
+          <div className="mt-3 rounded-xl border border-brand-200 bg-brand-500/5 p-4 dark:border-brand-900/60">
+            <p className="text-sm font-medium text-fg">Sobre los costos, claro y sin letras chiquitas</p>
+            <p className="mt-1 text-sm text-muted">
+              Tu plan RenBotIA cubre el <strong className="text-fg">bot con IA</strong>. Los mensajes de
+              WhatsApp los cobra <strong className="text-fg">Meta directamente</strong> a tu cuenta, con{' '}
+              <strong className="text-fg">1,000 conversaciones gratis cada mes</strong> — la mayoría de los
+              negocios empiezan sin costo extra. Nosotros no le agregamos ningún cargo.
+            </p>
+          </div>
+        </Card>
+      )}
+
       <Card className="border-dashed">
         <div className="flex items-start gap-4 opacity-70">
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-surface2 text-subtle">
