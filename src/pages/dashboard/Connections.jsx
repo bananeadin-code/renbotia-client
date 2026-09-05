@@ -163,14 +163,14 @@ export function Connections() {
         <p className="mt-1 text-muted">Conecta tus canales para que el bot atienda a tus clientes.</p>
       </div>
 
-      <Card>
+      <Card className={!connected && data?.embeddedEnabled ? 'border-brand-200 dark:border-brand-900/60' : ''}>
         <div className="flex items-start gap-4">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-500/10 text-brand-600">
-            <Icon name="message" size={22} />
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-500/10 text-brand-600">
+            <Icon name="message" size={24} />
           </span>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="font-semibold text-fg">WhatsApp</h2>
+              <h2 className="text-lg font-semibold text-fg">WhatsApp</h2>
               {connected ? (
                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600">
                   <Icon name="check" size={13} /> Conectado
@@ -181,66 +181,78 @@ export function Connections() {
                 </span>
               )}
             </div>
-
-            {connected ? (
-              <div className="mt-2 space-y-3">
-                <p className="text-sm text-muted">
-                  Tu número está conectado. El bot responde automáticamente a tus clientes en WhatsApp.
-                </p>
-                <p className="text-xs text-subtle">ID del número: {data.whatsapp.phoneNumberId}</p>
-                {isOwner && (
-                  <Button variant="ghost" onClick={disconnect} className="text-red-500 hover:bg-red-500/10">
-                    Desconectar
-                  </Button>
-                )}
-              </div>
-            ) : data?.embeddedEnabled ? (
-              <div className="mt-2 space-y-3">
-                <p className="text-sm text-muted">
-                  Conecta tu propia cuenta de WhatsApp Business en unos pasos. Necesitas un{' '}
-                  <strong className="text-fg">número dedicado</strong> que no esté activo en la app de
-                  WhatsApp (ni normal ni Business).
-                </p>
-                {isOwner ? (
-                  <Button onClick={launchSignup} disabled={!sdkReady || connecting}>
-                    {connecting ? 'Conectando…' : 'Conectar WhatsApp'}
-                    {!connecting && <Icon name="link" size={16} className="ml-1.5" />}
-                  </Button>
-                ) : (
-                  <Alert>Solo el dueño del negocio puede conectar WhatsApp.</Alert>
-                )}
-              </div>
-            ) : (
-              <div className="mt-2 space-y-3">
-                <p className="text-sm text-muted">
-                  La conexión directa de tu WhatsApp estará disponible muy pronto. Estamos completando
-                  la aprobación con Meta para habilitarla.
-                </p>
-                <span className="inline-block rounded-full bg-brand-500/10 px-3 py-1 text-xs font-medium text-brand-600">
-                  Próximamente
-                </span>
-              </div>
-            )}
+            <p className="mt-1 text-sm text-muted">
+              {connected
+                ? 'Tu número está conectado. El bot responde automáticamente a tus clientes en WhatsApp.'
+                : data?.embeddedEnabled
+                  ? 'Conecta tu propia cuenta de WhatsApp Business para que el bot atienda a tus clientes de forma automática.'
+                  : 'La conexión directa de WhatsApp estará disponible pronto. Estamos completando la aprobación con Meta.'}
+            </p>
           </div>
         </div>
+
+        {connected && (
+          <div className="mt-4 space-y-3 border-t border-line pt-4">
+            <p className="text-xs text-subtle">ID del número: {data.whatsapp.phoneNumberId}</p>
+            {isOwner && (
+              <Button variant="ghost" onClick={disconnect} className="text-red-500 hover:bg-red-500/10">
+                Desconectar
+              </Button>
+            )}
+          </div>
+        )}
+
+        {!connected && data?.embeddedEnabled && (
+          <div className="mt-5 border-t border-line pt-5">
+            {isOwner ? (
+              <>
+                <Button
+                  onClick={launchSignup}
+                  disabled={!sdkReady || connecting}
+                  className="w-full justify-center sm:w-auto"
+                >
+                  {connecting ? 'Conectando…' : 'Conectar WhatsApp'}
+                  {!connecting && <Icon name="link" size={16} className="ml-1.5" />}
+                </Button>
+                <p className="mt-3 flex items-start gap-1.5 text-xs text-subtle">
+                  <Icon name="shield" size={14} className="mt-0.5 shrink-0" />
+                  <span>
+                    Se abrirá una ventana segura de Meta para iniciar sesión y verificar tu número. Puedes
+                    cerrarla en cualquier momento.
+                  </span>
+                </p>
+              </>
+            ) : (
+              <Alert>Solo el dueño del negocio puede conectar WhatsApp.</Alert>
+            )}
+          </div>
+        )}
+
+        {!connected && !data?.embeddedEnabled && (
+          <div className="mt-4">
+            <span className="inline-block rounded-full bg-brand-500/10 px-3 py-1 text-xs font-medium text-brand-600">
+              Próximamente
+            </span>
+          </div>
+        )}
       </Card>
 
       {!connected && (
         <Card>
-          <h2 className="font-semibold text-fg">Cómo funciona, en simple</h2>
+          <h2 className="font-semibold text-fg">Cómo funciona</h2>
           <ol className="mt-4 space-y-4">
             {[
               {
                 t: 'Conecta tu número',
-                d: 'Inicias sesión con tu Facebook y confirmas tu número con un código. Es el proceso oficial y seguro de Meta; toma unos minutos.',
+                d: 'Inicias sesión con Facebook y confirmas tu número con un código. Es el proceso oficial de Meta y toma unos minutos.',
               },
               {
-                t: 'Tu bot ya está entrenado',
-                d: 'Responde con la información de tu negocio que configuraste aquí.',
+                t: 'El bot usa tu información',
+                d: 'Responde con los datos de tu negocio que configuraste en el panel.',
               },
               {
-                t: 'Listo: atiende solo',
-                d: 'Tu bot contesta a tus clientes en WhatsApp las 24 horas, sin que estés al pendiente.',
+                t: 'Atiende de forma automática',
+                d: 'El bot responde a tus clientes en WhatsApp las 24 horas.',
               },
             ].map((s, i) => (
               <li key={i} className="flex gap-3">
@@ -256,7 +268,7 @@ export function Connections() {
           </ol>
 
           <div className="mt-5 rounded-xl border border-line bg-surface2/50 p-4">
-            <p className="text-sm font-medium text-fg">¿Qué necesitas?</p>
+            <p className="text-sm font-medium text-fg">Qué necesitas</p>
             <p className="mt-1 text-sm text-muted">
               Un <strong className="text-fg">número dedicado</strong> para tu negocio: un chip o número que
               uses solo para el bot y que <strong className="text-fg">no esté activo</strong> en la app de
@@ -264,13 +276,13 @@ export function Connections() {
             </p>
           </div>
 
-          <div className="mt-3 rounded-xl border border-brand-200 bg-brand-500/5 p-4 dark:border-brand-900/60">
-            <p className="text-sm font-medium text-fg">Sobre los costos, claro y sin letras chiquitas</p>
+          <div className="mt-3 rounded-xl border border-line bg-surface2/50 p-4">
+            <p className="text-sm font-medium text-fg">Sobre costos</p>
             <p className="mt-1 text-sm text-muted">
-              Tu plan RenBotIA cubre el <strong className="text-fg">bot con IA</strong>. Los mensajes de
-              WhatsApp los cobra <strong className="text-fg">Meta directamente</strong> a tu cuenta, con{' '}
-              <strong className="text-fg">1,000 conversaciones gratis cada mes</strong> — la mayoría de los
-              negocios empiezan sin costo extra. Nosotros no le agregamos ningún cargo.
+              Tu plan RenBotIA cubre el bot con IA. Las conversaciones de WhatsApp las cobra{' '}
+              <strong className="text-fg">Meta directamente</strong> a tu cuenta, con{' '}
+              <strong className="text-fg">1,000 conversaciones gratis al mes</strong>. RenBotIA no agrega
+              ningún cargo por los mensajes.
             </p>
           </div>
         </Card>
