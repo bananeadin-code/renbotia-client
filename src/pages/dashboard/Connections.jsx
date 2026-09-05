@@ -206,14 +206,25 @@ export function Connections() {
           <div className="mt-5 border-t border-line pt-5">
             {isOwner ? (
               <>
-                <Button
-                  onClick={launchSignup}
-                  disabled={!sdkReady || connecting}
-                  className="w-full justify-center sm:w-auto"
-                >
-                  {connecting ? 'Conectando…' : 'Conectar WhatsApp'}
-                  {!connecting && <Icon name="link" size={16} className="ml-1.5" />}
-                </Button>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button
+                    onClick={launchSignup}
+                    disabled={!sdkReady || connecting}
+                    className="w-full justify-center sm:w-auto"
+                  >
+                    {connecting ? 'Conectando…' : 'Conectar WhatsApp'}
+                    {!connecting && <Icon name="link" size={16} className="ml-1.5" />}
+                  </Button>
+                  {connecting && (
+                    <button
+                      type="button"
+                      onClick={() => setConnecting(false)}
+                      className="text-sm font-medium text-muted underline-offset-2 hover:text-fg hover:underline"
+                    >
+                      Cancelar
+                    </button>
+                  )}
+                </div>
                 <p className="mt-3 flex items-start gap-1.5 text-xs text-subtle">
                   <Icon name="shield" size={14} className="mt-0.5 shrink-0" />
                   <span>
