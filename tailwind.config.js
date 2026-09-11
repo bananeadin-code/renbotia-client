@@ -55,14 +55,26 @@ export default {
         xl: '1rem',
         '2xl': '1.25rem',
       },
+      // Curvas de easing fuertes (Emil Kowalski) como utilidades: ease-out-strong, etc.
+      transitionTimingFunction: {
+        'out-strong': 'cubic-bezier(0.23, 1, 0.32, 1)',
+        'in-out-strong': 'cubic-bezier(0.77, 0, 0.175, 1)',
+        drawer: 'cubic-bezier(0.32, 0.72, 0, 1)',
+      },
       keyframes: {
         'fade-up': {
-          '0%': { opacity: '0', transform: 'translateY(8px)' },
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        // Entrada para popovers/menús: nunca desde scale(0) (Emil).
+        'scale-in': {
+          '0%': { opacity: '0', transform: 'scale(0.96)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
         },
       },
       animation: {
-        'fade-up': 'fade-up .4s ease-out both',
+        'fade-up': 'fade-up .5s cubic-bezier(0.23, 1, 0.32, 1) both',
+        'scale-in': 'scale-in .18s cubic-bezier(0.23, 1, 0.32, 1) both',
       },
     },
   },

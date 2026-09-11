@@ -15,6 +15,11 @@
   --glow: 16 185 129; /* emerald-500: color del brillo/spotlight */
   --glass-border: 255 255 255; /* borde-luz para superficies cristalinas */
   --glass-alpha: 0.72; /* opacidad de las superficies glass (claro) */
+  /* Curvas de easing FUERTES (Emil Kowalski). Las built-in de CSS son débiles;
+     estas dan la "intención" que distingue una UI cuidada de una genérica. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1); /* entradas/salidas: arranca rápido */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1); /* movimiento en pantalla */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1); /* estilo iOS (drawers/sheets) */
 }
 
 .dark {
@@ -121,6 +126,14 @@
     .glass {
       background-color: rgb(var(--surface));
     }
+  }
+}
+
+/* Reduced motion: las entradas se muestran sin movimiento (solo aparecen). */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-scale-in {
+    animation: none;
   }
 }
 
