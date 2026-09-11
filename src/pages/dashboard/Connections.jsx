@@ -102,7 +102,7 @@ export function Connections() {
     window.addEventListener('focus', onFocus);
 
     window.FB.login(
-      async (response) => {
+      (response) => {
         settled = true;
         window.removeEventListener('focus', onFocus);
         const code = response?.authResponse?.code;
@@ -116,15 +116,20 @@ export function Connections() {
           toast.error('No recibimos el número. Vuelve a intentar y completa todos los pasos.');
           return;
         }
-        try {
-          await connectionsApi.connectWhatsApp({ code, phoneNumberId, wabaId });
-          await refresh();
-          toast.success('¡WhatsApp conectado! Tu bot ya puede responder en tu número.');
-        } catch (err) {
-          toast.error(err.response?.data?.message || 'No se pudo conectar. Intenta de nuevo.');
-        } finally {
-          setConnecting(false);
-        }
+        // El SDK de Facebook NO acepta un callback async (lanza "Expression is
+        // of type asyncfunction, not function"); el trabajo asíncrono (canje del
+        // código en el backend) va en una función interna auto-invocada.
+        (async () => {
+          try {
+            await connectionsApi.connectWhatsApp({ code, phoneNumberId, wabaId });
+            await refresh();
+            toast.success('¡WhatsApp conectado! Tu bot ya puede responder en tu número.');
+          } catch (err) {
+            toast.error(err.response?.data?.message || 'No se pudo conectar. Intenta de nuevo.');
+          } finally {
+            setConnecting(false);
+          }
+        })();
       },
       {
         config_id: data.facebook.configId,
