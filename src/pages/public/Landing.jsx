@@ -151,16 +151,25 @@ export default function Landing() {
         </Reveal>
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f, i) => {
-            // Bento: la 1ª y la 4ª tarjetas ocupan doble ancho en desktop.
-            const wide = i === 0 || i === 3 ? 'lg:col-span-2' : 'lg:col-span-1';
+            // Bento con ritmo: la 1ª y la 4ª son "destacadas" — doble ancho, tinte
+            // de marca e ícono/título más grandes (no 4 tarjetas iguales de texto).
+            const wide = i === 0 || i === 3;
             return (
-              <Reveal key={f.title} delay={i * 80} className={wide}>
-                <SpotlightCard className="group h-full p-6">
+              <Reveal key={f.title} delay={i * 80} className={wide ? 'lg:col-span-2' : 'lg:col-span-1'}>
+                <SpotlightCard
+                  className={`group h-full p-6 ${
+                    wide ? 'bg-gradient-to-br from-brand-500/[0.09] via-surface to-surface' : ''
+                  }`}
+                >
                   <div className="relative z-[2] flex h-full flex-col">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-500/10 text-brand-600 ring-1 ring-inset ring-brand-500/20 dark:text-brand-300">
-                      <Icon name={f.icon} size={22} />
+                    <div
+                      className={`flex items-center justify-center rounded-xl bg-brand-500/10 text-brand-600 ring-1 ring-inset ring-brand-500/20 dark:text-brand-300 ${
+                        wide ? 'h-12 w-12' : 'h-11 w-11'
+                      }`}
+                    >
+                      <Icon name={f.icon} size={wide ? 24 : 22} />
                     </div>
-                    <h3 className="mt-4 text-lg font-semibold text-fg">{f.title}</h3>
+                    <h3 className={`mt-4 font-semibold text-fg ${wide ? 'text-xl' : 'text-lg'}`}>{f.title}</h3>
                     <p className="mt-2 text-sm leading-relaxed text-muted">{f.desc}</p>
                   </div>
                 </SpotlightCard>
