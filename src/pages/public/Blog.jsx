@@ -43,8 +43,7 @@ export default function Blog() {
       <section className="relative overflow-hidden">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-grid" />
         <div className="relative mx-auto max-w-3xl px-4 pb-2 pt-12 sm:pt-16">
-          <span className="eyebrow">Blog</span>
-          <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-fg sm:text-4xl">
+          <h1 className="text-4xl font-extrabold tracking-tight text-fg sm:text-5xl">
             Recursos para atender mejor por WhatsApp
           </h1>
           <p className="mt-3 max-w-xl text-muted">

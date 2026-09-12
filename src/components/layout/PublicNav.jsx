@@ -25,9 +25,9 @@ export function PublicNav() {
 
   return (
     <header className="sticky top-0 z-30 border-b border-line/70 bg-surface/80 backdrop-blur-md">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+      <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
         <Link to="/" aria-label="RenBotIA — inicio" onClick={close}>
-          <Logo size={30} />
+          <Logo size={40} />
         </Link>
 
         {/* Desktop */}
@@ -36,25 +36,25 @@ export function PublicNav() {
             <Link
               key={l.to}
               to={l.to}
-              className="rounded-lg px-3 py-2 text-sm font-medium text-muted hover:text-fg"
+              className="rounded-lg px-3.5 py-2 text-[15px] font-medium text-muted transition-colors hover:text-fg"
             >
               {l.label}
             </Link>
           ))}
           {isAuthenticated ? (
             <Link to="/dashboard">
-              <Button size="sm">Ir al panel</Button>
+              <Button>Ir al panel</Button>
             </Link>
           ) : (
             <>
               <Link
                 to="/login"
-                className="rounded-lg px-3 py-2 text-sm font-medium text-muted hover:text-fg"
+                className="rounded-lg px-3.5 py-2 text-[15px] font-medium text-muted transition-colors hover:text-fg"
               >
                 Entrar
               </Link>
               <Link to="/registro">
-                <Button size="sm">Crear cuenta</Button>
+                <Button>Crear cuenta</Button>
               </Link>
             </>
           )}

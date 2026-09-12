@@ -62,11 +62,16 @@
       radial-gradient(48% 42% at 100% 4%, rgb(18 169 127 / 0.12), transparent 60%),
       radial-gradient(45% 40% at 50% 110%, rgb(52 201 154 / 0.08), transparent 60%);
   }
+  /* Display (Sora) solo en títulos grandes; los pequeños (h3) en Inter, que se
+     lee mejor a tamaño chico. */
   h1,
-  h2,
-  h3 {
+  h2 {
     @apply text-fg font-display;
     letter-spacing: -0.02em;
+  }
+  h3 {
+    @apply text-fg;
+    letter-spacing: -0.01em;
   }
 
   /* ── Scrollbars personalizados (acordes a la marca y al tema) ──

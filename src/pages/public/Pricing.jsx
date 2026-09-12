@@ -41,8 +41,7 @@ export default function Pricing() {
       <section className="relative overflow-hidden">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-grid" />
         <div className="relative mx-auto max-w-6xl px-4 pb-4 pt-16 text-center sm:pt-20">
-          <span className="eyebrow">Precios</span>
-          <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-fg sm:text-5xl">
+          <h1 className="text-4xl font-extrabold tracking-tight text-fg sm:text-6xl">
             Planes simples y transparentes
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-lg text-muted">

@@ -50,7 +50,7 @@ export default function Status() {
       <PublicNav />
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-16">
         <div className="text-center">
-          <span className="eyebrow">Estado del servicio</span>
+          <h1 className="text-4xl font-extrabold tracking-tight text-fg sm:text-5xl">Estado del servicio</h1>
           {state.loading ? (
             <div className="mt-6 flex justify-center">
               <Spinner className="text-brand-600" />
