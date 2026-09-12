@@ -45,6 +45,9 @@ export default {
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
+        // Display con carácter (Space Grotesk) para títulos — sale de lo genérico
+        // (Inter en todo) manteniendo un tono profesional para servicios B2B.
+        display: ['"Space Grotesk"', 'Inter', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
         card: '0 1px 2px rgba(2,6,23,.06)',

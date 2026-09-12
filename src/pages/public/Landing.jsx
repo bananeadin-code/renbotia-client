@@ -69,7 +69,7 @@ export default function Landing() {
               <Icon name="sparkles" size={14} />
               Atención por WhatsApp con IA
             </span>
-            <h1 className="text-4xl font-extrabold leading-[1.1] tracking-tight text-fg sm:text-5xl">
+            <h1 className="text-5xl font-extrabold leading-[1.05] tracking-tight text-fg sm:text-6xl">
               El asistente de WhatsApp que tu despacho no tiene tiempo de ser
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted">
@@ -110,8 +110,7 @@ export default function Landing() {
       <section className="border-y border-line bg-surface2/40">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-20 lg:grid-cols-2">
           <Reveal>
-            <span className="eyebrow">Pruébalo ahora</span>
-            <h2 className="mt-3 text-3xl font-bold text-fg sm:text-4xl">
+            <h2 className="text-4xl font-bold tracking-tight text-fg sm:text-5xl">
               Habla con un bot de ejemplo, sin registrarte
             </h2>
             <p className="mt-4 max-w-md text-muted">
@@ -145,8 +144,7 @@ export default function Landing() {
       {/* Características (bento con glow que sigue el cursor) */}
       <section className="mx-auto w-full max-w-6xl px-4 py-20">
         <Reveal className="mx-auto max-w-2xl text-center">
-          <span className="eyebrow">Capacidades</span>
-          <h2 className="mt-3 text-3xl font-bold text-fg sm:text-4xl">Todo lo que tu bot necesita</h2>
+          <h2 className="text-4xl font-bold tracking-tight text-fg sm:text-5xl">Todo lo que tu bot necesita</h2>
           <p className="mt-3 text-muted">
             Configúralo una vez y deja que trabaje. Sin código, sin complicaciones.
           </p>
@@ -176,8 +174,7 @@ export default function Landing() {
       <section className="border-y border-line bg-surface2/60">
         <div className="mx-auto max-w-6xl px-4 py-20">
           <Reveal className="mx-auto max-w-2xl text-center">
-            <span className="eyebrow">Cómo funciona</span>
-            <h2 className="mt-3 text-3xl font-bold text-fg sm:text-4xl">En marcha en minutos</h2>
+            <h2 className="text-4xl font-bold tracking-tight text-fg sm:text-5xl">En marcha en minutos</h2>
             <p className="mt-3 text-muted">Tres pasos y tu bot está atendiendo.</p>
           </Reveal>
           <div className="mt-12 grid gap-6 md:grid-cols-3">
@@ -196,8 +193,7 @@ export default function Landing() {
 
       {/* Sectores */}
       <Reveal as="section" className="mx-auto w-full max-w-6xl px-4 py-20 text-center">
-        <span className="eyebrow">Sectores</span>
-        <h2 className="mt-3 text-3xl font-bold text-fg sm:text-4xl">Pensado para tu sector</h2>
+        <h2 className="text-4xl font-bold tracking-tight text-fg sm:text-5xl">Pensado para tu sector</h2>
         <p className="mt-3 text-muted">
           Ideal para negocios de servicios profesionales que reciben muchas consultas repetidas.
         </p>
@@ -234,7 +230,7 @@ export default function Landing() {
           />
           <div aria-hidden="true" className="dot-grid pointer-events-none absolute inset-0 opacity-40" />
           <div className="relative">
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">
+            <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
               Deja de responder las mismas preguntas
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-brand-50">

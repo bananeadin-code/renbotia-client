@@ -65,8 +65,8 @@
   h1,
   h2,
   h3 {
-    @apply text-fg;
-    letter-spacing: -0.01em;
+    @apply text-fg font-display;
+    letter-spacing: -0.02em;
   }
 
   /* ── Scrollbars personalizados (acordes a la marca y al tema) ──
