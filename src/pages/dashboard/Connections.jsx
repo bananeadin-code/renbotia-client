@@ -111,16 +111,13 @@ export function Connections() {
           return;
         }
         const { phoneNumberId, wabaId } = sessionInfo.current;
-        if (!phoneNumberId || !wabaId) {
-          setConnecting(false);
-          toast.error('No recibimos el número. Vuelve a intentar y completa todos los pasos.');
-          return;
-        }
         // El SDK de Facebook NO acepta un callback async (lanza "Expression is
         // of type asyncfunction, not function"); el trabajo asíncrono (canje del
         // código en el backend) va en una función interna auto-invocada.
         (async () => {
           try {
+            // Enviamos el code y, si el navegador los pasó, el número/WABA; si no,
+            // el backend los deduce del token (más robusto).
             await connectionsApi.connectWhatsApp({ code, phoneNumberId, wabaId });
             await refresh();
             toast.success('¡WhatsApp conectado! Tu bot ya puede responder en tu número.');
