@@ -24,6 +24,8 @@ export const authApi = {
   updateProfile: (name) => unwrap(api.patch('/auth/profile', { name })),
   requestEmailChange: (newEmail) => unwrap(api.post('/auth/email/request', { newEmail })),
   verifyEmailChange: (code) => unwrap(api.post('/auth/email/verify', { code })),
+  // Eliminación de cuenta (irreversible). password o confirm='ELIMINAR'.
+  deleteAccount: (body) => unwrap(api.delete('/auth/account', { data: body })),
 };
 
 export const onboardingApi = {

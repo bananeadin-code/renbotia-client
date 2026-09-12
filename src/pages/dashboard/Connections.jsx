@@ -292,10 +292,31 @@ export function Connections() {
           <div className="mt-3 rounded-xl border border-line bg-surface2/50 p-4">
             <p className="text-sm font-medium text-fg">Sobre costos</p>
             <p className="mt-1 text-sm text-muted">
-              Tu plan RenBotIA cubre el bot con IA. Las conversaciones de WhatsApp las cobra{' '}
-              <strong className="text-fg">Meta directamente</strong> a tu cuenta, con{' '}
-              <strong className="text-fg">1,000 conversaciones gratis al mes</strong>. RenBotIA no agrega
-              ningún cargo por los mensajes.
+              Tu plan RenBotIA cubre el bot con IA. Cuando un cliente te escribe y el bot le
+              responde, esas son <strong className="text-fg">conversaciones de servicio</strong> y{' '}
+              <strong className="text-fg">Meta no las cobra: son gratis e ilimitadas</strong>. Meta
+              solo cobra los mensajes con plantilla que tú <em>inicias</em> (promociones o avisos), y
+              lo hace <strong className="text-fg">directamente a tu cuenta</strong>. RenBotIA no
+              agrega ningún cargo por los mensajes.
+            </p>
+          </div>
+
+          <div className="mt-3 rounded-xl border border-line bg-surface2/50 p-4">
+            <p className="text-sm font-medium text-fg">Método de pago en Meta</p>
+            <p className="mt-1 text-sm text-muted">
+              Responder a tus clientes es gratis, así que puedes empezar sin tarjeta. Para no tener
+              interrupciones y habilitar mensajes proactivos más adelante, agrega un método de pago
+              en tu cuenta de Meta:{' '}
+              <a
+                href="https://business.facebook.com/billing_hub/accounts"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-brand-600 underline-offset-2 hover:underline"
+              >
+                Facturación en Meta Business
+              </a>{' '}
+              (WhatsApp Manager → Facturación). Este pago es entre tu negocio y Meta; RenBotIA no
+              interviene.
             </p>
           </div>
         </Card>

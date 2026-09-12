@@ -57,25 +57,35 @@ export const LEGAL = {
         ],
       },
       {
-        h: '6. Cookies y almacenamiento local',
+        h: '6. Eliminación de tu cuenta y tus datos',
+        p: [
+          'Puedes eliminar tu cuenta y todos tus datos en cualquier momento, tú mismo, desde el panel: entra a Perfil y usa la opción “Eliminar cuenta”. La eliminación es permanente e inmediata.',
+          'Al eliminar tu cuenta borramos: tu perfil de usuario, tu negocio, la configuración y el entrenamiento del bot, el historial de conversaciones, tus registros de gestión (citas, pedidos, prospectos), tu perfil de facturación y la tarjeta guardada en nuestro proveedor de pagos, y la conexión con WhatsApp. Una vez eliminada, no podremos recuperar esta información.',
+        ],
+        p2: [
+          'Si conectaste tu cuenta mediante Facebook o WhatsApp (Meta), también puedes consultar el procedimiento en renbotia.com/eliminar-datos. Si necesitas ayuda o no puedes acceder a tu cuenta, escríbenos a servicios@renbotia.com.',
+        ],
+      },
+      {
+        h: '7. Cookies y almacenamiento local',
         p: [
           'Usamos almacenamiento local del navegador para recordar tu sesión y tus preferencias (como el tema claro u oscuro). No usamos cookies de publicidad de terceros.',
         ],
       },
       {
-        h: '7. Conservación de los datos',
+        h: '8. Conservación de los datos',
         p: [
-          'Conservamos tus datos mientras tu cuenta esté activa y durante el tiempo necesario para cumplir obligaciones legales. Si cierras tu cuenta, eliminaremos o anonimizaremos tus datos salvo que la ley exija conservarlos.',
+          'Conservamos tus datos mientras tu cuenta esté activa y durante el tiempo necesario para cumplir obligaciones legales. Si eliminas tu cuenta, borramos tus datos de inmediato, salvo lo que la ley exija conservar.',
         ],
       },
       {
-        h: '8. Cambios a este aviso',
+        h: '9. Cambios a este aviso',
         p: [
           'Podemos actualizar este Aviso de Privacidad. Publicaremos la versión vigente en renbotia.com/privacidad, indicando la fecha de la última actualización.',
         ],
       },
       {
-        h: '9. Consentimiento',
+        h: '10. Consentimiento',
         p: [
           'Al registrarte y usar RenBotIA, manifiestas que leíste y aceptas este Aviso de Privacidad.',
         ],
@@ -150,7 +160,7 @@ export const LEGAL = {
       {
         h: '9. Terminación',
         p: [
-          'Puedes dejar de usar el servicio y cancelar tu plan en cualquier momento. Podemos suspender o cancelar cuentas que incumplan estos términos.',
+          'Puedes dejar de usar el servicio y cancelar tu plan en cualquier momento. También puedes eliminar tu cuenta y todos tus datos de forma permanente desde Perfil → “Eliminar cuenta” (ver el Aviso de Privacidad y renbotia.com/eliminar-datos). Podemos suspender o cancelar cuentas que incumplan estos términos.',
         ],
       },
       {
@@ -168,6 +178,46 @@ export const LEGAL = {
       {
         h: '12. Contacto',
         p: ['Para dudas sobre estos términos, escríbenos a servicios@renbotia.com.'],
+      },
+    ],
+  },
+
+  'eliminar-datos': {
+    slug: 'eliminar-datos',
+    title: 'Eliminación de datos',
+    updated: '12 de septiembre de 2026',
+    description:
+      'Cómo eliminar tu cuenta de RenBotIA y todos tus datos, incluidos los asociados a tu conexión con Facebook o WhatsApp (Meta).',
+    intro:
+      'En RenBotIA puedes eliminar tu cuenta y todos los datos asociados en cualquier momento. Aquí te explicamos cómo, incluyendo los datos vinculados a tu conexión con Facebook o WhatsApp (Meta).',
+    sections: [
+      {
+        h: 'Opción 1: elimínala desde tu panel (recomendado)',
+        p: ['Es la forma más rápida y borra todo de inmediato:'],
+        ul: [
+          'Inicia sesión en renbotia.com.',
+          'Entra a Perfil desde el menú de tu cuenta.',
+          'Baja hasta “Eliminar cuenta” y sigue las instrucciones para confirmar.',
+        ],
+        p2: [
+          'La eliminación es permanente. Borramos tu usuario, tu negocio, la configuración y el entrenamiento del bot, el historial de conversaciones, los registros de gestión, tu facturación (incluida la tarjeta guardada en nuestro proveedor de pagos) y la conexión con WhatsApp.',
+        ],
+      },
+      {
+        h: 'Opción 2: solicítala por correo',
+        p: [
+          'Si no puedes acceder a tu cuenta, escríbenos a servicios@renbotia.com desde el correo con el que te registraste, con el asunto “Eliminar mis datos”. Verificaremos tu identidad y eliminaremos tus datos en un plazo máximo de 30 días.',
+        ],
+      },
+      {
+        h: 'Datos de tu conexión con Facebook / WhatsApp',
+        p: [
+          'Si conectaste tu cuenta mediante Facebook o WhatsApp (Meta), al eliminar tu cuenta también removemos el vínculo y la información de esa conexión que guardamos (los identificadores de tu cuenta de WhatsApp Business y de tu número). Los datos que Meta conserva por su cuenta se rigen por las políticas de Meta y puedes gestionarlos desde la configuración de tu cuenta de Facebook.',
+        ],
+      },
+      {
+        h: 'Contacto',
+        p: ['¿Dudas sobre la eliminación de tus datos? Escríbenos a servicios@renbotia.com.'],
       },
     ],
   },

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { authApi } from '../../api/endpoints.js';
 import { useAuthStore } from '../../store/authStore.js';
 import { useBusinessStore } from '../../store/businessStore.js';
@@ -17,8 +18,9 @@ const INDUSTRIES = [
 ];
 
 export default function Profile() {
-  const { user, updateUser } = useAuthStore();
+  const { user, updateUser, logout } = useAuthStore();
   const { business } = useBusinessStore();
+  const navigate = useNavigate();
 
   // Datos personales (nombre editable)
   const [name, setName] = useState(user?.name || '');
@@ -134,6 +136,33 @@ export default function Profile() {
       setPwMsg('Te enviamos un enlace a tu correo para elegir una nueva contraseña.');
     } catch {
       setPwMsg('No se pudo iniciar el cambio de contraseña.');
+    }
+  }
+
+  // Eliminar cuenta (irreversible). Reautentica con contraseña; si la cuenta es
+  // de Google (sin contraseña), el backend acepta la palabra "ELIMINAR".
+  const [delOpen, setDelOpen] = useState(false);
+  const [delPassword, setDelPassword] = useState('');
+  const [delConfirm, setDelConfirm] = useState('');
+  const [deleting, setDeleting] = useState(false);
+
+  function closeDelete() {
+    setDelOpen(false);
+    setDelPassword('');
+    setDelConfirm('');
+  }
+
+  async function handleDeleteAccount(e) {
+    e.preventDefault();
+    setDeleting(true);
+    try {
+      await authApi.deleteAccount({ password: delPassword, confirm: delConfirm.trim() });
+      toast.success('Tu cuenta y todos tus datos fueron eliminados.');
+      await logout();
+      navigate('/');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'No se pudo eliminar la cuenta.');
+      setDeleting(false);
     }
   }
 
@@ -320,6 +349,64 @@ export default function Profile() {
             Cambiar contraseña
           </Button>
         </div>
+      </Card>
+
+      {/* Eliminar cuenta (zona de riesgo) */}
+      <Card className="border-red-500/30">
+        <h2 className="mb-1 font-semibold text-red-600">Eliminar cuenta</h2>
+        <p className="mb-4 text-sm text-muted">
+          Elimina de forma permanente tu cuenta y todos tus datos: tu negocio, la configuración y el
+          entrenamiento del bot, el historial de conversaciones, los registros de gestión, tu
+          facturación (incluida la tarjeta guardada) y la conexión con WhatsApp.{' '}
+          <strong className="text-fg">Esta acción no se puede deshacer.</strong>
+        </p>
+
+        {!delOpen ? (
+          <Button
+            variant="ghost"
+            onClick={() => setDelOpen(true)}
+            className="text-red-600 hover:bg-red-500/10"
+          >
+            Eliminar mi cuenta
+          </Button>
+        ) : (
+          <form
+            onSubmit={handleDeleteAccount}
+            className="space-y-3 rounded-lg border border-red-500/30 bg-red-500/5 p-4"
+          >
+            <p className="text-sm text-fg">
+              Para confirmar, escribe <strong>ELIMINAR</strong> y tu contraseña.
+            </p>
+            <Input
+              label="Escribe ELIMINAR"
+              value={delConfirm}
+              onChange={(e) => setDelConfirm(e.target.value)}
+              placeholder="ELIMINAR"
+              autoComplete="off"
+            />
+            <Input
+              label="Contraseña"
+              type="password"
+              value={delPassword}
+              onChange={(e) => setDelPassword(e.target.value)}
+              placeholder="Déjala vacía si entraste con Google"
+              autoComplete="current-password"
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" size="sm" type="button" onClick={closeDelete}>
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                size="sm"
+                disabled={deleting || delConfirm.trim() !== 'ELIMINAR'}
+                className="bg-red-600 text-white hover:bg-red-700"
+              >
+                {deleting ? 'Eliminando…' : 'Eliminar definitivamente'}
+              </Button>
+            </div>
+          </form>
+        )}
       </Card>
     </div>
   );

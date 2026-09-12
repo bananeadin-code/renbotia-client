@@ -77,6 +77,7 @@ export default function App() {
       <Route path="/status" element={<Status />} />
       <Route path="/privacidad" element={<Legal slug="privacidad" />} />
       <Route path="/terminos" element={<Legal slug="terminos" />} />
+      <Route path="/eliminar-datos" element={<Legal slug="eliminar-datos" />} />
       <Route path="/login" element={<Login />} />
       <Route path="/registro" element={<Register />} />
       <Route path="/recuperar" element={<ForgotPassword />} />

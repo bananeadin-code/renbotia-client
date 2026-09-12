@@ -144,6 +144,9 @@ export function PublicFooter() {
             <Link to="/terminos" className="hover:text-fg">
               Términos
             </Link>
+            <Link to="/eliminar-datos" className="hover:text-fg">
+              Eliminar datos
+            </Link>
             {GOOGLE_BUSINESS_URL && (
               <a
                 href={GOOGLE_BUSINESS_URL}
