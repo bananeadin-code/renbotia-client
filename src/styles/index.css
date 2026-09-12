@@ -132,7 +132,8 @@
 /* Reduced motion: las entradas se muestran sin movimiento (solo aparecen). */
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up,
-  .animate-scale-in {
+  .animate-scale-in,
+  .animate-slide-up {
     animation: none;
   }
 }

@@ -71,10 +71,16 @@ export default {
           '0%': { opacity: '0', transform: 'scale(0.96)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
         },
+        // Bottom-sheet (móvil): sube desde abajo con curva estilo iOS.
+        'slide-up': {
+          '0%': { transform: 'translateY(100%)' },
+          '100%': { transform: 'translateY(0)' },
+        },
       },
       animation: {
         'fade-up': 'fade-up .5s cubic-bezier(0.23, 1, 0.32, 1) both',
         'scale-in': 'scale-in .18s cubic-bezier(0.23, 1, 0.32, 1) both',
+        'slide-up': 'slide-up .35s cubic-bezier(0.32, 0.72, 0, 1) both',
       },
     },
   },

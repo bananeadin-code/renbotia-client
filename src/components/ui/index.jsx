@@ -18,7 +18,7 @@ export function Button({
     'inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-[transform,background-color,box-shadow,color,opacity] duration-150 ease-out-strong active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas disabled:opacity-50 disabled:cursor-not-allowed';
   const variants = {
     primary:
-      'bg-gradient-to-b from-brand-500 to-brand-600 text-white shadow-card hover:from-brand-500 hover:to-brand-700 hover:shadow-elevated',
+      'bg-gradient-to-b from-brand-500 to-brand-600 text-white shadow-card hover:from-brand-500 hover:to-brand-700 hover:shadow-elevated [@media(hover:hover)]:hover:-translate-y-px',
     secondary: 'bg-surface text-fg border border-line shadow-card hover:bg-surface2',
     ghost: 'text-muted hover:bg-surface2 hover:text-fg',
     danger: 'bg-red-600 text-white shadow-card hover:bg-red-700',

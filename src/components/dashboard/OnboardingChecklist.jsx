@@ -107,8 +107,8 @@ export function OnboardingChecklist() {
       </div>
 
       <ul className="mt-4 space-y-2">
-        {steps.map((s) => (
-          <li key={s.title}>
+        {steps.map((s, i) => (
+          <li key={s.title} className="animate-fade-up" style={{ animationDelay: `${i * 60}ms` }}>
             <Link
               to={s.to}
               className={`flex items-center gap-3 rounded-lg border p-3 transition ${

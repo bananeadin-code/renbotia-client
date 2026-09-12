@@ -43,7 +43,7 @@ export function Modal({ open, onClose, title, children, footer, size = 'md' }) {
       />
       {/* Panel */}
       <div
-        className={`relative z-10 flex max-h-[92vh] w-full ${maxW} flex-col rounded-t-2xl border border-line bg-surface shadow-pop sm:rounded-2xl animate-fade-up`}
+        className={`relative z-10 flex max-h-[92vh] w-full ${maxW} flex-col rounded-t-2xl border border-line bg-surface shadow-pop sm:rounded-2xl animate-slide-up sm:animate-scale-in`}
       >
         {title && (
           <div className="flex items-center justify-between border-b border-line px-5 py-4">
