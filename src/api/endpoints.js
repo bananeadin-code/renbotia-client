@@ -148,6 +148,12 @@ export const connectionsApi = {
   get: () => unwrap(api.get('/connections')),
   connectWhatsApp: (body) => unwrap(api.post('/connections/whatsapp', body)),
   disconnectWhatsApp: () => unwrap(api.post('/connections/whatsapp/disconnect')),
+  // Perfil de WhatsApp Business (lo que el cliente ve en el chat).
+  getProfile: () => unwrap(api.get('/connections/whatsapp/profile')),
+  updateProfile: (body) => unwrap(api.put('/connections/whatsapp/profile', body)),
+  // Plantillas de la WABA (crear/listar desde el sitio).
+  listTemplates: () => unwrap(api.get('/connections/whatsapp/templates')),
+  createTemplate: (body) => unwrap(api.post('/connections/whatsapp/templates', body)),
 };
 
 export const membersApi = {
