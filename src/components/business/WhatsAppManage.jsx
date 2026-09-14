@@ -36,6 +36,56 @@ const STATUS_STYLE = {
 };
 const STATUS_LABEL = { APPROVED: 'Aprobada', PENDING: 'En revisión', REJECTED: 'Rechazada' };
 
+// Accesos a Meta para lo que NO podemos hacer por API (para no dejar al usuario a la suerte).
+const META_LINKS = [
+  {
+    label: 'Cambiar el nombre visible',
+    desc: 'El nombre que ven tus clientes se cambia en el Administrador de WhatsApp y lo revisa Meta.',
+    url: 'https://business.facebook.com/wa/manage/phone-numbers/',
+  },
+  {
+    label: 'Método de pago y facturación',
+    desc: 'Agrega o actualiza tu tarjeta en Meta para enviar plantillas y evitar cortes.',
+    url: 'https://business.facebook.com/billing_hub/accounts',
+  },
+  {
+    label: 'Administrar plantillas en Meta',
+    desc: 'Revisa el estado (aprobada/rechazada) y edita tus plantillas.',
+    url: 'https://business.facebook.com/wa/manage/message-templates/',
+  },
+  {
+    label: 'Verificación del negocio',
+    desc: 'Estado y datos de la verificación de tu empresa en Meta.',
+    url: 'https://business.facebook.com/settings/security',
+  },
+];
+
+// Convierte un archivo de imagen a un data URI CUADRADO (cover) y comprimido,
+// como pide la foto de perfil de WhatsApp.
+function fileToSquareDataUri(file, size = 640) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        const scale = Math.max(size / img.width, size / img.height);
+        const w = img.width * scale;
+        const h = img.height * scale;
+        ctx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 export function WhatsAppManage({ isOwner }) {
   const [loading, setLoading] = useState(true);
   const [verticals, setVerticals] = useState([]);
@@ -48,6 +98,8 @@ export function WhatsAppManage({ isOwner }) {
     vertical: '',
   });
   const [savingProfile, setSavingProfile] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState('');
+  const [newPhoto, setNewPhoto] = useState('');
 
   const [templates, setTemplates] = useState([]);
   const [tplReason, setTplReason] = useState(null);
@@ -68,6 +120,7 @@ export function WhatsAppManage({ isOwner }) {
         address: pr.address || '',
         vertical: pr.vertical || '',
       });
+      setPhotoUrl(pr.profile_picture_url || '');
       setTemplates(t.templates || []);
       setTplReason(t.reason || null);
     } catch {
@@ -84,7 +137,11 @@ export function WhatsAppManage({ isOwner }) {
     e.preventDefault();
     setSavingProfile(true);
     try {
-      await connectionsApi.updateProfile(profile);
+      await connectionsApi.updateProfile({ ...profile, ...(newPhoto ? { photo: newPhoto } : {}) });
+      if (newPhoto) {
+        setPhotoUrl(newPhoto);
+        setNewPhoto('');
+      }
       toast.success('Perfil de WhatsApp actualizado.');
     } catch (err) {
       toast.error(err.response?.data?.message || 'No se pudo actualizar el perfil.');
@@ -135,6 +192,39 @@ export function WhatsAppManage({ isOwner }) {
         </div>
 
         <form onSubmit={saveProfile} className="mt-4 space-y-4">
+          {/* Foto de perfil */}
+          <div className="flex items-center gap-4">
+            <span className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-line bg-surface2 text-subtle">
+              {newPhoto || photoUrl ? (
+                <img src={newPhoto || photoUrl} alt="Foto de perfil" className="h-full w-full object-cover" />
+              ) : (
+                <Icon name="user" size={24} />
+              )}
+            </span>
+            <div>
+              {isOwner && (
+                <label className="inline-block cursor-pointer rounded-lg border border-line px-3 py-1.5 text-sm font-medium text-fg transition hover:border-brand-300">
+                  {newPhoto ? 'Cambiar otra' : 'Cambiar foto'}
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const f = e.target.files?.[0];
+                      if (!f) return;
+                      try {
+                        setNewPhoto(await fileToSquareDataUri(f));
+                      } catch {
+                        toast.error('No se pudo leer la imagen.');
+                      }
+                    }}
+                  />
+                </label>
+              )}
+              <p className="mt-1 text-xs text-subtle">Cuadrada, se recorta al centro. Se guarda al dar “Guardar perfil”.</p>
+            </div>
+          </div>
+
           <div>
             <label className="mb-1 block text-sm font-medium text-fg">Info (frase corta)</label>
             <input
@@ -300,6 +390,32 @@ export function WhatsAppManage({ isOwner }) {
             </div>
           </form>
         )}
+      </Card>
+
+      {/* Gestionar en Meta: lo que no se puede hacer por API */}
+      <Card>
+        <h2 className="font-semibold text-fg">Gestionar en Meta</h2>
+        <p className="mt-1 text-sm text-muted">
+          Algunas cosas se administran directo en Meta. Aquí tienes los accesos para no dejarlo a la
+          suerte.
+        </p>
+        <div className="mt-4 space-y-2">
+          {META_LINKS.map((l) => (
+            <a
+              key={l.url}
+              href={l.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-start gap-3 rounded-lg border border-line bg-surface2/40 px-3 py-2.5 transition hover:border-brand-300"
+            >
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-medium text-fg">{l.label}</span>
+                <span className="block text-xs text-muted">{l.desc}</span>
+              </span>
+              <Icon name="link" size={16} className="mt-0.5 shrink-0 text-subtle" />
+            </a>
+          ))}
+        </div>
       </Card>
     </>
   );
