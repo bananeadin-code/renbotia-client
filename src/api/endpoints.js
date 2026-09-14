@@ -117,6 +117,9 @@ export const conversationsApi = {
   setMode: (id, handoffMode) => unwrap(api.patch(`/conversations/${id}`, { handoffMode })),
   reply: (id, message) => unwrap(api.post(`/conversations/${id}/reply`, { message })),
   rate: (id, index, rating) => unwrap(api.post(`/conversations/${id}/rate`, { index, rating })),
+  // Plantillas de WhatsApp (para reactivar fuera de la ventana de 24h).
+  templates: () => unwrap(api.get('/conversations/templates')),
+  sendTemplate: (id, body) => unwrap(api.post(`/conversations/${id}/template`, body)),
 };
 
 export const managementApi = {
