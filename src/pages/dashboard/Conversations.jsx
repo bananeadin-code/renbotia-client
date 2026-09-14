@@ -29,6 +29,7 @@ const META_BILLING_URL = 'https://business.facebook.com/billing_hub/accounts';
  */
 export default function Conversations() {
   const [list, setList] = useState([]);
+  const [needAttention, setNeedAttention] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
   const [thread, setThread] = useState(null);
@@ -49,6 +50,7 @@ export default function Conversations() {
     try {
       const data = await conversationsApi.list();
       setList(data.conversations);
+      setNeedAttention(data.needAttention || 0);
     } catch {
       /* silencioso */
     } finally {
@@ -176,7 +178,15 @@ export default function Conversations() {
     <div>
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-fg">Conversaciones</h1>
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-2xl font-bold text-fg">Conversaciones</h1>
+            {needAttention > 0 && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-600">
+                <Icon name="alert" size={13} />
+                {needAttention} {needAttention === 1 ? 'requiere' : 'requieren'} atención
+              </span>
+            )}
+          </div>
           <p className="text-sm text-muted">
             Actividad del bot. Toma el control cuando una conversación lo amerite.
           </p>
@@ -226,7 +236,9 @@ export default function Conversations() {
                 className={`w-full rounded-xl border p-3 text-left transition ${
                   c.id === selectedId
                     ? 'border-brand-400 bg-brand-500/5'
-                    : 'border-line bg-surface hover:border-brand-300'
+                    : c.needsAttention
+                      ? 'border-amber-400/60 bg-amber-500/[0.06] hover:border-amber-400'
+                      : 'border-line bg-surface hover:border-brand-300'
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
