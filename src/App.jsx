@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import { useAuthStore } from './store/authStore.js';
 import { useThemeStore } from './store/themeStore.js';
 import { ProtectedRoute } from './router/ProtectedRoute.jsx';
+import ScrollToTop from './router/ScrollToTop.jsx';
 import { Toaster } from './components/ui/Toaster.jsx';
 import { Spinner } from './components/ui/index.jsx';
 
@@ -65,6 +66,7 @@ export default function App() {
 
   return (
     <>
+    <ScrollToTop />
     <Suspense fallback={<RouteFallback />}>
     <Routes>
       {/* Público */}

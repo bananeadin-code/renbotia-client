@@ -25,6 +25,15 @@ const FAQ_JSONLD = {
   })),
 };
 
+// Video real del hero. Cuando tengas el clip grabado:
+//   1) colócalo en client/public/ (recomendado: MP4 H.264, vertical ~9:16,
+//      corto y en loop, SIN audio; opcional un .webm para menor peso).
+//   2) pon aquí su ruta, p. ej. '/demo-whatsapp.mp4'.
+// Mientras esté vacío ('') se muestra la demo animada por código (fallback).
+const HERO_VIDEO_SRC = '';
+// Póster opcional (primer frame) para que no se vea negro mientras carga.
+const HERO_VIDEO_POSTER = '';
+
 /**
  * Landing pública. Estructura semántica (h1/h2, section) pensada para SEO local.
  * Diseño alineado a la skill ui-ux-pro-max (íconos SVG, tokens, jerarquía).
@@ -95,13 +104,24 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* Demo de chat animado (loop). Para usar un video/GIF real grabado en
-              WhatsApp a futuro, reemplaza <AnimatedChatDemo/> por, p.ej.:
-                <video src="/demo-whatsapp.mp4" autoPlay muted loop playsInline
-                       className="mx-auto w-full max-w-sm rounded-2xl shadow-pop" />
-              colocando el archivo en client/public/. */}
+          {/* Hero: video real si está configurado (HERO_VIDEO_SRC); si no, la demo
+              de chat animada por código como fallback. */}
           <div className="animate-fade-up lg:justify-self-end">
-            <AnimatedChatDemo botName="Asistente Legal" />
+            {HERO_VIDEO_SRC ? (
+              <video
+                src={HERO_VIDEO_SRC}
+                poster={HERO_VIDEO_POSTER || undefined}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                aria-label="Demostración del asistente de WhatsApp de RenBotIA"
+                className="mx-auto w-full max-w-sm rounded-[2rem] border border-line shadow-pop"
+              />
+            ) : (
+              <AnimatedChatDemo botName="Asistente Legal" />
+            )}
           </div>
         </div>
       </section>
