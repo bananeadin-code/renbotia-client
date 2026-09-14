@@ -396,8 +396,8 @@ export function WhatsAppManage({ isOwner }) {
       <Card>
         <h2 className="font-semibold text-fg">Gestionar en Meta</h2>
         <p className="mt-1 text-sm text-muted">
-          Algunas cosas se administran directo en Meta. Aquí tienes los accesos para no dejarlo a la
-          suerte.
+          Algunas cosas se administran directo en Meta. Aquí tienes los enlaces para realizar esos
+          ajustes.
         </p>
         <div className="mt-4 space-y-2">
           {META_LINKS.map((l) => (
