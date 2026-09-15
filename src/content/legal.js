@@ -130,7 +130,7 @@ export const LEGAL = {
           'Recabar datos personales sin fundamento legal, o violar la privacidad de terceros.',
         ],
         p2: [
-          'Eres responsable del contenido con el que entrenas tu bot y de cumplir las políticas de WhatsApp/Meta y las leyes aplicables, incluida la obtención del consentimiento de las personas que contactes.',
+          'Eres responsable del contenido con el que entrenas tu bot —incluidos los archivos, documentos e imágenes que subas— y de cumplir las políticas de WhatsApp/Meta y las leyes aplicables, incluida la obtención del consentimiento de las personas que contactes. No debes subir material ilícito, ofensivo, obsceno o ajeno a tu negocio; RenBotIA no revisa previamente cada archivo y el bot ignora el contenido que no corresponda al negocio.',
         ],
       },
       {

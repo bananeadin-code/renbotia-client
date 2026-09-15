@@ -6,6 +6,7 @@ import { toast } from '../../store/toastStore.js';
 import { Card, Button, Input, Textarea, Select, Alert, Spinner, Badge } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { limitsFor } from '../../lib/planLimits.js';
+import { extractTextFromFile } from '../../lib/extractText.js';
 
 const TONES = [
   { value: 'formal', label: 'Formal' },
@@ -148,6 +149,7 @@ export default function BotTraining() {
           extraContext: c.extraContext || '',
           faqs: c.faqs?.length ? c.faqs : [{ question: '', answer: '' }],
           images: c.images || [],
+          documents: c.documents || [],
           // servicesText: string crudo que edita el usuario; se parsea a array al
           // guardar (antes se parseaba en cada tecla y borraba comas/espacios).
           servicesText: (c.businessInfo?.services || []).join(', '),
@@ -207,6 +209,38 @@ export default function BotTraining() {
     }
   }
 
+  const [docBusy, setDocBusy] = useState(false);
+  async function addDocumentFile(file) {
+    if (!file) return;
+    if ((cfg.documents || []).length >= 10) {
+      setError('Puedes subir hasta 10 documentos.');
+      setFeedbackTick((t) => t + 1);
+      return;
+    }
+    setError('');
+    setDocBusy(true);
+    try {
+      const text = await extractTextFromFile(file);
+      if (!text.trim()) {
+        setError('No se pudo leer texto de ese archivo. Prueba con un PDF con texto (no escaneado) o un .txt.');
+        setFeedbackTick((t) => t + 1);
+        return;
+      }
+      setCfg((prev) => ({
+        ...prev,
+        documents: [...(prev.documents || []), { name: (file.name || 'documento').slice(0, 120), text }],
+      }));
+    } catch (e) {
+      setError(e.message || 'No se pudo procesar el archivo.');
+      setFeedbackTick((t) => t + 1);
+    } finally {
+      setDocBusy(false);
+    }
+  }
+  function removeDocument(i) {
+    setCfg((prev) => ({ ...prev, documents: (prev.documents || []).filter((_, idx) => idx !== i) }));
+  }
+
   async function save({ thenSimulate } = {}) {
     setMsg('');
     setError('');
@@ -235,6 +269,7 @@ export default function BotTraining() {
         extraContext: cfg.extraContext,
         faqs: cfg.faqs.filter((f) => f.question.trim() && f.answer.trim()),
         images: cfg.images.filter((img) => img.label.trim() && img.url.trim()),
+        documents: (cfg.documents || []).filter((d) => d.text?.trim()),
         businessInfo: { ...cfg.businessInfo, services },
       };
       // Sector del negocio (aplica a todos los planes; vive en Business).
@@ -535,6 +570,71 @@ export default function BotTraining() {
               </div>
             ))}
           </div>
+        </Card>
+      )}
+
+      {/* Documentos de contexto (Elite) */}
+      {limits.documents && (
+        <Card>
+          <div className="mb-1 flex items-center justify-between gap-2">
+            <h2 className="font-semibold text-fg">Documentos de contexto</h2>
+            <label
+              className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-sm font-medium text-fg transition hover:border-brand-300 ${
+                docBusy ? 'pointer-events-none opacity-60' : ''
+              }`}
+            >
+              <Icon name="plus" size={16} />
+              {docBusy ? 'Leyendo…' : 'Subir archivo'}
+              <input
+                type="file"
+                accept=".pdf,.txt,.md,text/plain,application/pdf"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  e.target.value = '';
+                  addDocumentFile(f);
+                }}
+              />
+            </label>
+          </div>
+          <p className="mb-3 text-xs text-muted">
+            Sube PDFs o archivos de texto con información del negocio (folletos, catálogos, políticas).
+            Extraemos el texto para que el bot lo use como referencia. {(cfg.documents || []).length}/10.
+          </p>
+          <div className="space-y-2">
+            {(cfg.documents || []).length === 0 ? (
+              <p className="rounded-lg border border-dashed border-line p-4 text-center text-sm text-subtle">
+                Aún no subes documentos. Ej. un PDF con tus servicios o preguntas frecuentes.
+              </p>
+            ) : (
+              (cfg.documents || []).map((d, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-line bg-surface2/40 px-3 py-2"
+                >
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium text-fg">{d.name || 'Documento'}</div>
+                    <div className="text-xs text-subtle">
+                      {(d.text || '').length.toLocaleString('es-MX')} caracteres
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => removeDocument(i)}
+                    className="shrink-0 text-xs text-red-500 hover:underline"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+          <p className="mt-3 flex items-start gap-1.5 text-[11px] text-subtle">
+            <Icon name="shield" size={12} className="mt-0.5 shrink-0" />
+            <span>
+              Sube solo contenido lícito y relacionado con tu negocio; eres responsable de lo que
+              cargas. El bot ignora lo que no corresponda al negocio.
+            </span>
+          </p>
         </Card>
       )}
 
