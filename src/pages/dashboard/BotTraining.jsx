@@ -289,6 +289,12 @@ export default function BotTraining() {
         <Badge color="green">Plan {planName}</Badge>
       </div>
 
+      <p className="rounded-lg border border-line bg-surface2/40 px-3 py-2 text-xs text-subtle">
+        Mientras más información y contexto le des al bot, y cuando envía imágenes, consume más
+        tokens de tu cupo: es la naturaleza de la IA y del caché de contexto. Dale lo esencial y
+        claro para aprovecharlo mejor.
+      </p>
+
       {(msg || error || issues.length > 0) && (
       <div ref={alertRef} className="scroll-mt-20 space-y-6">
       {msg && <Alert variant="success">{msg}</Alert>}
