@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import { PublicNav, PublicFooter } from '../../components/layout/PublicNav.jsx';
 import { SupportWidget } from '../../components/whatsapp/SupportWidget.jsx';
 import { SpotlightCard } from '../../components/ui/SpotlightCard.jsx';
+import { Reveal } from '../../components/ui/Reveal.jsx';
 import { Button } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { Breadcrumbs } from '../../components/ui/Breadcrumbs.jsx';
@@ -84,7 +85,7 @@ export default function Solution() {
 
       <main className="mx-auto max-w-4xl px-4 py-16">
         {/* Dolores → Beneficios */}
-        <div className="grid gap-6 md:grid-cols-2">
+        <Reveal className="grid gap-6 md:grid-cols-2">
           <div>
             <h2 className="text-sm font-semibold uppercase tracking-wide text-subtle">
               Lo que hoy te quita tiempo
@@ -111,11 +112,11 @@ export default function Solution() {
               ))}
             </ul>
           </div>
-        </div>
+        </Reveal>
 
         {/* Ejemplo de conversación */}
         {sol.example && (
-          <div className="mt-12">
+          <Reveal className="mt-12">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-subtle">
               Un ejemplo
             </h2>
@@ -131,12 +132,12 @@ export default function Solution() {
                 </p>
               </div>
             </div>
-          </div>
+          </Reveal>
         )}
 
         {/* FAQs */}
         {sol.faqs?.length > 0 && (
-          <div className="mt-12">
+          <Reveal className="mt-12">
             <h2 className="text-xl font-bold text-fg sm:text-2xl">Preguntas frecuentes</h2>
             <div className="mt-4 divide-y divide-line border-y border-line">
               {sol.faqs.map((f) => (
@@ -146,11 +147,11 @@ export default function Solution() {
                 </div>
               ))}
             </div>
-          </div>
+          </Reveal>
         )}
 
         {/* CTA */}
-        <div className="mt-12 rounded-2xl border border-brand-200 bg-brand-50/60 p-7 text-center dark:border-brand-900/60 dark:bg-brand-900/20">
+        <Reveal className="mt-12 rounded-2xl border border-brand-200 bg-brand-50/60 p-7 text-center dark:border-brand-900/60 dark:bg-brand-900/20">
           <h2 className="text-xl font-bold text-fg sm:text-2xl">
             Pruébalo con la información de tu negocio
           </h2>
@@ -162,10 +163,10 @@ export default function Solution() {
               Empezar gratis <Icon name="arrowRight" size={18} />
             </Button>
           </Link>
-        </div>
+        </Reveal>
 
         {/* Otras industrias (enlazado interno) */}
-        <div className="mt-14">
+        <Reveal className="mt-14">
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-subtle">
             Para otros sectores
           </h2>
@@ -185,7 +186,7 @@ export default function Solution() {
               </Link>
             ))}
           </div>
-        </div>
+        </Reveal>
       </main>
 
       <PublicFooter />

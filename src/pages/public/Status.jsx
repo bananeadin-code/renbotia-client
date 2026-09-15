@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { PublicNav, PublicFooter } from '../../components/layout/PublicNav.jsx';
 import { Card, Spinner } from '../../components/ui/index.jsx';
+import { Reveal } from '../../components/ui/Reveal.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { useSeo } from '../../lib/seo.js';
 
@@ -76,7 +77,8 @@ export default function Status() {
         </div>
 
         {!state.loading && (
-          <Card className="mt-8 !p-0">
+          <Reveal className="mt-8">
+            <Card className="!p-0">
             <ul className="divide-y divide-line">
               {rows.map((key) => {
                 const up = state.components[key] === 'ok';
@@ -95,7 +97,8 @@ export default function Status() {
                 );
               })}
             </ul>
-          </Card>
+            </Card>
+          </Reveal>
         )}
 
         <p className="mt-6 text-center text-xs text-subtle">

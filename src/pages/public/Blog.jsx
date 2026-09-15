@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { PublicNav, PublicFooter } from '../../components/layout/PublicNav.jsx';
 import { SupportWidget } from '../../components/whatsapp/SupportWidget.jsx';
 import { SpotlightCard } from '../../components/ui/SpotlightCard.jsx';
+import { Reveal } from '../../components/ui/Reveal.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { POSTS } from '../../content/blog.js';
 import { useSeo, SITE_URL } from '../../lib/seo.js';
@@ -55,8 +56,9 @@ export default function Blog() {
 
       <main className="mx-auto max-w-3xl px-4 pb-16 pt-8">
         <div className="space-y-4">
-          {POSTS.map((post) => (
-            <Link key={post.slug} to={`/blog/${post.slug}`} className="block">
+          {POSTS.map((post, i) => (
+            <Reveal as="div" key={post.slug} delay={i * 60}>
+              <Link to={`/blog/${post.slug}`} className="block">
               <SpotlightCard className="group p-6">
                 <div className="relative z-[2]">
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-subtle">
@@ -83,7 +85,8 @@ export default function Blog() {
                   </div>
                 </div>
               </SpotlightCard>
-            </Link>
+              </Link>
+            </Reveal>
           ))}
         </div>
       </main>

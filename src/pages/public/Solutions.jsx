@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { PublicNav, PublicFooter } from '../../components/layout/PublicNav.jsx';
 import { SupportWidget } from '../../components/whatsapp/SupportWidget.jsx';
 import { SpotlightCard } from '../../components/ui/SpotlightCard.jsx';
+import { Reveal } from '../../components/ui/Reveal.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { SOLUTIONS } from '../../content/solutions.js';
 import { useSeo, SITE_URL } from '../../lib/seo.js';
@@ -35,8 +36,9 @@ export default function Solutions() {
 
       <main className="mx-auto max-w-5xl px-4 pb-16 pt-10">
         <div className="grid gap-4 sm:grid-cols-2">
-          {SOLUTIONS.map((s) => (
-            <Link key={s.slug} to={`/soluciones/${s.slug}`}>
+          {SOLUTIONS.map((s, i) => (
+            <Reveal as="div" key={s.slug} delay={(i % 2) * 80}>
+              <Link to={`/soluciones/${s.slug}`}>
               <SpotlightCard className="group h-full p-6">
                 <div className="relative z-[2]">
                   <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-500/10 text-brand-600 ring-1 ring-inset ring-brand-500/20">
@@ -51,7 +53,8 @@ export default function Solutions() {
                   </span>
                 </div>
               </SpotlightCard>
-            </Link>
+              </Link>
+            </Reveal>
           ))}
         </div>
       </main>

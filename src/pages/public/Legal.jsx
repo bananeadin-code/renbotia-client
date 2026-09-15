@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { PublicNav, PublicFooter } from '../../components/layout/PublicNav.jsx';
+import { Reveal } from '../../components/ui/Reveal.jsx';
 import { getLegal } from '../../content/legal.js';
 import { useSeo, SITE_URL } from '../../lib/seo.js';
 
@@ -45,7 +46,7 @@ export default function Legal({ slug }) {
 
         <div className="mt-8 space-y-8">
           {doc.sections.map((s) => (
-            <section key={s.h}>
+            <Reveal as="section" key={s.h}>
               <h2 className="text-lg font-bold text-fg">{s.h}</h2>
               {s.p?.map((para, i) => (
                 <p key={i} className="mt-2 text-[15px] leading-relaxed text-fg/90">
@@ -67,7 +68,7 @@ export default function Legal({ slug }) {
                   {para}
                 </p>
               ))}
-            </section>
+            </Reveal>
           ))}
         </div>
 

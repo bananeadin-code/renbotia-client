@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
 import { PublicNav, PublicFooter } from '../../components/layout/PublicNav.jsx';
 import { Button } from '../../components/ui/index.jsx';
+import { Reveal } from '../../components/ui/Reveal.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { Breadcrumbs } from '../../components/ui/Breadcrumbs.jsx';
 import { SupportWidget } from '../../components/whatsapp/SupportWidget.jsx';
@@ -119,7 +120,7 @@ export default function BlogPost() {
           </div>
 
           {/* CTA */}
-          <div className="mt-10 rounded-2xl border border-brand-200 bg-brand-50/60 p-6 text-center dark:border-brand-900/60 dark:bg-brand-900/20">
+          <Reveal className="mt-10 rounded-2xl border border-brand-200 bg-brand-50/60 p-6 text-center dark:border-brand-900/60 dark:bg-brand-900/20">
             <h3 className="text-lg font-bold text-fg">Prueba tu asistente de WhatsApp gratis</h3>
             <p className="mx-auto mt-1 max-w-md text-sm text-muted">
               Arma tu bot con la información de tu negocio y pruébalo en un simulador en minutos.
@@ -129,12 +130,12 @@ export default function BlogPost() {
                 Empezar gratis <Icon name="chevronRight" size={16} />
               </Button>
             </Link>
-          </div>
+          </Reveal>
         </article>
 
         {/* Relacionados */}
         {related.length > 0 && (
-          <section className="mt-12 border-t border-line pt-8">
+          <Reveal as="section" className="mt-12 border-t border-line pt-8">
             <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-subtle">
               Sigue leyendo
             </h2>
@@ -150,7 +151,7 @@ export default function BlogPost() {
                 </Link>
               ))}
             </div>
-          </section>
+          </Reveal>
         )}
       </main>
       <PublicFooter />
