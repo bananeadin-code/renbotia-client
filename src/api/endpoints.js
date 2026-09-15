@@ -166,4 +166,6 @@ export const membersApi = {
 
 export const adminApi = {
   businesses: () => unwrap(api.get('/admin/businesses')),
+  // Control fiscal (RESICO): ingresos del sitio + estimación de impuestos.
+  fiscal: () => unwrap(api.get('/admin/fiscal')),
 };

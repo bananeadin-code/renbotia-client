@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { adminApi } from '../../api/endpoints.js';
 import { Card, Badge, Spinner, Alert } from '../../components/ui/index.jsx';
+import { AdminFiscal } from '../../components/admin/AdminFiscal.jsx';
 
 export default function AdminPanel() {
   const [data, setData] = useState(null);
@@ -33,6 +34,14 @@ export default function AdminPanel() {
           por el precio intro y la caché). El costo excluye el consumo de datos demo y debe cuadrar
           con tu consola de Anthropic.
         </p>
+      </div>
+
+      {/* Control fiscal (RESICO): ingresos del sitio + estimación de impuestos */}
+      <AdminFiscal />
+
+      <div className="border-t border-line pt-2">
+        <h2 className="text-lg font-bold text-fg">Negocios y costo de API</h2>
+        <p className="text-sm text-muted">Consumo real y costo estimado por negocio.</p>
       </div>
 
       {/* Totales */}
