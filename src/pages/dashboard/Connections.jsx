@@ -196,6 +196,15 @@ export function Connections() {
 
         {connected && (
           <div className="mt-4 space-y-3 border-t border-line pt-4">
+            {data.whatsapp.phoneNumber && (
+              <p className="text-sm text-fg">
+                Número conectado:{' '}
+                <span className="font-semibold tabular">{data.whatsapp.phoneNumber}</span>
+              </p>
+            )}
+            {data.whatsapp.verifiedName && (
+              <p className="text-xs text-subtle">Nombre visible: {data.whatsapp.verifiedName}</p>
+            )}
             <p className="text-xs text-subtle">ID del número: {data.whatsapp.phoneNumberId}</p>
             {isOwner && (
               <Button variant="ghost" onClick={disconnect} className="text-red-500 hover:bg-red-500/10">

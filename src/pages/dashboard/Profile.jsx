@@ -5,7 +5,7 @@ import { useAuthStore } from '../../store/authStore.js';
 import { useBusinessStore } from '../../store/businessStore.js';
 import { businessApi } from '../../api/endpoints.js';
 import { toast } from '../../store/toastStore.js';
-import { WhatsAppVerification } from '../../components/business/WhatsAppVerification.jsx';
+import { ConnectedChannels } from '../../components/business/ConnectedChannels.jsx';
 import { ActivityLog } from '../../components/business/ActivityLog.jsx';
 import { Card, Button, Input, Select, Alert } from '../../components/ui/index.jsx';
 
@@ -298,8 +298,8 @@ export default function Profile() {
         </form>
       </Card>
 
-      {/* Número de WhatsApp + verificación de propiedad */}
-      <WhatsAppVerification />
+      {/* Canales conectados (informativo) */}
+      <ConnectedChannels />
 
       {/* Bitácora de auditoría */}
       <ActivityLog />
