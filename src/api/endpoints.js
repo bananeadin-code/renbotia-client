@@ -115,6 +115,7 @@ export const conversationsApi = {
   list: () => unwrap(api.get('/conversations')),
   get: (id) => unwrap(api.get(`/conversations/${id}`)),
   setMode: (id, handoffMode) => unwrap(api.patch(`/conversations/${id}`, { handoffMode })),
+  rename: (id, title) => unwrap(api.patch(`/conversations/${id}`, { title })),
   reply: (id, message) => unwrap(api.post(`/conversations/${id}/reply`, { message })),
   rate: (id, index, rating) => unwrap(api.post(`/conversations/${id}/rate`, { index, rating })),
   // Plantillas de WhatsApp (para reactivar fuera de la ventana de 24h).

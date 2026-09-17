@@ -21,6 +21,37 @@ function windowRemaining(iso) {
 
 const META_BILLING_URL = 'https://business.facebook.com/billing_hub/accounts';
 
+// Etiqueta legible del registro de trabajo captado (para el badge en la lista).
+const RECORD_LABEL = { cita: 'Cita', reservacion: 'Reservación', pedido: 'Pedido', prospecto: 'Prospecto' };
+
+const DATE_PRESETS = [
+  { value: 'all', label: 'Todas' },
+  { value: 'today', label: 'Hoy' },
+  { value: '7', label: '7 días' },
+  { value: '30', label: '30 días' },
+];
+
+// Aplica búsqueda por nombre/título y filtro por fecha a la lista.
+function filterConversations(list, search, datePreset) {
+  const q = search.trim().toLowerCase();
+  let cutoff = 0;
+  if (datePreset === 'today') {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    cutoff = d.getTime();
+  } else if (datePreset === '7' || datePreset === '30') {
+    cutoff = Date.now() - Number(datePreset) * 24 * 60 * 60 * 1000;
+  }
+  return list.filter((c) => {
+    if (q) {
+      const hay = `${c.title || ''} ${c.customerName || ''}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    if (cutoff && new Date(c.lastAt).getTime() < cutoff) return false;
+    return true;
+  });
+}
+
 /**
  * Bandeja de Conversaciones: actividad del bot con relevo humano. El dueño (o un
  * colaborador) ve las conversaciones, toma el control (modo manual) cuando lo
@@ -44,6 +75,11 @@ export default function Conversations() {
   const [templatesLoaded, setTemplatesLoaded] = useState(false);
   const [tplName, setTplName] = useState('');
   const [sendingTpl, setSendingTpl] = useState(false);
+  // Búsqueda + filtro por fecha (cliente) y renombrar conversación.
+  const [search, setSearch] = useState('');
+  const [datePreset, setDatePreset] = useState('all');
+  const [renaming, setRenaming] = useState(false);
+  const [titleDraft, setTitleDraft] = useState('');
   const scrollRef = useRef(null);
 
   async function loadList() {
@@ -77,6 +113,62 @@ export default function Conversations() {
       }
     } finally {
       setLoadingThread(false);
+    }
+  }
+
+  // Refresco SILENCIOSO del hilo abierto (tiempo real por polling). Solo cambia el
+  // estado si llegaron mensajes nuevos o cambió el modo (evita re-render y saltos).
+  async function refreshThread(id) {
+    try {
+      const data = await conversationsApi.get(id);
+      setWaWindow(data.whatsappWindow || null);
+      setThread((prev) => {
+        const next = data.conversation;
+        if (
+          prev &&
+          next &&
+          prev.messages.length === next.messages.length &&
+          prev.handoffMode === next.handoffMode &&
+          prev.title === next.title
+        ) {
+          return prev;
+        }
+        return next;
+      });
+    } catch {
+      /* silencioso */
+    }
+  }
+
+  // Tiempo real: refresca la LISTA cada 12s y el HILO abierto cada 5s. Se pausa
+  // cuando la pestaña no está visible (ahorra peticiones).
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (!document.hidden) loadList();
+    }, 12000);
+    return () => clearInterval(id);
+  }, []);
+  useEffect(() => {
+    if (!selectedId) return undefined;
+    const id = setInterval(() => {
+      if (!document.hidden) refreshThread(selectedId);
+    }, 5000);
+    return () => clearInterval(id);
+  }, [selectedId]);
+
+  async function saveTitle() {
+    const t = titleDraft.trim();
+    if (!t || !selectedId) {
+      setRenaming(false);
+      return;
+    }
+    try {
+      const data = await conversationsApi.rename(selectedId, t);
+      setThread(data.conversation);
+      setRenaming(false);
+      loadList();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'No se pudo renombrar.');
     }
   }
 
@@ -173,6 +265,7 @@ export default function Conversations() {
   const isManual = thread?.handoffMode === 'manual';
   const isWhatsapp = thread?.channel === 'whatsapp';
   const windowClosed = isWhatsapp && waWindow && !waWindow.open;
+  const filtered = filterConversations(list, search, datePreset);
 
   return (
     <div>
@@ -228,8 +321,40 @@ export default function Conversations() {
       ) : (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-[330px_minmax(0,1fr)]">
           {/* Lista */}
-          <div className={`space-y-2 ${selectedId ? 'hidden lg:block' : ''}`}>
-            {list.map((c) => (
+          <div className={`${selectedId ? 'hidden lg:block' : ''}`}>
+            {/* Buscar + filtro por fecha */}
+            <div className="mb-3 space-y-2">
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Buscar por nombre…"
+                className="w-full rounded-lg border border-line bg-canvas px-3 py-2 text-sm text-fg outline-none focus:border-brand-500"
+              />
+              <div className="flex flex-wrap gap-1.5">
+                {DATE_PRESETS.map((p) => (
+                  <button
+                    key={p.value}
+                    type="button"
+                    onClick={() => setDatePreset(p.value)}
+                    className={`rounded-full px-2.5 py-1 text-xs font-medium transition ${
+                      datePreset === p.value
+                        ? 'bg-brand-600 text-white'
+                        : 'border border-line text-muted hover:text-fg'
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {filtered.length === 0 ? (
+              <p className="rounded-xl border border-dashed border-line p-4 text-center text-sm text-subtle">
+                Sin conversaciones que coincidan.
+              </p>
+            ) : (
+            <div className="space-y-2">
+            {filtered.map((c) => (
               <button
                 key={c.id}
                 onClick={() => openConv(c.id)}
@@ -267,9 +392,16 @@ export default function Conversations() {
                       <Icon name="alert" size={11} /> Ventana cerrada
                     </span>
                   )}
+                  {c.capturedRecordType && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-brand-500/15 px-2 py-0.5 text-[10px] font-semibold text-brand-700 dark:text-brand-300">
+                      <Icon name="clipboard" size={11} /> {RECORD_LABEL[c.capturedRecordType] || 'Registro'}
+                    </span>
+                  )}
                 </div>
               </button>
             ))}
+            </div>
+            )}
           </div>
 
           {/* Hilo */}
@@ -296,9 +428,45 @@ export default function Conversations() {
                   >
                     <Icon name="chevronRight" size={20} className="rotate-180" />
                   </button>
-                  <span className="min-w-0 flex-1 truncate text-sm font-semibold text-fg">
-                    {thread.title}
-                  </span>
+                  {renaming ? (
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        saveTitle();
+                      }}
+                      className="flex min-w-0 flex-1 items-center gap-1.5"
+                    >
+                      <input
+                        autoFocus
+                        value={titleDraft}
+                        onChange={(e) => setTitleDraft(e.target.value)}
+                        maxLength={80}
+                        className="min-w-0 flex-1 rounded-md border border-line bg-canvas px-2 py-1 text-sm text-fg outline-none focus:border-brand-500"
+                      />
+                      <button type="submit" className="shrink-0 text-xs font-semibold text-brand-600 hover:underline">
+                        Guardar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setRenaming(false)}
+                        className="shrink-0 text-xs text-muted hover:text-fg"
+                      >
+                        Cancelar
+                      </button>
+                    </form>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTitleDraft(thread.title || '');
+                        setRenaming(true);
+                      }}
+                      title="Renombrar conversación"
+                      className="min-w-0 flex-1 truncate text-left text-sm font-semibold text-fg underline-offset-2 hover:underline"
+                    >
+                      {thread.title}
+                    </button>
+                  )}
                   {/* Selector de modo */}
                   <div className="flex shrink-0 rounded-lg border border-line p-0.5 text-xs">
                     <button
@@ -369,9 +537,24 @@ export default function Conversations() {
                                 : 'bg-whatsapp-bubbleIn dark:bg-whatsapp-darkBubbleIn'
                             }`}
                           >
-                            <p className={`whitespace-pre-wrap break-words ${mine && agent ? 'text-white' : 'text-slate-800 dark:text-whatsapp-darkText'}`}>
-                              {m.content}
-                            </p>
+                            {m.images?.length > 0 && (
+                              <div className="mb-1 space-y-1">
+                                {m.images.map((img, k) => (
+                                  <img
+                                    key={k}
+                                    src={img.url}
+                                    alt={img.label || 'imagen'}
+                                    loading="lazy"
+                                    className="max-h-60 w-full rounded-md object-cover"
+                                  />
+                                ))}
+                              </div>
+                            )}
+                            {m.content && m.content !== '(imagen del cliente)' && (
+                              <p className={`whitespace-pre-wrap break-words ${mine && agent ? 'text-white' : 'text-slate-800 dark:text-whatsapp-darkText'}`}>
+                                {m.content}
+                              </p>
+                            )}
                             <span className={`mt-0.5 block text-right text-[10px] ${mine && agent ? 'text-white/70' : 'text-slate-400 dark:text-whatsapp-darkTime'}`}>
                               {timeOf(m.timestamp)}
                             </span>
