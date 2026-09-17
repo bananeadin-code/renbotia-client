@@ -150,6 +150,7 @@ export default function BotTraining() {
           faqs: c.faqs?.length ? c.faqs : [{ question: '', answer: '' }],
           images: c.images || [],
           documents: c.documents || [],
+          quickReplies: c.quickReplies?.length ? c.quickReplies : [''],
           // servicesText: string crudo que edita el usuario; se parsea a array al
           // guardar (antes se parseaba en cada tecla y borraba comas/espacios).
           servicesText: (c.businessInfo?.services || []).join(', '),
@@ -241,6 +242,16 @@ export default function BotTraining() {
     setCfg((prev) => ({ ...prev, documents: (prev.documents || []).filter((_, idx) => idx !== i) }));
   }
 
+  function updateQuickReply(i, value) {
+    setCfg((prev) => ({ ...prev, quickReplies: prev.quickReplies.map((q, idx) => (idx === i ? value : q)) }));
+  }
+  function addQuickReply() {
+    setCfg((prev) => ({ ...prev, quickReplies: [...(prev.quickReplies || []), ''] }));
+  }
+  function removeQuickReply(i) {
+    setCfg((prev) => ({ ...prev, quickReplies: prev.quickReplies.filter((_, idx) => idx !== i) }));
+  }
+
   async function save({ thenSimulate } = {}) {
     setMsg('');
     setError('');
@@ -270,6 +281,7 @@ export default function BotTraining() {
         faqs: cfg.faqs.filter((f) => f.question.trim() && f.answer.trim()),
         images: cfg.images.filter((img) => img.label.trim() && img.url.trim()),
         documents: (cfg.documents || []).filter((d) => d.text?.trim()),
+        quickReplies: (cfg.quickReplies || []).map((s) => s.trim()).filter(Boolean),
         businessInfo: { ...cfg.businessInfo, services },
       };
       // Sector del negocio (aplica a todos los planes; vive en Business).
@@ -637,6 +649,50 @@ export default function BotTraining() {
           </p>
         </Card>
       )}
+
+      {/* Respuestas rápidas (para el agente en Conversaciones) */}
+      <Card>
+        <div className="mb-1 flex items-center justify-between gap-2">
+          <h2 className="font-semibold text-fg">Respuestas rápidas</h2>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={addQuickReply}
+            disabled={(cfg.quickReplies || []).length >= 12}
+          >
+            <Icon name="plus" size={16} /> Agregar
+          </Button>
+        </div>
+        <p className="mb-3 text-xs text-muted">
+          Frases guardadas que tú o tu equipo insertan con un clic al responder de forma manual en
+          Conversaciones. El bot no las usa.
+        </p>
+        <div className="space-y-2">
+          {(cfg.quickReplies || []).filter((q) => q !== undefined).length === 0 && (
+            <p className="rounded-lg border border-dashed border-line p-4 text-center text-sm text-subtle">
+              Sin respuestas rápidas. Ej. “En un momento te atiende un asesor.”
+            </p>
+          )}
+          {(cfg.quickReplies || []).map((q, i) => (
+            <div key={i} className="flex items-start gap-2">
+              <div className="min-w-0 flex-1">
+                <Textarea
+                  rows={2}
+                  value={q}
+                  onChange={(e) => updateQuickReply(i, e.target.value)}
+                  placeholder="Escribe una respuesta rápida"
+                />
+              </div>
+              <button
+                onClick={() => removeQuickReply(i)}
+                className="mt-2 shrink-0 text-xs text-red-500 hover:underline"
+              >
+                Eliminar
+              </button>
+            </div>
+          ))}
+        </div>
+      </Card>
 
       {/* Espaciador: da despeje para que la barra fija no tape el final del
           contenido (Imágenes del bot y demás) al hacer scroll. */}

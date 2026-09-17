@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { conversationsApi } from '../../api/endpoints.js';
+import { conversationsApi, botConfigApi } from '../../api/endpoints.js';
 import { downloadFile } from '../../api/download.js';
 import { toast } from '../../store/toastStore.js';
 import { Card, Button, Badge, Spinner, Alert } from '../../components/ui/index.jsx';
@@ -44,7 +44,7 @@ function filterConversations(list, search, datePreset) {
   }
   return list.filter((c) => {
     if (q) {
-      const hay = `${c.title || ''} ${c.customerName || ''}`.toLowerCase();
+      const hay = `${c.title || ''} ${c.customerName || ''} ${(c.tags || []).join(' ')}`.toLowerCase();
       if (!hay.includes(q)) return false;
     }
     if (cutoff && new Date(c.lastAt).getTime() < cutoff) return false;
@@ -80,7 +80,19 @@ export default function Conversations() {
   const [datePreset, setDatePreset] = useState('all');
   const [renaming, setRenaming] = useState(false);
   const [titleDraft, setTitleDraft] = useState('');
+  // Etiquetas, respuestas rápidas y resumen con IA.
+  const [tagDraft, setTagDraft] = useState('');
+  const [quickReplies, setQuickReplies] = useState([]);
+  const [summary, setSummary] = useState(null); // { summary, suggestion } | null
+  const [summarizing, setSummarizing] = useState(false);
   const scrollRef = useRef(null);
+
+  useEffect(() => {
+    botConfigApi
+      .get()
+      .then((d) => setQuickReplies(d.botConfig?.quickReplies || []))
+      .catch(() => {});
+  }, []);
 
   async function loadList() {
     try {
@@ -103,6 +115,8 @@ export default function Conversations() {
     setTemplatesLoaded(false);
     setTemplates([]);
     setTplName('');
+    setSummary(null);
+    setRenaming(false);
     try {
       const data = await conversationsApi.get(id);
       setThread(data.conversation);
@@ -170,6 +184,43 @@ export default function Conversations() {
     } catch (err) {
       toast.error(err.response?.data?.message || 'No se pudo renombrar.');
     }
+  }
+
+  // Resumen con IA de la conversación (consume créditos como un mensaje).
+  async function runSummary() {
+    if (!selectedId) return;
+    setSummarizing(true);
+    setSummary(null);
+    try {
+      const data = await conversationsApi.summarize(selectedId);
+      setSummary({ summary: data.summary, suggestion: data.suggestion });
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'No se pudo generar el resumen.');
+    } finally {
+      setSummarizing(false);
+    }
+  }
+
+  // Etiquetas del agente (organizar la bandeja).
+  async function updateTags(next) {
+    try {
+      const data = await conversationsApi.setTags(selectedId, next);
+      setThread(data.conversation);
+      loadList();
+    } catch {
+      toast.error('No se pudo actualizar las etiquetas.');
+    }
+  }
+  function addTag(e) {
+    e.preventDefault();
+    const t = tagDraft.trim().toLowerCase();
+    setTagDraft('');
+    const cur = thread?.tags || [];
+    if (!t || cur.includes(t) || cur.length >= 8) return;
+    updateTags([...cur, t]);
+  }
+  function removeTag(t) {
+    updateTags((thread?.tags || []).filter((x) => x !== t));
   }
 
   async function loadTemplates() {
@@ -397,6 +448,11 @@ export default function Conversations() {
                       <Icon name="clipboard" size={11} /> {RECORD_LABEL[c.capturedRecordType] || 'Registro'}
                     </span>
                   )}
+                  {(c.tags || []).slice(0, 3).map((t) => (
+                    <span key={t} className="inline-flex items-center rounded-full bg-surface2 px-2 py-0.5 text-[10px] font-medium text-muted">
+                      #{t}
+                    </span>
+                  ))}
                 </div>
               </button>
             ))}
@@ -487,6 +543,83 @@ export default function Conversations() {
                     </button>
                   </div>
                 </div>
+
+                {/* Barra: etiquetas + resumen IA */}
+                <div className="flex flex-wrap items-center gap-2 border-b border-line bg-surface px-4 py-2">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {(thread.tags || []).map((t) => (
+                      <span key={t} className="inline-flex items-center gap-1 rounded-full bg-surface2 px-2 py-0.5 text-[11px] font-medium text-muted">
+                        #{t}
+                        <button
+                          type="button"
+                          onClick={() => removeTag(t)}
+                          aria-label={`Quitar etiqueta ${t}`}
+                          className="leading-none text-subtle hover:text-red-500"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                    <form onSubmit={addTag}>
+                      <input
+                        value={tagDraft}
+                        onChange={(e) => setTagDraft(e.target.value)}
+                        placeholder="+ etiqueta"
+                        maxLength={24}
+                        aria-label="Agregar etiqueta"
+                        className="w-24 rounded-full border border-line bg-canvas px-2.5 py-0.5 text-[11px] text-fg outline-none focus:border-brand-500"
+                      />
+                    </form>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={runSummary}
+                    disabled={summarizing}
+                    className="ml-auto inline-flex shrink-0 items-center gap-1 rounded-lg border border-line px-2.5 py-1 text-xs font-medium text-brand-600 transition hover:border-brand-300 disabled:opacity-50"
+                  >
+                    <Icon name="bot" size={14} /> {summarizing ? 'Resumiendo…' : 'Resumen IA'}
+                  </button>
+                </div>
+
+                {/* Panel de resumen con IA */}
+                {(summarizing || summary) && (
+                  <div className="border-b border-line bg-brand-500/[0.05] px-4 py-3 text-sm">
+                    {summarizing ? (
+                      <p className="text-muted">Generando resumen…</p>
+                    ) : (
+                      <div className="space-y-2">
+                        <div>
+                          <div className="text-[11px] font-semibold uppercase tracking-wide text-brand-600">Resumen</div>
+                          <p className="mt-0.5 text-fg/90">{summary.summary}</p>
+                        </div>
+                        {summary.suggestion && (
+                          <div>
+                            <div className="text-[11px] font-semibold uppercase tracking-wide text-brand-600">
+                              Respuesta sugerida
+                            </div>
+                            <p className="mt-0.5 text-fg/90">{summary.suggestion}</p>
+                            <div className="mt-1.5 flex gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setMode('manual');
+                                  setReply(summary.suggestion);
+                                  setSummary(null);
+                                }}
+                                className="rounded-lg bg-brand-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-brand-700"
+                              >
+                                Usar sugerencia
+                              </button>
+                              <button type="button" onClick={() => setSummary(null)} className="text-xs text-muted hover:text-fg">
+                                Descartar
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {thread.needsAttention && (
                   <div className="border-b border-amber-500/20 bg-amber-500/10 px-4 py-2 text-xs text-amber-700 dark:text-amber-300">
@@ -647,23 +780,40 @@ export default function Conversations() {
                     </p>
                   </div>
                 ) : isManual ? (
-                  <form onSubmit={sendReply} className="flex items-center gap-2 border-t border-line bg-surface p-2.5">
-                    <input
-                      value={reply}
-                      onChange={(e) => setReply(e.target.value)}
-                      placeholder="Escribe como persona…"
-                      maxLength={2000}
-                      className="min-w-0 flex-1 rounded-full border border-line bg-canvas px-4 py-2 text-sm text-fg outline-none focus:border-brand-500"
-                    />
-                    <button
-                      type="submit"
-                      disabled={sending || !reply.trim()}
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white transition hover:bg-brand-700 disabled:opacity-40"
-                      aria-label="Enviar"
-                    >
-                      <Icon name="arrowRight" size={18} />
-                    </button>
-                  </form>
+                  <div className="border-t border-line bg-surface">
+                    {quickReplies.length > 0 && (
+                      <div className="flex gap-1.5 overflow-x-auto px-2.5 pt-2.5">
+                        {quickReplies.map((qr, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => setReply(qr)}
+                            title={qr}
+                            className="max-w-[170px] shrink-0 truncate rounded-full border border-line px-2.5 py-1 text-xs text-muted transition hover:border-brand-300 hover:text-fg"
+                          >
+                            {qr}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <form onSubmit={sendReply} className="flex items-center gap-2 p-2.5">
+                      <input
+                        value={reply}
+                        onChange={(e) => setReply(e.target.value)}
+                        placeholder="Escribe como persona…"
+                        maxLength={2000}
+                        className="min-w-0 flex-1 rounded-full border border-line bg-canvas px-4 py-2 text-sm text-fg outline-none focus:border-brand-500"
+                      />
+                      <button
+                        type="submit"
+                        disabled={sending || !reply.trim()}
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white transition hover:bg-brand-700 disabled:opacity-40"
+                        aria-label="Enviar"
+                      >
+                        <Icon name="arrowRight" size={18} />
+                      </button>
+                    </form>
+                  </div>
                 ) : (
                   <div className="border-t border-line bg-surface px-4 py-3 text-center text-xs text-muted">
                     El bot está respondiendo esta conversación. Cambia a{' '}
