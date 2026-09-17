@@ -7,6 +7,7 @@ import { Card, Button, Input, Textarea, Select, Alert, Spinner, Badge } from '..
 import { Icon } from '../../components/ui/Icon.jsx';
 import { limitsFor } from '../../lib/planLimits.js';
 import { extractTextFromFile } from '../../lib/extractText.js';
+import { INDUSTRY_TEMPLATES } from '../../content/industryTemplates.js';
 
 const TONES = [
   { value: 'formal', label: 'Formal' },
@@ -242,6 +243,25 @@ export default function BotTraining() {
     setCfg((prev) => ({ ...prev, documents: (prev.documents || []).filter((_, idx) => idx !== i) }));
   }
 
+  function applyTemplate(t) {
+    if (
+      !window.confirm(
+        `Se reemplazarán las preguntas frecuentes y los servicios con la plantilla de "${t.label}". Podrás ajustar todo antes de guardar. ¿Continuar?`
+      )
+    )
+      return;
+    const maxF = limits.maxFaqs ?? t.faqs.length;
+    setCfg((prev) => ({
+      ...prev,
+      botName: t.botName || prev.botName,
+      tone: limits.tone ? t.tone || prev.tone : prev.tone,
+      faqs: t.faqs.slice(0, maxF),
+      servicesText: (t.services || []).join(', '),
+      businessInfo: { ...prev.businessInfo, services: t.services || [] },
+    }));
+    toast.success('Plantilla cargada. Revisa, ajusta y guarda.');
+  }
+
   function updateQuickReply(i, value) {
     setCfg((prev) => ({ ...prev, quickReplies: prev.quickReplies.map((q, idx) => (idx === i ? value : q)) }));
   }
@@ -341,6 +361,27 @@ export default function BotTraining() {
         tokens de tu cupo: es la naturaleza de la IA y del caché de contexto. Dale lo esencial y
         claro para aprovecharlo mejor.
       </p>
+
+      {/* Plantillas de arranque por giro */}
+      <Card>
+        <h2 className="font-semibold text-fg">Plantillas de arranque</h2>
+        <p className="mt-1 text-sm text-muted">
+          ¿Empezando? Carga preguntas frecuentes y servicios base según tu giro, y ajústalos a tu
+          negocio. No empieces de cero.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {INDUSTRY_TEMPLATES.map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              onClick={() => applyTemplate(t)}
+              className="rounded-full border border-line px-3 py-1.5 text-sm font-medium text-fg transition hover:border-brand-300 hover:text-brand-600"
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </Card>
 
       {(msg || error || issues.length > 0) && (
       <div ref={alertRef} className="scroll-mt-20 space-y-6">
