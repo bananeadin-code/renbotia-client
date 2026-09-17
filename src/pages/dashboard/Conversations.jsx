@@ -31,8 +31,8 @@ const DATE_PRESETS = [
   { value: '30', label: '30 días' },
 ];
 
-// Aplica búsqueda por nombre/título y filtro por fecha a la lista.
-function filterConversations(list, search, datePreset) {
+// Aplica búsqueda por nombre/título, filtro por fecha y "solo leads calientes".
+function filterConversations(list, search, datePreset, onlyHot) {
   const q = search.trim().toLowerCase();
   let cutoff = 0;
   if (datePreset === 'today') {
@@ -43,6 +43,7 @@ function filterConversations(list, search, datePreset) {
     cutoff = Date.now() - Number(datePreset) * 24 * 60 * 60 * 1000;
   }
   return list.filter((c) => {
+    if (onlyHot && !c.hotLead) return false;
     if (q) {
       const hay = `${c.title || ''} ${c.customerName || ''} ${(c.tags || []).join(' ')}`.toLowerCase();
       if (!hay.includes(q)) return false;
@@ -61,6 +62,8 @@ function filterConversations(list, search, datePreset) {
 export default function Conversations() {
   const [list, setList] = useState([]);
   const [needAttention, setNeedAttention] = useState(0);
+  const [hotLeads, setHotLeads] = useState(0);
+  const [onlyHot, setOnlyHot] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
   const [thread, setThread] = useState(null);
@@ -99,6 +102,7 @@ export default function Conversations() {
       const data = await conversationsApi.list();
       setList(data.conversations);
       setNeedAttention(data.needAttention || 0);
+      setHotLeads(data.hotLeads || 0);
     } catch {
       /* silencioso */
     } finally {
@@ -143,7 +147,8 @@ export default function Conversations() {
           next &&
           prev.messages.length === next.messages.length &&
           prev.handoffMode === next.handoffMode &&
-          prev.title === next.title
+          prev.title === next.title &&
+          prev.hotLead === next.hotLead
         ) {
           return prev;
         }
@@ -183,6 +188,19 @@ export default function Conversations() {
       loadList();
     } catch (err) {
       toast.error(err.response?.data?.message || 'No se pudo renombrar.');
+    }
+  }
+
+  // Lead caliente: el agente lo cierra al darle seguimiento (o lo reabre).
+  async function toggleHotLead(next) {
+    if (!selectedId) return;
+    try {
+      const data = await conversationsApi.setHotLead(selectedId, next);
+      setThread(data.conversation);
+      loadList();
+      if (!next) toast.success('Lead marcado como atendido.');
+    } catch {
+      toast.error('No se pudo actualizar el lead.');
     }
   }
 
@@ -316,7 +334,7 @@ export default function Conversations() {
   const isManual = thread?.handoffMode === 'manual';
   const isWhatsapp = thread?.channel === 'whatsapp';
   const windowClosed = isWhatsapp && waWindow && !waWindow.open;
-  const filtered = filterConversations(list, search, datePreset);
+  const filtered = filterConversations(list, search, datePreset, onlyHot);
 
   return (
     <div>
@@ -329,6 +347,19 @@ export default function Conversations() {
                 <Icon name="alert" size={13} />
                 {needAttention} {needAttention === 1 ? 'requiere' : 'requieren'} atención
               </span>
+            )}
+            {hotLeads > 0 && (
+              <button
+                type="button"
+                onClick={() => setOnlyHot((v) => !v)}
+                title={onlyHot ? 'Mostrar todas' : 'Ver solo leads calientes'}
+                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold transition ${
+                  onlyHot ? 'bg-rose-600 text-white' : 'bg-rose-500/15 text-rose-600 hover:bg-rose-500/25'
+                }`}
+              >
+                <Icon name="flame" size={13} />
+                {hotLeads} {hotLeads === 1 ? 'lead caliente' : 'leads calientes'}
+              </button>
             )}
           </div>
           <p className="text-sm text-muted">
@@ -414,7 +445,9 @@ export default function Conversations() {
                     ? 'border-brand-400 bg-brand-500/5'
                     : c.needsAttention
                       ? 'border-amber-400/60 bg-amber-500/[0.06] hover:border-amber-400'
-                      : 'border-line bg-surface hover:border-brand-300'
+                      : c.hotLead
+                        ? 'border-rose-400/60 bg-rose-500/[0.06] hover:border-rose-400'
+                        : 'border-line bg-surface hover:border-brand-300'
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
@@ -426,6 +459,11 @@ export default function Conversations() {
                   {c.needsAttention && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-600">
                       <Icon name="alert" size={11} /> Requiere atención
+                    </span>
+                  )}
+                  {c.hotLead && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/15 px-2 py-0.5 text-[10px] font-semibold text-rose-600">
+                      <Icon name="flame" size={11} /> Lead caliente
                     </span>
                   )}
                   <span
@@ -625,6 +663,23 @@ export default function Conversations() {
                   <div className="border-b border-amber-500/20 bg-amber-500/10 px-4 py-2 text-xs text-amber-700 dark:text-amber-300">
                     <strong>Requiere atención.</strong>{' '}
                     {thread.attentionReason || 'El bot pidió que entre una persona.'}
+                  </div>
+                )}
+
+                {thread.hotLead && (
+                  <div className="flex items-start gap-2 border-b border-rose-500/20 bg-rose-500/10 px-4 py-2 text-xs text-rose-700 dark:text-rose-300">
+                    <Icon name="flame" size={14} className="mt-0.5 shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <strong>Lead caliente.</strong>{' '}
+                      {thread.hotLeadReason || 'El bot detectó alta intención de compra. Dale seguimiento pronto.'}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => toggleHotLead(false)}
+                      className="shrink-0 font-semibold underline-offset-2 hover:underline"
+                    >
+                      Marcar atendido
+                    </button>
                   </div>
                 )}
 

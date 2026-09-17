@@ -16,6 +16,16 @@ const TONES = [
   { value: 'tecnico', label: 'Técnico' },
 ];
 
+// Ícono por giro para las plantillas de arranque (más presentables que solo texto).
+const TEMPLATE_ICONS = {
+  legal: 'building',
+  contable: 'card',
+  consultoria: 'academic',
+  agencia: 'chart',
+  restaurante: 'cart',
+  cafeteria: 'cart',
+};
+
 // Sectores (igual que en el inicio/onboarding); "otro" permite especificar.
 const INDUSTRIES = [
   { value: 'legal', label: 'Despacho legal' },
@@ -117,6 +127,19 @@ export default function BotTraining() {
   const [uploadingIdx, setUploadingIdx] = useState(-1); // imagen que se está subiendo
   const alertRef = useRef(null); // para hacer scroll al aviso tras guardar
   const [feedbackTick, setFeedbackTick] = useState(0); // fuerza scroll en cada intento
+  // Tarjeta de plantillas de arranque: visible por defecto, descartable por
+  // negocio (útil sobre todo al crear la cuenta) y colapsable.
+  const [showTemplates, setShowTemplates] = useState(true);
+  const [tplOpen, setTplOpen] = useState(true);
+
+  useEffect(() => {
+    try {
+      const key = `rb_hide_starter_tpl_${business?.id || business?._id || 'x'}`;
+      if (localStorage.getItem(key) === '1') setShowTemplates(false);
+    } catch {
+      /* sin persistencia (modo privado): se mantiene visible */
+    }
+  }, [business?.id, business?._id]);
 
   // Al aparecer un aviso (éxito/error/validación), lo trae a la vista: al guardar
   // sueles estar abajo (barra sticky) y el mensaje sale arriba. Depende de un
@@ -262,6 +285,18 @@ export default function BotTraining() {
     toast.success('Plantilla cargada. Revisa, ajusta y guarda.');
   }
 
+  // Descartar la tarjeta de plantillas (sirve sobre todo al crear la cuenta). Se
+  // recuerda por negocio en el navegador para no volver a mostrarla.
+  const tplHideKey = `rb_hide_starter_tpl_${business?.id || business?._id || 'x'}`;
+  function dismissTemplates() {
+    try {
+      localStorage.setItem(tplHideKey, '1');
+    } catch {
+      /* modo privado: no persistente, se oculta solo esta sesión */
+    }
+    setShowTemplates(false);
+  }
+
   function updateQuickReply(i, value) {
     setCfg((prev) => ({ ...prev, quickReplies: prev.quickReplies.map((q, idx) => (idx === i ? value : q)) }));
   }
@@ -362,26 +397,74 @@ export default function BotTraining() {
         claro para aprovecharlo mejor.
       </p>
 
-      {/* Plantillas de arranque por giro */}
-      <Card>
-        <h2 className="font-semibold text-fg">Plantillas de arranque</h2>
-        <p className="mt-1 text-sm text-muted">
-          ¿Empezando? Carga preguntas frecuentes y servicios base según tu giro, y ajústalos a tu
-          negocio. No empieces de cero.
-        </p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {INDUSTRY_TEMPLATES.map((t) => (
+      {/* Plantillas de arranque por giro (descartable; útil al crear la cuenta) */}
+      {showTemplates && (
+        <Card className="overflow-hidden border-brand-400/30 bg-gradient-to-br from-brand-500/[0.07] to-transparent p-0">
+          <div className="flex items-start gap-3 p-4 sm:p-5">
+            <span className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500/15 text-brand-600 dark:text-brand-300 sm:flex">
+              <Icon name="academic" size={20} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <h2 className="font-semibold text-fg">Plantillas de arranque</h2>
+                <span className="rounded-full bg-brand-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-600 dark:text-brand-300">
+                  Recomendado
+                </span>
+              </div>
+              <p className="mt-0.5 text-sm text-muted">
+                ¿Empezando? Carga preguntas frecuentes y servicios base según tu giro y ajústalos a tu
+                negocio. No empieces de cero.
+              </p>
+
+              {tplOpen && (
+                <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {INDUSTRY_TEMPLATES.map((t) => (
+                    <button
+                      key={t.key}
+                      type="button"
+                      onClick={() => applyTemplate(t)}
+                      className="group flex items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2.5 text-left text-sm font-medium text-fg transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-sm"
+                    >
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-surface2 text-subtle transition group-hover:bg-brand-500/10 group-hover:text-brand-600">
+                        <Icon name={TEMPLATE_ICONS[t.key] || 'building'} size={15} />
+                      </span>
+                      <span className="truncate">{t.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div className="mt-3 flex items-center gap-4 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setTplOpen((v) => !v)}
+                  className="inline-flex items-center gap-1 font-medium text-muted transition hover:text-fg"
+                >
+                  <Icon name="chevronRight" size={14} className={tplOpen ? 'rotate-90' : ''} />
+                  {tplOpen ? 'Ocultar' : 'Mostrar plantillas'}
+                </button>
+                <button
+                  type="button"
+                  onClick={dismissTemplates}
+                  className="font-medium text-subtle transition hover:text-fg"
+                >
+                  No, gracias
+                </button>
+              </div>
+            </div>
+
             <button
-              key={t.key}
               type="button"
-              onClick={() => applyTemplate(t)}
-              className="rounded-full border border-line px-3 py-1.5 text-sm font-medium text-fg transition hover:border-brand-300 hover:text-brand-600"
+              onClick={dismissTemplates}
+              aria-label="Descartar plantillas de arranque"
+              title="Descartar"
+              className="shrink-0 rounded-lg p-1 text-subtle transition hover:bg-surface2 hover:text-fg"
             >
-              {t.label}
+              <Icon name="close" size={18} />
             </button>
-          ))}
-        </div>
-      </Card>
+          </div>
+        </Card>
+      )}
 
       {(msg || error || issues.length > 0) && (
       <div ref={alertRef} className="scroll-mt-20 space-y-6">

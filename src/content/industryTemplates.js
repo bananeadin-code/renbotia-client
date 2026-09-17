@@ -65,4 +65,16 @@ export const INDUSTRY_TEMPLATES = [
       { question: '¿Tienen servicio para llevar?', answer: 'Sí, puedes ordenar para llevar. Dime qué se te antoja y te ayudo con tu pedido.' },
     ],
   },
+  {
+    key: 'cafeteria',
+    label: 'Cafetería',
+    botName: 'Asistente',
+    tone: 'cercano',
+    services: ['Pedidos para llevar', 'Menú y bebidas', 'Cafetería de especialidad'],
+    faqs: [
+      { question: '¿Cuál es su horario?', answer: 'Con gusto te confirmo el horario de hoy. Por lo general abrimos desde temprano; dime a qué hora piensas venir.' },
+      { question: '¿Tienen opciones sin azúcar o veganas?', answer: 'Sí, manejamos opciones sin azúcar y alternativas de leche vegetal. Dime qué buscas y te recomiendo.' },
+      { question: '¿Puedo ordenar para llevar?', answer: '¡Claro! Dime qué se te antoja y a qué hora pasas, y te dejo tu pedido listo.' },
+    ],
+  },
 ];

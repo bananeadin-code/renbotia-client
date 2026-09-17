@@ -60,6 +60,7 @@ export const botConfigApi = {
 export const usageApi = {
   summary: (days = 30) => unwrap(api.get(`/usage?days=${days}`)),
   impact: () => unwrap(api.get('/usage/impact')),
+  analytics: () => unwrap(api.get('/usage/analytics')),
 };
 
 export const chatApi = {
@@ -117,6 +118,7 @@ export const conversationsApi = {
   setMode: (id, handoffMode) => unwrap(api.patch(`/conversations/${id}`, { handoffMode })),
   rename: (id, title) => unwrap(api.patch(`/conversations/${id}`, { title })),
   setTags: (id, tags) => unwrap(api.patch(`/conversations/${id}`, { tags })),
+  setHotLead: (id, hotLead) => unwrap(api.patch(`/conversations/${id}`, { hotLead })),
   summarize: (id) => unwrap(api.post(`/conversations/${id}/summary`)),
   reply: (id, message) => unwrap(api.post(`/conversations/${id}/reply`, { message })),
   rate: (id, index, rating) => unwrap(api.post(`/conversations/${id}/rate`, { index, rating })),
