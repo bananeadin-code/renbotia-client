@@ -31,8 +31,15 @@ const DATE_PRESETS = [
   { value: '30', label: '30 días' },
 ];
 
-// Aplica búsqueda por nombre/título, filtro por fecha y "solo leads calientes".
-function filterConversations(list, search, datePreset, onlyHot) {
+// Una conversación "espera respuesta" si el último mensaje es del CLIENTE: nadie
+// (ni el bot ni una persona) le ha contestado todavía. Sirve para no dejar leads
+// sin seguimiento. (Con el bot en automático se responde solo; esto aflora sobre
+// todo en modo manual, pausado o tras una escalación.)
+const isWaitingReply = (c) => c.lastRole === 'user';
+
+// Aplica búsqueda por nombre/título, filtro por fecha, "solo leads calientes" y
+// "solo esperan respuesta".
+function filterConversations(list, search, datePreset, onlyHot, onlyWaiting) {
   const q = search.trim().toLowerCase();
   let cutoff = 0;
   if (datePreset === 'today') {
@@ -44,6 +51,7 @@ function filterConversations(list, search, datePreset, onlyHot) {
   }
   return list.filter((c) => {
     if (onlyHot && !c.hotLead) return false;
+    if (onlyWaiting && !isWaitingReply(c)) return false;
     if (q) {
       const hay = `${c.title || ''} ${c.customerName || ''} ${(c.tags || []).join(' ')}`.toLowerCase();
       if (!hay.includes(q)) return false;
@@ -64,6 +72,7 @@ export default function Conversations() {
   const [needAttention, setNeedAttention] = useState(0);
   const [hotLeads, setHotLeads] = useState(0);
   const [onlyHot, setOnlyHot] = useState(false);
+  const [onlyWaiting, setOnlyWaiting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
   const [thread, setThread] = useState(null);
@@ -334,7 +343,8 @@ export default function Conversations() {
   const isManual = thread?.handoffMode === 'manual';
   const isWhatsapp = thread?.channel === 'whatsapp';
   const windowClosed = isWhatsapp && waWindow && !waWindow.open;
-  const filtered = filterConversations(list, search, datePreset, onlyHot);
+  const waitingCount = list.filter(isWaitingReply).length;
+  const filtered = filterConversations(list, search, datePreset, onlyHot, onlyWaiting);
 
   return (
     <div>
@@ -359,6 +369,19 @@ export default function Conversations() {
               >
                 <Icon name="flame" size={13} />
                 {hotLeads} {hotLeads === 1 ? 'lead caliente' : 'leads calientes'}
+              </button>
+            )}
+            {waitingCount > 0 && (
+              <button
+                type="button"
+                onClick={() => setOnlyWaiting((v) => !v)}
+                title={onlyWaiting ? 'Mostrar todas' : 'Ver solo las que esperan respuesta'}
+                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold transition ${
+                  onlyWaiting ? 'bg-sky-600 text-white' : 'bg-sky-500/15 text-sky-600 hover:bg-sky-500/25'
+                }`}
+              >
+                <Icon name="clock" size={13} />
+                {waitingCount} {waitingCount === 1 ? 'espera respuesta' : 'esperan respuesta'}
               </button>
             )}
           </div>
@@ -464,6 +487,11 @@ export default function Conversations() {
                   {c.hotLead && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/15 px-2 py-0.5 text-[10px] font-semibold text-rose-600">
                       <Icon name="flame" size={11} /> Lead caliente
+                    </span>
+                  )}
+                  {isWaitingReply(c) && !c.needsAttention && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-sky-500/15 px-2 py-0.5 text-[10px] font-semibold text-sky-600">
+                      <Icon name="clock" size={11} /> Espera respuesta
                     </span>
                   )}
                   <span
