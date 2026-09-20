@@ -392,9 +392,9 @@ export default function BotTraining() {
       </div>
 
       <p className="rounded-lg border border-line bg-surface2/40 px-3 py-2 text-xs text-subtle">
-        Mientras más información y contexto le des al bot, y cuando envía imágenes, consume más
-        tokens de tu cupo: es la naturaleza de la IA y del caché de contexto. Dale lo esencial y
-        claro para aprovecharlo mejor.
+        Entre más información le des al bot y más imágenes envíe, cada conversación usa un poco más
+        de tu plan del mes. No tienes que contar nada: dale lo esencial y claro, así responde mejor
+        y te rinde para más conversaciones.
       </p>
 
       {/* Plantillas de arranque por giro (descartable; útil al crear la cuenta) */}

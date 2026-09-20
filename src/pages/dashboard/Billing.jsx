@@ -7,6 +7,7 @@ import { CheckoutDialog } from '../../components/billing/CheckoutDialog.jsx';
 import { toast } from '../../store/toastStore.js';
 import { Card, Button, Badge, Alert, Spinner } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
+import { fmtConversations } from '../../lib/usage.js';
 
 /**
  * Facturación: plan actual + gestión (cambiar/cancelar/reactivar), balance,
@@ -207,15 +208,21 @@ export default function Billing() {
             <div className="font-medium text-fg">{renewalStr}</div>
           </div>
           <div>
-            <div className="text-muted">Tokens disponibles</div>
+            <div className="text-muted">Conversaciones disponibles</div>
             <div className="font-medium tabular text-brand-700 dark:text-brand-300">
-              {balance ? balance.available.toLocaleString('es-MX') : '—'}
+              {balance ? `${fmtConversations(balance.available)}` : '—'}
+            </div>
+            <div className="text-[11px] text-subtle">
+              aprox. · {balance ? balance.available.toLocaleString('es-MX') : '—'} tokens
             </div>
           </div>
           <div>
             <div className="text-muted">Créditos extra</div>
             <div className="font-medium tabular text-fg">
-              {balance ? balance.extraTokens.toLocaleString('es-MX') : '—'}
+              {balance ? `${fmtConversations(balance.extraTokens)} conv.` : '—'}
+            </div>
+            <div className="text-[11px] text-subtle">
+              {balance ? balance.extraTokens.toLocaleString('es-MX') : '—'} tokens
             </div>
           </div>
         </div>
@@ -289,7 +296,7 @@ export default function Billing() {
                   ${pack.priceMXN.toLocaleString('es-MX')}
                 </div>
                 <div className="text-xs text-subtle">
-                  {pack.tokens.toLocaleString('es-MX')} tokens
+                  {fmtConversations(pack.tokens)} conversaciones · {pack.tokens.toLocaleString('es-MX')} tokens
                 </div>
                 <Button
                   className="mt-4 w-full"

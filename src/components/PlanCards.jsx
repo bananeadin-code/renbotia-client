@@ -4,17 +4,9 @@ import { Icon } from './ui/Icon.jsx';
 import { BorderBeam } from './ui/BorderBeam.jsx';
 import { WaitlistButton } from './WaitlistButton.jsx';
 import { billingApi } from '../api/endpoints.js';
+import { fmtConversations } from '../lib/usage.js';
 
 const HIGHLIGHT = 'pro'; // plan destacado
-
-// Estimado APROXIMADO de conversaciones diarias que alcanza el cupo de cada plan
-// (solo tokens del plan, sin extras). Varía según el largo de las conversaciones;
-// se muestra como referencia, no como límite exacto.
-const DAILY_ESTIMATE = {
-  free: '~2 a 3 conversaciones al día',
-  pro: '~20 a 25 conversaciones al día',
-  elite: '~60 conversaciones al día',
-};
 
 /**
  * Grid de tarjetas de planes reutilizable (precios y onboarding).
@@ -85,14 +77,12 @@ export function PlanCards({ plans, selectedKey, onSelect, ctaLabel = 'Elegir pla
                 </>
               )}
             </div>
-            <p className="mt-1 text-sm text-muted">
-              {plan.monthlyTokenLimit.toLocaleString('es-MX')} tokens/mes
+            <p className="mt-1 text-sm font-medium text-fg">
+              {fmtConversations(plan.monthlyTokenLimit)} conversaciones al mes
             </p>
-            {DAILY_ESTIMATE[plan.key] && (
-              <p className="mt-0.5 text-xs text-subtle">
-                Estimado: {DAILY_ESTIMATE[plan.key]} (aprox.)
-              </p>
-            )}
+            <p className="mt-0.5 text-xs text-subtle">
+              Aproximado; equivale a {plan.monthlyTokenLimit.toLocaleString('es-MX')} tokens de IA
+            </p>
 
             <ul className="mt-4 flex-1 space-y-2 text-sm text-fg">
               {(plan.highlights || []).map((h) => (

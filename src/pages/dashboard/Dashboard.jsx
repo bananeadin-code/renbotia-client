@@ -15,6 +15,7 @@ import { Card, Badge, Spinner, Button } from '../../components/ui/index.jsx';
 import { SpotlightCard } from '../../components/ui/SpotlightCard.jsx';
 import { OnboardingChecklist } from '../../components/dashboard/OnboardingChecklist.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
+import { fmtConversations } from '../../lib/usage.js';
 
 const fmtNum = (n) => (n == null ? '—' : n.toLocaleString('es-MX'));
 
@@ -93,17 +94,17 @@ export default function Dashboard() {
           sub={`Renueva: ${subscription ? new Date(subscription.renewalDate).toLocaleDateString('es-MX') : '—'}`}
         />
         <StatCard
-          label="Tokens totales disponibles"
-          icon="bot"
-          value={balance ? balance.available.toLocaleString('es-MX') : '—'}
-          sub={balance ? `de ${(balance.planLimit + balance.extraTokens).toLocaleString('es-MX')}` : ''}
+          label="Conversaciones disponibles"
+          icon="message"
+          value={balance ? `${fmtConversations(balance.available)}` : '—'}
+          sub={balance ? `aprox. · ${balance.available.toLocaleString('es-MX')} tokens de IA` : ''}
           color="text-brand-600"
         />
         <StatCard
-          label="Consumidos (plan)"
+          label="Uso de tu plan este mes"
           icon="chart"
           value={balance ? `${usedPct}%` : '—'}
-          sub={balance ? `${balance.planUsed.toLocaleString('es-MX')} tokens de ${balance.planLimit.toLocaleString('es-MX')}` : ''}
+          sub={balance ? `${fmtConversations(balance.planUsed)} de ${fmtConversations(balance.planLimit)} conversaciones usadas` : ''}
         />
         <Card>
           <div className="flex items-start justify-between">
@@ -160,33 +161,40 @@ export default function Dashboard() {
         </p>
       </Card>
 
-      {/* Barra de consumo */}
+      {/* Barra de consumo (en conversaciones, tono tranquilo) */}
       <Card>
         <div className="mb-2 flex items-center justify-between text-sm">
-          <span className="font-medium text-fg">Uso del plan este periodo</span>
+          <span className="font-medium text-fg">Conversaciones de tu plan este mes</span>
           <span className="text-muted">
-            {balance ? `${balance.planUsed.toLocaleString('es-MX')} / ${balance.planLimit.toLocaleString('es-MX')}` : ''}
+            {balance
+              ? `${fmtConversations(balance.planUsed)} de ${fmtConversations(balance.planLimit)}`
+              : ''}
           </span>
         </div>
         <div className="h-3 w-full overflow-hidden rounded-full bg-surface2">
           <div
-            className={`h-full rounded-full transition-all ${usedPct > 90 ? 'bg-red-500' : 'bg-brand-500'}`}
+            className={`h-full rounded-full transition-all ${usedPct > 90 ? 'bg-amber-500' : 'bg-brand-500'}`}
             style={{ width: `${usedPct}%` }}
           />
         </div>
-        {usedPct > 90 && (
-          <p className="mt-2 text-xs text-red-600">
-            Estás por agotar tu plan.{' '}
+        {usedPct > 90 ? (
+          <p className="mt-2 text-xs text-amber-600">
+            Vas muy bien, ya casi usas todo tu plan del mes. Si quieres que el bot no pare, puedes{' '}
             <Link to="/dashboard/facturacion" className="font-medium underline">
-              Compra créditos
+              sumar más conversaciones
             </Link>
+            .
+          </p>
+        ) : (
+          <p className="mt-2 text-xs text-subtle">
+            Tranquilo: no tienes que contar tokens. Tu plan se renueva cada mes y aquí ves cuánto llevas.
           </p>
         )}
       </Card>
 
       {/* Gráfica */}
       <Card>
-        <h2 className="mb-4 font-semibold text-fg">Consumo de tokens (últimos 14 días)</h2>
+        <h2 className="mb-4 font-semibold text-fg">Actividad de tu bot (últimos 14 días)</h2>
         {loading ? (
           <div className="flex justify-center py-16">
             <Spinner className="text-brand-600" />
