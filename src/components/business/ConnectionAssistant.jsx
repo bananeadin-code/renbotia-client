@@ -126,7 +126,7 @@ export function ConnectionAssistant() {
 
         {allReady && (
           <p className="mt-3 flex items-center gap-1.5 text-sm font-medium text-brand-600">
-            <Icon name="checkCircle" size={16} /> Todo listo. Pulsa “Conectar WhatsApp” abajo.
+            <Icon name="checkCircle" size={16} /> Todo listo. Ya puedes pulsar “Conectar WhatsApp”.
           </p>
         )}
       </div>
