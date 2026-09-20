@@ -116,52 +116,95 @@ export function PublicNav() {
   );
 }
 
+// Secciones del footer, agrupadas por tema para que sea fácil de escanear.
+const FOOTER_SECTIONS = [
+  {
+    title: 'Producto',
+    links: [
+      { to: '/soluciones', label: 'Soluciones' },
+      { to: '/precios', label: 'Precios' },
+      { to: '/blog', label: 'Blog' },
+      { to: '/registro', label: 'Crear cuenta' },
+    ],
+  },
+  {
+    title: 'Soporte',
+    links: [
+      { to: '/contacto', label: 'Contacto' },
+      { to: '/status', label: 'Estado del servicio' },
+      ...(GOOGLE_BUSINESS_URL
+        ? [{ href: GOOGLE_BUSINESS_URL, label: 'Encuéntranos en Google', external: true }]
+        : []),
+    ],
+  },
+  {
+    title: 'Legal',
+    links: [
+      { to: '/privacidad', label: 'Privacidad' },
+      { to: '/terminos', label: 'Términos' },
+      { to: '/eliminar-datos', label: 'Eliminar datos' },
+    ],
+  },
+];
+
+function FooterLink({ link }) {
+  const cls = 'text-sm text-muted transition hover:text-fg';
+  if (link.external) {
+    return (
+      <a href={link.href} target="_blank" rel="noopener noreferrer" className={cls}>
+        {link.label}
+      </a>
+    );
+  }
+  return (
+    <Link to={link.to} className={cls}>
+      {link.label}
+    </Link>
+  );
+}
+
 export function PublicFooter() {
   return (
-    <footer className="border-t border-line bg-surface">
-      <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-muted">
-        <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <Logo size={26} />
-          <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
-            <Link to="/soluciones" className="hover:text-fg">
-              Soluciones
+    <footer className="mt-16 border-t border-line bg-surface">
+      <div className="mx-auto max-w-6xl px-4 py-14">
+        <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
+          {/* Marca */}
+          <div className="max-w-xs">
+            <Logo size={30} />
+            <p className="mt-4 text-sm leading-relaxed text-muted">
+              Asistentes de WhatsApp con IA para profesionistas y negocios de México. Atienden,
+              agendan y captan clientes las 24 horas.
+            </p>
+            <Link
+              to="/registro"
+              className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600 transition hover:gap-2.5 dark:text-brand-400"
+            >
+              Crea tu bot gratis
+              <Icon name="arrowRight" size={16} />
             </Link>
-            <Link to="/precios" className="hover:text-fg">
-              Precios
-            </Link>
-            <Link to="/blog" className="hover:text-fg">
-              Blog
-            </Link>
-            <Link to="/registro" className="hover:text-fg">
-              Crear cuenta
-            </Link>
-            <Link to="/status" className="hover:text-fg">
-              Estado
-            </Link>
-            <Link to="/contacto" className="hover:text-fg">
-              Contacto
-            </Link>
-            <Link to="/privacidad" className="hover:text-fg">
-              Privacidad
-            </Link>
-            <Link to="/terminos" className="hover:text-fg">
-              Términos
-            </Link>
-            <Link to="/eliminar-datos" className="hover:text-fg">
-              Eliminar datos
-            </Link>
-            {GOOGLE_BUSINESS_URL && (
-              <a
-                href={GOOGLE_BUSINESS_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-fg"
-              >
-                Encuéntranos en Google
-              </a>
-            )}
-          </nav>
+          </div>
+
+          {/* Columnas por sección */}
+          {FOOTER_SECTIONS.map((section) => (
+            <div key={section.title}>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-subtle">
+                {section.title}
+              </h3>
+              <ul className="mt-4 space-y-3">
+                {section.links.map((link) => (
+                  <li key={link.label}>
+                    <FooterLink link={link} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        {/* Barra inferior */}
+        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-line pt-6 text-sm text-muted sm:flex-row">
           <span>© {new Date().getFullYear()} RenBotIA · Asistentes de WhatsApp con IA</span>
+          <span className="text-subtle">Hecho en Durango, México</span>
         </div>
       </div>
     </footer>
