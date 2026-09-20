@@ -104,7 +104,7 @@ export default function Dashboard() {
           label="Uso de tu plan este mes"
           icon="chart"
           value={balance ? `${usedPct}%` : '—'}
-          sub={balance ? `${fmtConversations(balance.planUsed)} de ${fmtConversations(balance.planLimit)} conversaciones usadas` : ''}
+          sub="de tu plan mensual"
         />
         <Card>
           <div className="flex items-start justify-between">
@@ -138,7 +138,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div>
             <div className="tabular text-2xl font-extrabold text-fg">{fmtNum(impact?.conversations)}</div>
-            <div className="text-xs text-muted">Conversaciones</div>
+            <div className="text-xs text-muted">Conversaciones atendidas</div>
           </div>
           <div>
             <div className="tabular text-2xl font-extrabold text-fg">{fmtNum(impact?.botReplies)}</div>
@@ -164,12 +164,8 @@ export default function Dashboard() {
       {/* Barra de consumo (en conversaciones, tono tranquilo) */}
       <Card>
         <div className="mb-2 flex items-center justify-between text-sm">
-          <span className="font-medium text-fg">Conversaciones de tu plan este mes</span>
-          <span className="text-muted">
-            {balance
-              ? `${fmtConversations(balance.planUsed)} de ${fmtConversations(balance.planLimit)}`
-              : ''}
-          </span>
+          <span className="font-medium text-fg">Uso de tu plan este mes</span>
+          <span className="text-muted">{balance ? `${usedPct}%` : ''}</span>
         </div>
         <div className="h-3 w-full overflow-hidden rounded-full bg-surface2">
           <div
@@ -187,7 +183,9 @@ export default function Dashboard() {
           </p>
         ) : (
           <p className="mt-2 text-xs text-subtle">
-            Tranquilo: no tienes que contar tokens. Tu plan se renueva cada mes y aquí ves cuánto llevas.
+            {balance
+              ? `Te alcanza para ${fmtConversations(balance.available)} conversaciones más este mes. No tienes que contar nada.`
+              : 'Tu plan se renueva cada mes y aquí ves cuánto llevas.'}
           </p>
         )}
       </Card>
