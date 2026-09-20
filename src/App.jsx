@@ -21,6 +21,7 @@ const BlogPost = lazy(() => import('./pages/public/BlogPost.jsx'));
 const Solutions = lazy(() => import('./pages/public/Solutions.jsx'));
 const Solution = lazy(() => import('./pages/public/Solution.jsx'));
 const Status = lazy(() => import('./pages/public/Status.jsx'));
+const Contact = lazy(() => import('./pages/public/Contact.jsx'));
 const Legal = lazy(() => import('./pages/public/Legal.jsx'));
 const Login = lazy(() => import('./pages/public/Login.jsx'));
 const Register = lazy(() => import('./pages/public/Register.jsx'));
@@ -78,6 +79,7 @@ export default function App() {
       <Route path="/soluciones" element={<Solutions />} />
       <Route path="/soluciones/:slug" element={<Solution />} />
       <Route path="/status" element={<Status />} />
+      <Route path="/contacto" element={<Contact />} />
       <Route path="/privacidad" element={<Legal slug="privacidad" />} />
       <Route path="/terminos" element={<Legal slug="terminos" />} />
       <Route path="/eliminar-datos" element={<Legal slug="eliminar-datos" />} />

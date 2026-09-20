@@ -79,6 +79,11 @@ export const demoApi = {
   send: (message, history = []) => unwrap(api.post('/demo/message', { message, history })),
 };
 
+export const contactApi = {
+  // Formulario de contacto público (envía a tu buzón vía Resend en el backend).
+  submit: (body) => unwrap(api.post('/contact', body)),
+};
+
 export const waitlistApi = {
   // Lista de espera de planes de pago ("avísame cuando esté").
   join: (email, planKey) => unwrap(api.post('/waitlist', { email, planKey })),

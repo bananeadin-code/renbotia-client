@@ -138,6 +138,9 @@ export function PublicFooter() {
             <Link to="/status" className="hover:text-fg">
               Estado
             </Link>
+            <Link to="/contacto" className="hover:text-fg">
+              Contacto
+            </Link>
             <Link to="/privacidad" className="hover:text-fg">
               Privacidad
             </Link>

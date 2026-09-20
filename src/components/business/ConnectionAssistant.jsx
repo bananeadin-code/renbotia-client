@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useBusinessStore } from '../../store/businessStore.js';
 import { Card } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
-
-const SUPPORT_EMAIL = 'servicios@renbotia.com';
 
 // Requisitos que evitan que el usuario se atore a mitad de la conexión (el punto
 // de mayor abandono). Se confirman antes de abrir el modal de Meta.
@@ -157,16 +156,12 @@ export function ConnectionAssistant() {
           <span className="font-medium text-fg">¿Prefieres que lo hagamos contigo?</span> Te ayudamos
           a conectar tu número sin complicaciones.
         </p>
-        <a
-          href={`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(
-            'Ayuda para conectar mi WhatsApp'
-          )}&body=${encodeURIComponent(
-            'Hola, quiero conectar mi WhatsApp a RenBotIA y me gustaría que me ayuden. Mi negocio es: '
-          )}`}
+        <Link
+          to="/contacto?motivo=conexion"
           className="shrink-0 rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-brand-700"
         >
           Pedir ayuda
-        </a>
+        </Link>
       </div>
     </Card>
   );
