@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { adminApi } from '../../api/endpoints.js';
-import { Card, Alert, Spinner } from '../../components/ui/index.jsx';
+import { toast } from '../../store/toastStore.js';
+import { Card, Alert, Spinner, Button } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 
 /**
@@ -14,6 +15,19 @@ const mxn = (n) =>
 export function AdminFiscal() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [pdfLoading, setPdfLoading] = useState(false);
+
+  async function downloadPdf() {
+    setPdfLoading(true);
+    try {
+      const { downloadFiscalReportPdf } = await import('../../lib/pdf.js');
+      await downloadFiscalReportPdf(data);
+    } catch {
+      toast.error('No se pudo generar el PDF. Intenta de nuevo.');
+    } finally {
+      setPdfLoading(false);
+    }
+  }
 
   useEffect(() => {
     adminApi
@@ -36,12 +50,18 @@ export function AdminFiscal() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h2 className="text-lg font-bold text-fg">Control fiscal · {regime.name}</h2>
-        <p className="text-sm text-muted">
-          Ingresos reales del sitio (pagos completados) y una estimación de impuestos según tu
-          régimen (clave {regime.code}). Es un apoyo de control, no un cálculo oficial.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-bold text-fg">Control fiscal · {regime.name}</h2>
+          <p className="text-sm text-muted">
+            Ingresos reales del sitio (pagos completados) y una estimación de impuestos según tu
+            régimen (clave {regime.code}). Es un apoyo de control, no un cálculo oficial.
+          </p>
+        </div>
+        <Button variant="secondary" size="sm" className="shrink-0" disabled={pdfLoading} onClick={downloadPdf}>
+          <Icon name="download" size={16} />
+          {pdfLoading ? 'Generando…' : 'Descargar PDF'}
+        </Button>
       </div>
 
       {beta && (

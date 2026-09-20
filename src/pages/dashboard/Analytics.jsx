@@ -11,7 +11,9 @@ import {
   Legend,
 } from 'recharts';
 import { usageApi } from '../../api/endpoints.js';
-import { Card, Spinner } from '../../components/ui/index.jsx';
+import { useBusinessStore } from '../../store/businessStore.js';
+import { toast } from '../../store/toastStore.js';
+import { Card, Spinner, Button } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 
 const fmt = (n) => (n == null ? '—' : n.toLocaleString('es-MX'));
@@ -62,8 +64,10 @@ function BreakdownBar({ label, count, total, color = 'bg-brand-500' }) {
 }
 
 export default function Analytics() {
+  const business = useBusinessStore((s) => s.business);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   useEffect(() => {
     usageApi
@@ -72,6 +76,18 @@ export default function Analytics() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  async function downloadPdf() {
+    setPdfLoading(true);
+    try {
+      const { downloadMonthlyReportPdf } = await import('../../lib/pdf.js');
+      await downloadMonthlyReportPdf(data, business?.name || '');
+    } catch {
+      toast.error('No se pudo generar el PDF. Intenta de nuevo.');
+    } finally {
+      setPdfLoading(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -93,9 +109,17 @@ export default function Analytics() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-fg">Analíticas</h1>
-        <p className="text-sm capitalize text-muted">{data?.month || 'Actividad de tu bot'}</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-fg">Analíticas</h1>
+          <p className="text-sm capitalize text-muted">{data?.month || 'Actividad de tu bot'}</p>
+        </div>
+        {hasActivity && (
+          <Button variant="secondary" size="sm" disabled={pdfLoading} onClick={downloadPdf}>
+            <Icon name="download" size={16} />
+            {pdfLoading ? 'Generando…' : 'Descargar PDF'}
+          </Button>
+        )}
       </div>
 
       {!hasActivity ? (
