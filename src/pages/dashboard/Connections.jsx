@@ -5,6 +5,7 @@ import { toast } from '../../store/toastStore.js';
 import { Card, Button, Alert, Spinner } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { WhatsAppManage } from '../../components/business/WhatsAppManage.jsx';
+import { ConnectionAssistant } from '../../components/business/ConnectionAssistant.jsx';
 
 /**
  * Módulo "Conexiones": el cliente conecta SU propio WhatsApp mediante Embedded
@@ -262,6 +263,9 @@ export function Connections() {
 
       {/* Gestión del WhatsApp conectado: perfil + plantillas */}
       {connected && <WhatsAppManage isOwner={isOwner} />}
+
+      {/* Asistente de conexión (guía + atascos + ayuda) cuando aún no conecta */}
+      {!connected && data?.embeddedEnabled && isOwner && <ConnectionAssistant />}
 
       {!connected && (
         <Card>
