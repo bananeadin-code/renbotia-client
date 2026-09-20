@@ -204,7 +204,6 @@ export function PublicFooter() {
         {/* Barra inferior */}
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-line pt-6 text-sm text-muted sm:flex-row">
           <span>© {new Date().getFullYear()} RenBotIA · Asistentes de WhatsApp con IA</span>
-          <span className="text-subtle">Hecho en Durango, México</span>
         </div>
       </div>
     </footer>
