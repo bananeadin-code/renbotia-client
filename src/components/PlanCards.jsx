@@ -26,8 +26,10 @@ export function PlanCards({ plans, selectedKey, onSelect, ctaLabel = 'Elegir pla
   const [fetchedLive, setFetchedLive] = useState(null);
   useEffect(() => {
     if (typeof paidPlansLive === 'boolean') return; // ya lo pasaron
+    // Endpoint PÚBLICO: funciona con o sin sesión (la página de Precios no tiene
+    // token, y antes caía a "Próximamente" por el 401 del config autenticado).
     billingApi
-      .config()
+      .publicConfig()
       .then((d) => setFetchedLive(Boolean(d.paidPlansLive)))
       .catch(() => setFetchedLive(false));
   }, [paidPlansLive]);

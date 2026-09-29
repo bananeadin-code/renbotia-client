@@ -109,6 +109,8 @@ export const billingApi = {
   changePlan: (planKey) => unwrap(api.post('/billing/change-plan', { planKey })),
   // Tarjeta guardada (Stripe Elements) + recarga automática
   config: () => unwrap(api.get('/billing/config')),
+  // Estado público de planes (sin sesión) para la página de Precios.
+  publicConfig: () => unwrap(api.get('/billing/public-config')),
   setupIntent: () => unwrap(api.post('/billing/setup-intent')),
   getPaymentMethod: () => unwrap(api.get('/billing/payment-method')),
   savePaymentMethod: (paymentMethodId) =>
