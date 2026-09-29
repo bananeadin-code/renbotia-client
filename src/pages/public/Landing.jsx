@@ -50,7 +50,7 @@ const SECTORS = ['Despachos legales', 'Contadores', 'Consultoras', 'Agencias de 
 const STEPS = [
   { n: '01', title: 'Configura tu bot', desc: 'Responde 3 pasos: negocio, plan y preguntas frecuentes.' },
   { n: '02', title: 'Entrénalo y pruébalo', desc: 'Ajusta tono e información y pruébalo en el simulador de WhatsApp.' },
-  { n: '03', title: 'Atiende sin parar', desc: 'Tu bot responde con tu información, con tu voz, las 24 horas.' },
+  { n: '03', title: 'Conéctalo y atiende sin parar', desc: 'Conecta tu WhatsApp en minutos y el bot responde con tu voz, las 24 horas.' },
 ];
 
 export default function Landing() {
@@ -263,7 +263,7 @@ export default function Landing() {
               Deja de responder las mismas preguntas
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-brand-50">
-              Crea tu cuenta, entrena tu bot en minutos y pruébalo en el simulador.
+              Crea tu cuenta, entrena tu bot en minutos, pruébalo en el simulador y conéctalo a tu WhatsApp.
             </p>
             <div className="mt-8">
               <Link to="/registro">

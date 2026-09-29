@@ -16,11 +16,11 @@ export const FAQS = [
   },
   {
     q: '¿Se conecta a WhatsApp real?',
-    a: 'En esta versión incluimos un simulador de WhatsApp para que pruebes y ajustes el bot. La conexión con WhatsApp Business API llega en una fase posterior.',
+    a: 'Sí. Conectas tu propio número de WhatsApp Business en minutos desde el panel, con el proceso oficial de Meta y una guía paso a paso. Antes de conectarlo, puedes probar y ajustar todo en el simulador.',
   },
   {
-    q: '¿Qué pasa si se me acaban los tokens del plan?',
-    a: 'Te avisamos en el panel y puedes comprar paquetes de créditos adicionales que se suman a tu balance, sin cambiar de plan.',
+    q: '¿Qué pasa si se me acaban las conversaciones de mi plan?',
+    a: 'Tu plan se renueva cada mes. Si necesitas más antes de la renovación, te avisamos en el panel y puedes comprar paquetes de créditos que se suman a tu balance, sin cambiar de plan.',
   },
   {
     q: '¿Puedo cambiar el tono o las respuestas después?',
@@ -28,7 +28,7 @@ export const FAQS = [
   },
   {
     q: '¿Hay un plan gratis?',
-    a: 'Sí. El plan Free incluye 50,000 tokens para que pruebes tu bot sin tarjeta ni límite de días. Cuando lo necesites, subes a Pro o Elite, o compras paquetes de créditos extra.',
+    a: 'Sí. El plan Free te alcanza para alrededor de 10 conversaciones al mes (50,000 tokens de IA), sin tarjeta ni límite de días. Cuando lo necesites, subes a Pro o Elite, o compras paquetes de créditos extra.',
   },
   {
     q: '¿En cuánto tiempo queda listo mi bot?',
