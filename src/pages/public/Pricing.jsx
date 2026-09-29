@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { planApi } from '../../api/endpoints.js';
 import { PublicNav, PublicFooter } from '../../components/layout/PublicNav.jsx';
 import { PlanCards } from '../../components/PlanCards.jsx';
@@ -16,6 +16,7 @@ const GUARANTEES = [
 ];
 
 export default function Pricing() {
+  const navigate = useNavigate();
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -59,7 +60,11 @@ export default function Pricing() {
               <Spinner className="text-brand-600" />
             </div>
           ) : (
-            <PlanCards plans={plans} />
+            <PlanCards
+              plans={plans}
+              ctaLabel="Comenzar"
+              onSelect={(key) => navigate(`/registro?plan=${key}`)}
+            />
           )}
         </Reveal>
 
