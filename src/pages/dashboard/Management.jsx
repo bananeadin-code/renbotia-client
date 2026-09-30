@@ -5,6 +5,7 @@ import { managementApi } from '../../api/endpoints.js';
 import { downloadFile } from '../../api/download.js';
 import { useBusinessStore } from '../../store/businessStore.js';
 import { toast } from '../../store/toastStore.js';
+import { confirm } from '../../store/confirmStore.js';
 import { RecordModal } from '../../components/management/RecordModal.jsx';
 import { AvailabilityConfig } from '../../components/management/AvailabilityConfig.jsx';
 import { CalendarView } from '../../components/management/CalendarView.jsx';
@@ -91,7 +92,15 @@ export default function Management() {
     }
   }
   async function remove(rec) {
-    if (!window.confirm('¿Eliminar este registro?')) return;
+    if (
+      !(await confirm({
+        title: 'Eliminar registro',
+        message: '¿Eliminar este registro? Esta acción no se puede deshacer.',
+        tone: 'danger',
+        confirmLabel: 'Eliminar',
+      }))
+    )
+      return;
     try {
       await managementApi.deleteRecord(rec.id);
       toast.success('Registro eliminado.');

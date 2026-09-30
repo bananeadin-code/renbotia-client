@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore.js';
 import { Button, Input, Alert, PasswordInput } from '../../components/ui/index.jsx';
+import { useForm, v } from '../../lib/useForm.js';
 import { AuthLayout } from '../../components/layout/AuthLayout.jsx';
 import { GoogleButton } from '../../components/auth/GoogleButton.jsx';
 import { OtpForm } from '../../components/auth/OtpForm.jsx';
@@ -15,14 +16,21 @@ export default function Register() {
   });
   const navigate = useNavigate();
   const register = useAuthStore((s) => s.register);
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const f = useForm(
+    { name: '', email: '', password: '' },
+    {
+      name: v.compose(v.required('Escribe tu nombre'), v.minLen(2, 'Escribe tu nombre')),
+      email: v.compose(v.required('Escribe tu correo'), v.email()),
+      password: v.compose(v.required('Crea una contraseña'), v.minLen(8, 'Mínimo 8 caracteres')),
+    }
+  );
   const [password2, setPassword2] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   // Estado pendiente de verificación de correo tras registrar.
   const [pending, setPending] = useState(null); // { email, devCode? }
 
-  const mismatch = password2.length > 0 && form.password !== password2;
+  const mismatch = password2.length > 0 && f.values.password !== password2;
 
   // Tras crear/entrar la cuenta: si venía a aceptar una invitación, va a
   // aceptarla; si no, al onboarding (aún no tiene negocio propio).
@@ -43,15 +51,16 @@ export default function Register() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
-    if (form.password !== password2) {
+    if (!f.validate()) return;
+    if (f.values.password !== password2) {
       setError('Las contraseñas no coinciden.');
       return;
     }
     setLoading(true);
     try {
-      const res = await register(form);
+      const res = await register(f.values);
       // El registro ya no inicia sesión: pide verificar el correo por código.
-      setPending({ email: res.email || form.email, devCode: res.devCode });
+      setPending({ email: res.email || f.values.email, devCode: res.devCode });
     } catch (err) {
       setError(err.response?.data?.message || 'No se pudo crear la cuenta');
     } finally {
@@ -104,37 +113,34 @@ export default function Register() {
         onSuccess={afterAuth}
         onError={(e) => setError(e.response?.data?.message || 'No se pudo entrar con Google.')}
       />
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} noValidate className="space-y-4">
         {error && <Alert variant="error">{error}</Alert>}
         <Input
           label="Nombre"
-          required
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
+          value={f.values.name}
+          onChange={f.setField('name')}
+          error={f.errors.name}
           placeholder="Tu nombre"
         />
         <Input
           label="Email"
           type="email"
-          required
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          value={f.values.email}
+          onChange={f.setField('email')}
+          error={f.errors.email}
           placeholder="tu@email.com"
         />
         <PasswordInput
           label="Contraseña"
-          required
-          minLength={8}
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
+          value={f.values.password}
+          onChange={f.setField('password')}
+          error={f.errors.password}
           placeholder="Mínimo 8 caracteres"
         />
         <div>
           <Input
             label="Repetir contraseña"
             type="password"
-            required
-            minLength={8}
             value={password2}
             onChange={(e) => setPassword2(e.target.value)}
             placeholder="Vuelve a escribir tu contraseña"

@@ -5,6 +5,7 @@ import { Card, Button, Input, Textarea, Select, Alert } from '../../components/u
 import { Icon } from '../../components/ui/Icon.jsx';
 import { Reveal } from '../../components/ui/Reveal.jsx';
 import { contactApi } from '../../api/endpoints.js';
+import { useForm, v } from '../../lib/useForm.js';
 import { useSeo } from '../../lib/seo.js';
 
 const TOPICS = ['Conexión de WhatsApp', 'Ventas y planes', 'Facturación', 'Soporte', 'Otro'];
@@ -23,23 +24,25 @@ export default function Contact() {
   const [params] = useSearchParams();
   const initialTopic = MOTIVO_TO_TOPIC[params.get('motivo')] || TOPICS[0];
 
-  const [form, setForm] = useState({ name: '', email: '', topic: initialTopic, message: '', website: '' });
+  const f = useForm(
+    { name: '', email: '', topic: initialTopic, message: '', website: '' },
+    {
+      name: v.compose(v.required('Escribe tu nombre'), v.minLen(2, 'Escribe tu nombre')),
+      email: v.compose(v.required('Escribe tu correo'), v.email()),
+      message: v.compose(v.required('Escribe tu mensaje'), v.minLen(10, 'Cuéntanos un poco más (al menos 10 caracteres)')),
+    }
+  );
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
 
-  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
-
   async function onSubmit(e) {
     e.preventDefault();
     setError('');
-    if (form.name.trim().length < 2 || !form.email.includes('@') || form.message.trim().length < 10) {
-      setError('Completa tu nombre, un correo válido y un mensaje de al menos 10 caracteres.');
-      return;
-    }
+    if (!f.validate()) return;
     setSending(true);
     try {
-      await contactApi.submit(form);
+      await contactApi.submit(f.values);
       setSent(true);
     } catch (err) {
       setError(err.response?.data?.message || 'No se pudo enviar. Intenta de nuevo en un momento.');
@@ -73,38 +76,38 @@ export default function Contact() {
               </div>
               <h2 className="mt-4 text-xl font-bold text-fg">¡Mensaje enviado!</h2>
               <p className="mx-auto mt-2 max-w-md text-sm text-muted">
-                Gracias, {form.name.split(' ')[0]}. Recibimos tu mensaje y te responderemos al correo
-                que nos dejaste lo antes posible.
+                Gracias, {f.values.name.split(' ')[0]}. Recibimos tu mensaje y te responderemos al
+                correo que nos dejaste lo antes posible.
               </p>
             </Card>
           ) : (
             <Card>
-              <form onSubmit={onSubmit} className="space-y-4">
+              <form onSubmit={onSubmit} noValidate className="space-y-4">
                 {error && <Alert variant="error">{error}</Alert>}
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Input
                     label="Tu nombre"
                     name="name"
-                    value={form.name}
-                    onChange={set('name')}
+                    value={f.values.name}
+                    onChange={f.setField('name')}
+                    error={f.errors.name}
                     placeholder="Nombre y apellido"
                     maxLength={80}
-                    required
                   />
                   <Input
                     label="Tu correo"
                     type="email"
                     name="email"
-                    value={form.email}
-                    onChange={set('email')}
+                    value={f.values.email}
+                    onChange={f.setField('email')}
+                    error={f.errors.email}
                     placeholder="tucorreo@ejemplo.com"
                     maxLength={120}
-                    required
                   />
                 </div>
 
-                <Select label="Tema" value={form.topic} onChange={set('topic')}>
+                <Select label="Tema" value={f.values.topic} onChange={f.setField('topic')}>
                   {TOPICS.map((t) => (
                     <option key={t} value={t}>
                       {t}
@@ -115,20 +118,20 @@ export default function Contact() {
                 <Textarea
                   label="Mensaje"
                   name="message"
-                  value={form.message}
-                  onChange={set('message')}
+                  value={f.values.message}
+                  onChange={f.setField('message')}
+                  error={f.errors.message}
                   placeholder="Cuéntanos en qué te podemos ayudar…"
                   rows={5}
                   maxLength={2000}
-                  required
                 />
 
                 {/* Honeypot anti-bots: oculto para personas; los bots lo llenan. */}
                 <input
                   type="text"
                   name="website"
-                  value={form.website}
-                  onChange={set('website')}
+                  value={f.values.website}
+                  onChange={f.setField('website')}
                   tabIndex={-1}
                   autoComplete="off"
                   aria-hidden="true"

@@ -5,6 +5,7 @@ import { useThemeStore } from './store/themeStore.js';
 import { ProtectedRoute } from './router/ProtectedRoute.jsx';
 import ScrollToTop from './router/ScrollToTop.jsx';
 import { Toaster } from './components/ui/Toaster.jsx';
+import { ConfirmDialog } from './components/ui/ConfirmDialog.jsx';
 import { Spinner } from './components/ui/index.jsx';
 
 // La Landing va EAGER (es el LCP y la página más importante para SEO); el resto
@@ -140,6 +141,7 @@ export default function App() {
     </Routes>
     </Suspense>
     <Toaster />
+    <ConfirmDialog />
     </>
   );
 }

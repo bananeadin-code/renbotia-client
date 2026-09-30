@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { billingApi } from '../../api/endpoints.js';
+import { confirm } from '../../store/confirmStore.js';
 import { Card, Button, Select, Input, Alert, Spinner } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
 import { useThemeStore } from '../../store/themeStore.js';
@@ -73,7 +74,15 @@ export function PaymentMethod({ packs = [] }) {
   }
 
   async function removeCard() {
-    if (!window.confirm('¿Quitar la tarjeta guardada? Esto también desactiva la recarga automática.')) return;
+    if (
+      !(await confirm({
+        title: 'Quitar tarjeta',
+        message: 'Se quitará tu tarjeta guardada y se desactivará la recarga automática. ¿Continuar?',
+        tone: 'danger',
+        confirmLabel: 'Quitar',
+      }))
+    )
+      return;
     setRemoving(true);
     setError('');
     try {

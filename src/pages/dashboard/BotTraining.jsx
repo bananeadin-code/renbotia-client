@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { botConfigApi, businessApi } from '../../api/endpoints.js';
 import { useBusinessStore } from '../../store/businessStore.js';
 import { toast } from '../../store/toastStore.js';
+import { confirm } from '../../store/confirmStore.js';
 import { Card, Button, Input, Textarea, Select, Alert, Spinner, Badge } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { limitsFor } from '../../lib/planLimits.js';
@@ -266,13 +267,13 @@ export default function BotTraining() {
     setCfg((prev) => ({ ...prev, documents: (prev.documents || []).filter((_, idx) => idx !== i) }));
   }
 
-  function applyTemplate(t) {
-    if (
-      !window.confirm(
-        `Se reemplazarán las preguntas frecuentes y los servicios con la plantilla de "${t.label}". Podrás ajustar todo antes de guardar. ¿Continuar?`
-      )
-    )
-      return;
+  async function applyTemplate(t) {
+    const ok = await confirm({
+      title: 'Cargar plantilla',
+      message: `Se reemplazarán las preguntas frecuentes y los servicios con la plantilla de "${t.label}". Podrás ajustar todo antes de guardar.`,
+      confirmLabel: 'Cargar plantilla',
+    });
+    if (!ok) return;
     const maxF = limits.maxFaqs ?? t.faqs.length;
     setCfg((prev) => ({
       ...prev,

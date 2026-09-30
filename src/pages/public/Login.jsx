@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore.js';
 import { Button, Input, Alert, PasswordInput } from '../../components/ui/index.jsx';
+import { useForm, v } from '../../lib/useForm.js';
 import { AuthLayout } from '../../components/layout/AuthLayout.jsx';
 import { GoogleButton } from '../../components/auth/GoogleButton.jsx';
 import { OtpForm } from '../../components/auth/OtpForm.jsx';
@@ -12,7 +13,13 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const login = useAuthStore((s) => s.login);
-  const [form, setForm] = useState({ email: '', password: '' });
+  const f = useForm(
+    { email: '', password: '' },
+    {
+      email: v.compose(v.required('Escribe tu correo'), v.email()),
+      password: v.required('Escribe tu contraseña'),
+    }
+  );
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   // Paso pendiente: 2FA de login o verificación de correo (registrado sin verificar).
@@ -27,9 +34,10 @@ export default function Login() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
+    if (!f.validate()) return;
     setLoading(true);
     try {
-      const res = await login(form);
+      const res = await login(f.values);
       if (res.needs2fa) {
         setPending({ mode: 'login_2fa', email: res.email, devCode: res.devCode });
       } else if (res.needsEmailVerification) {
@@ -88,21 +96,21 @@ export default function Login() {
         onSuccess={() => navigate(from, { replace: true })}
         onError={(e) => setError(e.response?.data?.message || 'No se pudo entrar con Google.')}
       />
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} noValidate className="space-y-4">
         {error && <Alert variant="error">{error}</Alert>}
         <Input
           label="Email"
           type="email"
-          required
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          value={f.values.email}
+          onChange={f.setField('email')}
+          error={f.errors.email}
           placeholder="tu@email.com"
         />
         <PasswordInput
           label="Contraseña"
-          required
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
+          value={f.values.password}
+          onChange={f.setField('password')}
+          error={f.errors.password}
           placeholder="••••••••"
         />
         <div className="text-right">

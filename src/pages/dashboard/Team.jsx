@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { membersApi } from '../../api/endpoints.js';
 import { toast } from '../../store/toastStore.js';
+import { confirm } from '../../store/confirmStore.js';
 import { useBusinessStore } from '../../store/businessStore.js';
 import { limitsFor } from '../../lib/planLimits.js';
 import { Card, Button, Input, Badge, Alert, Spinner } from '../../components/ui/index.jsx';
@@ -60,7 +61,15 @@ export default function Team() {
   }
 
   async function removeMember(m) {
-    if (!window.confirm(`¿Quitar a ${m.name || m.email} del negocio?`)) return;
+    if (
+      !(await confirm({
+        title: 'Quitar colaborador',
+        message: `¿Quitar a ${m.name || m.email} del negocio? Perderá el acceso a este proyecto.`,
+        tone: 'danger',
+        confirmLabel: 'Quitar',
+      }))
+    )
+      return;
     try {
       await membersApi.remove(m.userId);
       toast.success('Colaborador removido.');

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { connectionsApi } from '../../api/endpoints.js';
 import { useBusinessStore } from '../../store/businessStore.js';
 import { toast } from '../../store/toastStore.js';
+import { confirm } from '../../store/confirmStore.js';
 import { Card, Button, Alert, Spinner } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { WhatsAppManage } from '../../components/business/WhatsAppManage.jsx';
@@ -144,7 +145,15 @@ export function Connections() {
   }
 
   async function disconnect() {
-    if (!window.confirm('¿Desconectar tu WhatsApp? El bot dejará de responder en ese número.')) return;
+    if (
+      !(await confirm({
+        title: 'Desconectar WhatsApp',
+        message: 'El bot dejará de responder en ese número. ¿Seguro que quieres desconectarlo?',
+        tone: 'danger',
+        confirmLabel: 'Desconectar',
+      }))
+    )
+      return;
     try {
       await connectionsApi.disconnectWhatsApp();
       await refresh();
