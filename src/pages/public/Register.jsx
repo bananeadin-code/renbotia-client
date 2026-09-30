@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore.js';
-import { Button, Input, Alert } from '../../components/ui/index.jsx';
+import { Button, Input, Alert, PasswordInput } from '../../components/ui/index.jsx';
 import { AuthLayout } from '../../components/layout/AuthLayout.jsx';
 import { GoogleButton } from '../../components/auth/GoogleButton.jsx';
 import { OtpForm } from '../../components/auth/OtpForm.jsx';
@@ -121,9 +121,8 @@ export default function Register() {
           onChange={(e) => setForm({ ...form, email: e.target.value })}
           placeholder="tu@email.com"
         />
-        <Input
+        <PasswordInput
           label="Contraseña"
-          type="password"
           required
           minLength={8}
           value={form.password}

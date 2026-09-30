@@ -41,6 +41,10 @@ export function Connections() {
   const [data, setData] = useState(null);
   const [sdkReady, setSdkReady] = useState(false);
   const [connecting, setConnecting] = useState(false);
+  // El botón de conectar se habilita solo cuando el usuario marcó los 3 puntos
+  // del checklist "Antes de conectar" (evita intentos fallidos por no tener listo
+  // el número dedicado).
+  const [checklistReady, setChecklistReady] = useState(false);
   // Datos que el Embedded Signup envía por postMessage (número + WABA).
   const sessionInfo = useRef({ phoneNumberId: '', wabaId: '' });
 
@@ -167,6 +171,12 @@ export function Connections() {
         <p className="mt-1 text-muted">Conecta tus canales para que el bot atienda a tus clientes.</p>
       </div>
 
+      {/* Antes de conectar: checklist arriba, para asegurar el número dedicado
+          antes de abrir el modal de Meta. */}
+      {!connected && data?.embeddedEnabled && isOwner && (
+        <ConnectionAssistant onReadyChange={setChecklistReady} />
+      )}
+
       <Card className={!connected && data?.embeddedEnabled ? 'border-brand-200 dark:border-brand-900/60' : ''}>
         <div className="flex items-start gap-4">
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-500/10 text-brand-600">
@@ -222,7 +232,7 @@ export function Connections() {
                 <div className="flex flex-wrap items-center gap-3">
                   <Button
                     onClick={launchSignup}
-                    disabled={!sdkReady || connecting}
+                    disabled={!sdkReady || connecting || !checklistReady}
                     className="w-full justify-center sm:w-auto"
                   >
                     {connecting ? 'Conectando…' : 'Conectar WhatsApp'}
@@ -239,10 +249,11 @@ export function Connections() {
                   )}
                 </div>
                 <p className="mt-3 flex items-start gap-1.5 text-xs text-subtle">
-                  <Icon name="shield" size={14} className="mt-0.5 shrink-0" />
+                  <Icon name={checklistReady ? 'shield' : 'alert'} size={14} className="mt-0.5 shrink-0" />
                   <span>
-                    Se abrirá una ventana segura de Meta para iniciar sesión y verificar tu número. Puedes
-                    cerrarla en cualquier momento.
+                    {checklistReady
+                      ? 'Se abrirá una ventana segura de Meta para iniciar sesión y verificar tu número. Puedes cerrarla en cualquier momento.'
+                      : 'Marca los 3 puntos de “Antes de conectar” (arriba) para continuar.'}
                   </span>
                 </p>
               </>
@@ -263,9 +274,6 @@ export function Connections() {
 
       {/* Gestión del WhatsApp conectado: perfil + plantillas */}
       {connected && <WhatsAppManage isOwner={isOwner} />}
-
-      {/* Asistente de conexión (guía + atascos + ayuda) cuando aún no conecta */}
-      {!connected && data?.embeddedEnabled && isOwner && <ConnectionAssistant />}
 
       {!connected && (
         <Card>

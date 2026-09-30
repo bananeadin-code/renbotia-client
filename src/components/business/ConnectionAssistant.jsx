@@ -51,7 +51,7 @@ const BLOCKERS = [
  * vía de ayuda directa para no perder a un interesado. Solo se muestra mientras
  * el canal NO está conectado.
  */
-export function ConnectionAssistant() {
+export function ConnectionAssistant({ onReadyChange }) {
   const business = useBusinessStore((s) => s.business);
   const storageKey = `rb_conn_ready_${business?.id || business?._id || 'x'}`;
   const [checked, setChecked] = useState({});
@@ -64,6 +64,12 @@ export function ConnectionAssistant() {
       /* sin persistencia: se empieza vacío */
     }
   }, [storageKey]);
+
+  // Avisa al contenedor si los 3 puntos ya están marcados (para habilitar el
+  // botón de conectar solo cuando el usuario confirmó estar listo).
+  useEffect(() => {
+    onReadyChange?.(CHECKLIST.every((c) => checked[c.key]));
+  }, [checked, onReadyChange]);
 
   function toggle(key) {
     setChecked((prev) => {

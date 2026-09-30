@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Logo } from '../ui/Logo.jsx';
+import { Logo, LogoMark } from '../ui/Logo.jsx';
 import { Icon } from '../ui/Icon.jsx';
 import { ThemeToggle } from '../ui/ThemeToggle.jsx';
 
@@ -32,8 +32,13 @@ export function AuthLayout({ title, subtitle, children, footer }) {
           className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-white/15 blur-3xl"
         />
         <div className="relative">
-          <Link to="/" aria-label="RenBotIA — inicio">
-            <Logo size={32} textClass="text-white" />
+          {/* En el panel verde, el glifo esmeralda se perdía con el fondo. Va en un
+              chip claro para que resalte, con el wordmark en blanco. */}
+          <Link to="/" aria-label="RenBotIA — inicio" className="inline-flex items-center gap-2.5">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/95 shadow-sm ring-1 ring-white/40">
+              <LogoMark size={26} />
+            </span>
+            <span className="text-lg font-extrabold tracking-tight text-white">RenBotIA</span>
           </Link>
         </div>
 

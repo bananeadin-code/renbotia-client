@@ -180,8 +180,8 @@ export function CheckoutDialog({
       )}
 
       <p className="mt-4 flex items-center gap-1.5 text-[11px] text-subtle">
-        <Icon name="card" size={13} /> Pago protegido por Stripe. Prueba: 4242 4242 4242 4242, fecha
-        futura y cualquier CVC.
+        <Icon name="card" size={13} /> Pago protegido por Stripe.
+        {pk?.startsWith('pk_test_') && ' Prueba: 4242 4242 4242 4242, fecha futura y cualquier CVC.'}
       </p>
     </Modal>
   );

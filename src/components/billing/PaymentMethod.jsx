@@ -177,7 +177,12 @@ export function PaymentMethod({ packs = [] }) {
             appearance: { theme: isDark ? 'night' : 'stripe' },
           }}
         >
-          <AddCardForm onSaved={onCardSaved} onCancel={() => setAdding(false)} onError={setError} />
+          <AddCardForm
+            onSaved={onCardSaved}
+            onCancel={() => setAdding(false)}
+            onError={setError}
+            testMode={pk.startsWith('pk_test_')}
+          />
         </Elements>
       ) : (
         <div className="rounded-lg border border-dashed border-line p-5 text-center">
@@ -266,7 +271,7 @@ export function PaymentMethod({ packs = [] }) {
 }
 
 /** Formulario de tarjeta con Stripe Elements (iframes). Confirma el SetupIntent. */
-function AddCardForm({ onSaved, onCancel, onError }) {
+function AddCardForm({ onSaved, onCancel, onError, testMode }) {
   const stripe = useStripe();
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
@@ -306,7 +311,8 @@ function AddCardForm({ onSaved, onCancel, onError }) {
         </Button>
       </div>
       <p className="text-[11px] text-subtle">
-        Pago seguro con Stripe. Prueba (modo test): 4242 4242 4242 4242, cualquier fecha futura y CVC.
+        Pago seguro con Stripe.
+        {testMode && ' Prueba (modo test): 4242 4242 4242 4242, cualquier fecha futura y CVC.'}
       </p>
     </form>
   );

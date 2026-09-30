@@ -138,3 +138,5 @@ export function Alert({ children, variant = 'info' }) {
     </div>
   );
 }
+
+export { PasswordInput } from './PasswordInput.jsx';
