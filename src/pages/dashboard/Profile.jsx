@@ -10,6 +10,7 @@ import { ActivityLog } from '../../components/business/ActivityLog.jsx';
 import { Card, Button, Input, Select, Alert } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { fileToAvatarDataUri } from '../../lib/image.js';
+import { v } from '../../lib/useForm.js';
 
 const INDUSTRIES = [
   { value: 'legal', label: 'Despacho legal' },
@@ -26,10 +27,14 @@ export default function Profile() {
 
   // Datos personales (nombre editable)
   const [name, setName] = useState(user?.name || '');
+  const [nameErr, setNameErr] = useState('');
   const [savingName, setSavingName] = useState(false);
 
   async function saveName(e) {
     e.preventDefault();
+    const msg = v.minLen(2, 'Escribe tu nombre (mínimo 2 letras).')(name.trim());
+    setNameErr(msg);
+    if (msg) return;
     setSavingName(true);
     try {
       const { user: updated } = await authApi.updateProfile(name.trim());
@@ -45,12 +50,16 @@ export default function Profile() {
   // Cambio de correo (con re-verificación al correo nuevo)
   const [emailStep, setEmailStep] = useState('idle'); // idle | request | verify
   const [newEmail, setNewEmail] = useState('');
+  const [newEmailErr, setNewEmailErr] = useState('');
   const [emailCode, setEmailCode] = useState('');
   const [emailDevCode, setEmailDevCode] = useState('');
   const [emailBusy, setEmailBusy] = useState(false);
 
   async function requestEmailChange(e) {
     e.preventDefault();
+    const msg = v.email('Escribe un correo válido.')(newEmail);
+    setNewEmailErr(msg);
+    if (msg) return;
     setEmailBusy(true);
     try {
       const res = await authApi.requestEmailChange(newEmail.trim());
@@ -109,6 +118,7 @@ export default function Profile() {
   });
   const [bizMsg, setBizMsg] = useState('');
   const [bizErr, setBizErr] = useState('');
+  const [bizNameErr, setBizNameErr] = useState('');
   const [savingBiz, setSavingBiz] = useState(false);
 
   // Foto/avatar del negocio: se comprime en el navegador y se guarda al momento.
@@ -147,6 +157,9 @@ export default function Profile() {
     e.preventDefault();
     setBizMsg('');
     setBizErr('');
+    const msg = v.minLen(2, 'Escribe el nombre del negocio.')(biz.name.trim());
+    setBizNameErr(msg);
+    if (msg) return;
     setSavingBiz(true);
     try {
       const { business: updated } = await businessApi.update(biz);
@@ -204,14 +217,16 @@ export default function Profile() {
       {/* Datos personales */}
       <Card>
         <h2 className="mb-4 font-semibold text-fg">Datos personales</h2>
-        <form onSubmit={saveName} className="space-y-4">
+        <form onSubmit={saveName} noValidate className="space-y-4">
           <Input
             label="Nombre"
             value={name}
-            onChange={(e) => setName(e.target.value)}
-            minLength={2}
+            onChange={(e) => {
+              setName(e.target.value);
+              if (nameErr) setNameErr('');
+            }}
+            error={nameErr}
             maxLength={80}
-            required
           />
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-xs text-subtle">
@@ -245,13 +260,16 @@ export default function Profile() {
         )}
 
         {emailStep === 'request' && (
-          <form onSubmit={requestEmailChange} className="space-y-3">
+          <form onSubmit={requestEmailChange} noValidate className="space-y-3">
             <Input
               label="Nuevo correo"
               type="email"
-              required
               value={newEmail}
-              onChange={(e) => setNewEmail(e.target.value)}
+              onChange={(e) => {
+                setNewEmail(e.target.value);
+                if (newEmailErr) setNewEmailErr('');
+              }}
+              error={newEmailErr}
               placeholder="nuevo@correo.com"
             />
             <div className="flex justify-end gap-2">
@@ -353,8 +371,16 @@ export default function Profile() {
             <Alert variant="error">{bizErr}</Alert>
           </div>
         )}
-        <form onSubmit={saveBusiness} className="space-y-4">
-          <Input label="Nombre del negocio" value={biz.name} onChange={(e) => setBiz({ ...biz, name: e.target.value })} />
+        <form onSubmit={saveBusiness} noValidate className="space-y-4">
+          <Input
+            label="Nombre del negocio"
+            value={biz.name}
+            onChange={(e) => {
+              setBiz({ ...biz, name: e.target.value });
+              if (bizNameErr) setBizNameErr('');
+            }}
+            error={bizNameErr}
+          />
           <Select label="Rubro" value={biz.industry} onChange={(e) => setBiz({ ...biz, industry: e.target.value })}>
             {INDUSTRIES.map((i) => (
               <option key={i.value} value={i.value}>

@@ -128,10 +128,9 @@ export default function BotTraining() {
   const [uploadingIdx, setUploadingIdx] = useState(-1); // imagen que se está subiendo
   const alertRef = useRef(null); // para hacer scroll al aviso tras guardar
   const [feedbackTick, setFeedbackTick] = useState(0); // fuerza scroll en cada intento
-  // Tarjeta de plantillas de arranque: visible por defecto, descartable por
-  // negocio (útil sobre todo al crear la cuenta) y colapsable.
+  // Tarjeta de plantillas de arranque: visible por defecto; se oculta para el
+  // usuario solo al pulsar "No mostrar de nuevo" (recordado en el navegador).
   const [showTemplates, setShowTemplates] = useState(true);
-  const [tplOpen, setTplOpen] = useState(true);
 
   useEffect(() => {
     try {
@@ -400,68 +399,47 @@ export default function BotTraining() {
 
       {/* Plantillas de arranque por giro (descartable; útil al crear la cuenta) */}
       {showTemplates && (
-        <Card className="overflow-hidden border-brand-400/30 bg-gradient-to-br from-brand-500/[0.07] to-transparent p-0">
-          <div className="flex items-start gap-3 p-4 sm:p-5">
-            <span className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500/15 text-brand-600 dark:text-brand-300 sm:flex">
-              <Icon name="academic" size={20} />
+        <Card className="border-brand-400/30 bg-gradient-to-br from-brand-500/[0.07] to-transparent">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-500/15 text-brand-600 dark:text-brand-300">
+              <Icon name="academic" size={18} />
             </span>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <h2 className="font-semibold text-fg">Plantillas de arranque</h2>
-                <span className="rounded-full bg-brand-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-600 dark:text-brand-300">
-                  Recomendado
-                </span>
-              </div>
-              <p className="mt-0.5 text-sm text-muted">
-                ¿Empezando? Carga preguntas frecuentes y servicios base según tu giro y ajústalos a tu
-                negocio. No empieces de cero.
-              </p>
-
-              {tplOpen && (
-                <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {INDUSTRY_TEMPLATES.map((t) => (
-                    <button
-                      key={t.key}
-                      type="button"
-                      onClick={() => applyTemplate(t)}
-                      className="group flex items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2.5 text-left text-sm font-medium text-fg transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-sm"
-                    >
-                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-surface2 text-subtle transition group-hover:bg-brand-500/10 group-hover:text-brand-600">
-                        <Icon name={TEMPLATE_ICONS[t.key] || 'building'} size={15} />
-                      </span>
-                      <span className="truncate">{t.label}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              <div className="mt-3 flex items-center gap-4 text-xs">
-                <button
-                  type="button"
-                  onClick={() => setTplOpen((v) => !v)}
-                  className="inline-flex items-center gap-1 font-medium text-muted transition hover:text-fg"
-                >
-                  <Icon name="chevronRight" size={14} className={tplOpen ? 'rotate-90' : ''} />
-                  {tplOpen ? 'Ocultar' : 'Mostrar plantillas'}
-                </button>
-                <button
-                  type="button"
-                  onClick={dismissTemplates}
-                  className="font-medium text-subtle transition hover:text-fg"
-                >
-                  No, gracias
-                </button>
-              </div>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+              <h2 className="font-semibold text-fg">Plantillas de arranque</h2>
+              <span className="rounded-full bg-brand-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-600 dark:text-brand-300">
+                Recomendado
+              </span>
             </div>
+          </div>
 
+          <p className="mt-2 text-sm text-muted">
+            ¿Empezando? Carga preguntas frecuentes y servicios base según tu giro y ajústalos a tu
+            negocio. No empieces de cero.
+          </p>
+
+          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {INDUSTRY_TEMPLATES.map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => applyTemplate(t)}
+                className="group flex items-center gap-2 rounded-xl border border-line bg-surface px-3 py-3 text-left text-sm font-medium text-fg transition hover:border-brand-300 hover:shadow-sm active:scale-[0.98] sm:py-2.5 sm:hover:-translate-y-0.5"
+              >
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-surface2 text-subtle transition group-hover:bg-brand-500/10 group-hover:text-brand-600">
+                  <Icon name={TEMPLATE_ICONS[t.key] || 'building'} size={15} />
+                </span>
+                <span className="truncate">{t.label}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-4 flex justify-center border-t border-line pt-3 sm:justify-end">
             <button
               type="button"
               onClick={dismissTemplates}
-              aria-label="Descartar plantillas de arranque"
-              title="Descartar"
-              className="shrink-0 rounded-lg p-1 text-subtle transition hover:bg-surface2 hover:text-fg"
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-muted transition hover:bg-surface2 hover:text-fg"
             >
-              <Icon name="close" size={18} />
+              <Icon name="close" size={14} /> No mostrar de nuevo
             </button>
           </div>
         </Card>
