@@ -6,7 +6,7 @@ import { confirm } from '../../store/confirmStore.js';
 import { Card, Button, Alert, Spinner } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { WhatsAppManage } from '../../components/business/WhatsAppManage.jsx';
-import { ConnectionAssistant } from '../../components/business/ConnectionAssistant.jsx';
+import { ConnectionChecklist, ConnectionHelp } from '../../components/business/ConnectionAssistant.jsx';
 
 /**
  * Módulo "Conexiones": el cliente conecta SU propio WhatsApp mediante Embedded
@@ -180,12 +180,6 @@ export function Connections() {
         <p className="mt-1 text-muted">Conecta tus canales para que el bot atienda a tus clientes.</p>
       </div>
 
-      {/* Antes de conectar: checklist arriba, para asegurar el número dedicado
-          antes de abrir el modal de Meta. */}
-      {!connected && data?.embeddedEnabled && isOwner && (
-        <ConnectionAssistant onReadyChange={setChecklistReady} />
-      )}
-
       <Card className={!connected && data?.embeddedEnabled ? 'border-brand-200 dark:border-brand-900/60' : ''}>
         <div className="flex items-start gap-4">
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-500/10 text-brand-600">
@@ -236,12 +230,18 @@ export function Connections() {
 
         {!connected && data?.embeddedEnabled && (
           <div className="mt-5 border-t border-line pt-5">
-            {isOwner ? (
-              <>
+            {!isOwner ? (
+              <Alert>Solo el dueño del negocio puede conectar WhatsApp.</Alert>
+            ) : !checklistReady ? (
+              // Antes de conectar: el checklist ocupa este espacio; al marcar los
+              // 3 puntos, se desvanece y aparece el botón de conexión.
+              <ConnectionChecklist onReadyChange={setChecklistReady} />
+            ) : (
+              <div className="animate-fade-up">
                 <div className="flex flex-wrap items-center gap-3">
                   <Button
                     onClick={launchSignup}
-                    disabled={!sdkReady || connecting || !checklistReady}
+                    disabled={!sdkReady || connecting}
                     className="w-full justify-center sm:w-auto"
                   >
                     {connecting ? 'Conectando…' : 'Conectar WhatsApp'}
@@ -258,16 +258,13 @@ export function Connections() {
                   )}
                 </div>
                 <p className="mt-3 flex items-start gap-1.5 text-xs text-subtle">
-                  <Icon name={checklistReady ? 'shield' : 'alert'} size={14} className="mt-0.5 shrink-0" />
+                  <Icon name="shield" size={14} className="mt-0.5 shrink-0" />
                   <span>
-                    {checklistReady
-                      ? 'Se abrirá una ventana segura de Meta para iniciar sesión y verificar tu número. Puedes cerrarla en cualquier momento.'
-                      : 'Marca los 3 puntos de “Antes de conectar” (arriba) para continuar.'}
+                    Se abrirá una ventana segura de Meta para iniciar sesión y verificar tu número.
+                    Puedes cerrarla en cualquier momento.
                   </span>
                 </p>
-              </>
-            ) : (
-              <Alert>Solo el dueño del negocio puede conectar WhatsApp.</Alert>
+              </div>
             )}
           </div>
         )}
@@ -283,6 +280,9 @@ export function Connections() {
 
       {/* Gestión del WhatsApp conectado: perfil + plantillas */}
       {connected && <WhatsAppManage isOwner={isOwner} />}
+
+      {/* Ayuda (atascos + contacto) debajo de la tarjeta, mientras no conecta */}
+      {!connected && data?.embeddedEnabled && isOwner && <ConnectionHelp />}
 
       {!connected && (
         <Card>

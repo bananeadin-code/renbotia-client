@@ -46,12 +46,11 @@ const BLOCKERS = [
 ];
 
 /**
- * Asistente de conexión: guía al dueño para conectar su WhatsApp sin atorarse.
- * Checklist previo (recordado por negocio), solución de atascos comunes y una
- * vía de ayuda directa para no perder a un interesado. Solo se muestra mientras
- * el canal NO está conectado.
+ * Checklist "Antes de conectar": va DENTRO de la tarjeta de WhatsApp, encima del
+ * botón. Cuando el usuario marca los 3 puntos, avisa (onReadyChange) para que el
+ * contenedor lo reemplace por el flujo de conexión. Se recuerda en el navegador.
  */
-export function ConnectionAssistant({ onReadyChange }) {
+export function ConnectionChecklist({ onReadyChange }) {
   const business = useBusinessStore((s) => s.business);
   const storageKey = `rb_conn_ready_${business?.id || business?._id || 'x'}`;
   const [checked, setChecked] = useState({});
@@ -65,8 +64,6 @@ export function ConnectionAssistant({ onReadyChange }) {
     }
   }, [storageKey]);
 
-  // Avisa al contenedor si los 3 puntos ya están marcados (para habilitar el
-  // botón de conectar solo cuando el usuario confirmó estar listo).
   useEffect(() => {
     onReadyChange?.(CHECKLIST.every((c) => checked[c.key]));
   }, [checked, onReadyChange]);
@@ -83,61 +80,59 @@ export function ConnectionAssistant({ onReadyChange }) {
     });
   }
 
-  const done = CHECKLIST.filter((c) => checked[c.key]).length;
-  const allReady = done === CHECKLIST.length;
-
   return (
-    <Card className="space-y-5">
-      {/* Checklist previo */}
-      <div>
-        <div className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600">
-            <Icon name="checkCircle" size={17} />
-          </span>
-          <h2 className="font-semibold text-fg">Antes de conectar (2 minutos)</h2>
-        </div>
-        <p className="mt-1 text-sm text-muted">
-          Confirma estos puntos para que la conexión salga a la primera. Toma unos minutos y es el
-          proceso oficial de Meta.
-        </p>
+    <div>
+      <div className="flex items-center gap-2">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600">
+          <Icon name="checkCircle" size={17} />
+        </span>
+        <h3 className="font-semibold text-fg">Antes de conectar (2 minutos)</h3>
+      </div>
+      <p className="mt-1 text-sm text-muted">
+        Confirma estos puntos para que la conexión salga a la primera. Al marcar los tres, se activa
+        el botón para conectar.
+      </p>
 
-        <div className="mt-3 space-y-2">
-          {CHECKLIST.map((item) => {
-            const on = Boolean(checked[item.key]);
-            return (
-              <button
-                key={item.key}
-                type="button"
-                onClick={() => toggle(item.key)}
-                className={`flex w-full items-start gap-3 rounded-xl border p-3 text-left transition ${
-                  on ? 'border-brand-400/60 bg-brand-500/[0.06]' : 'border-line bg-surface hover:border-brand-300'
+      <div className="mt-3 space-y-2">
+        {CHECKLIST.map((item) => {
+          const on = Boolean(checked[item.key]);
+          return (
+            <button
+              key={item.key}
+              type="button"
+              onClick={() => toggle(item.key)}
+              aria-pressed={on}
+              className={`flex w-full items-start gap-3 rounded-xl border p-3 text-left transition ${
+                on ? 'border-brand-400/60 bg-brand-500/[0.06]' : 'border-line bg-surface hover:border-brand-300'
+              }`}
+            >
+              <span
+                className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition ${
+                  on ? 'border-brand-500 bg-brand-500 text-white' : 'border-line text-transparent'
                 }`}
               >
-                <span
-                  className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition ${
-                    on ? 'border-brand-500 bg-brand-500 text-white' : 'border-line text-transparent'
-                  }`}
-                >
-                  <Icon name="check" size={13} />
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-sm font-medium text-fg">{item.title}</span>
-                  <span className="block text-xs text-muted">{item.detail}</span>
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {allReady && (
-          <p className="mt-3 flex items-center gap-1.5 text-sm font-medium text-brand-600">
-            <Icon name="checkCircle" size={16} /> Todo listo. Ya puedes pulsar “Conectar WhatsApp”.
-          </p>
-        )}
+                <Icon name="check" size={13} />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-sm font-medium text-fg">{item.title}</span>
+                <span className="block text-xs text-muted">{item.detail}</span>
+              </span>
+            </button>
+          );
+        })}
       </div>
+    </div>
+  );
+}
 
-      {/* Solución de atascos */}
-      <div className="border-t border-line pt-4">
+/**
+ * Ayuda de conexión (secundaria, va DEBAJO de la tarjeta): soluciones a atascos
+ * comunes y una vía de contacto directa para no perder a un interesado.
+ */
+export function ConnectionHelp() {
+  return (
+    <Card className="space-y-5">
+      <div>
         <h3 className="text-sm font-semibold text-fg">¿Se atoró la conexión? Soluciones rápidas</h3>
         <div className="mt-2 space-y-1.5">
           {BLOCKERS.map((b) => (
@@ -156,7 +151,6 @@ export function ConnectionAssistant({ onReadyChange }) {
         </div>
       </div>
 
-      {/* Ayuda directa (concierge) */}
       <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-brand-400/30 bg-brand-500/[0.05] p-3">
         <p className="text-sm text-muted">
           <span className="font-medium text-fg">¿Prefieres que lo hagamos contigo?</span> Te ayudamos
