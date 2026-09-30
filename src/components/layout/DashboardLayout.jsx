@@ -133,8 +133,12 @@ export function DashboardLayout() {
           </div>
 
           <div className="mb-4 flex items-center gap-3 rounded-lg border border-line bg-surface2 px-3 py-2.5">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-500/15 text-sm font-bold text-brand-700 dark:text-brand-300">
-              {business?.name?.charAt(0).toUpperCase() || 'N'}
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-500/15 text-sm font-bold text-brand-700 dark:text-brand-300">
+              {business?.photo ? (
+                <img src={business.photo} alt="" className="h-full w-full object-cover" />
+              ) : (
+                business?.name?.charAt(0).toUpperCase() || 'N'
+              )}
             </div>
             <div className="min-w-0">
               <div className="truncate text-sm font-semibold text-fg">{business?.name}</div>

@@ -264,6 +264,15 @@ const ICONS = {
       <path d="m3 3 18 18" {...P} />
     </>
   ),
+  camera: (
+    <>
+      <path
+        d="M4 8a2 2 0 0 1 2-2h1.2a2 2 0 0 0 1.7-1l.5-.8A2 2 0 0 1 11 3h2a2 2 0 0 1 1.6.9l.5.9a2 2 0 0 0 1.7 1H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"
+        {...P}
+      />
+      <circle cx="12" cy="13" r="3.2" {...P} />
+    </>
+  ),
 };
 
 export function Icon({ name, size = 20, className = '', title, ...rest }) {

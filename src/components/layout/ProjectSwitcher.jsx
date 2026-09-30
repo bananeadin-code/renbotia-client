@@ -11,14 +11,18 @@ function ProjectAvatar({ project, size = 'md' }) {
   const dim = size === 'sm' ? 'h-7 w-7 text-[11px]' : 'h-8 w-8 text-xs';
   return (
     <span
-      className={`flex ${dim} shrink-0 items-center justify-center rounded-lg font-bold ${
+      className={`flex ${dim} shrink-0 items-center justify-center overflow-hidden rounded-lg font-bold ${
         owner
           ? 'bg-brand-500/15 text-brand-700 dark:text-brand-300'
           : 'bg-sky-500/15 text-sky-700 dark:text-sky-300'
       }`}
       aria-hidden="true"
     >
-      {project.name?.charAt(0).toUpperCase() || 'N'}
+      {project.photo ? (
+        <img src={project.photo} alt="" className="h-full w-full object-cover" />
+      ) : (
+        project.name?.charAt(0).toUpperCase() || 'N'
+      )}
     </span>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authApi } from '../../api/endpoints.js';
 import { useAuthStore } from '../../store/authStore.js';
@@ -8,6 +8,8 @@ import { toast } from '../../store/toastStore.js';
 import { ConnectedChannels } from '../../components/business/ConnectedChannels.jsx';
 import { ActivityLog } from '../../components/business/ActivityLog.jsx';
 import { Card, Button, Input, Select, Alert } from '../../components/ui/index.jsx';
+import { Icon } from '../../components/ui/Icon.jsx';
+import { fileToAvatarDataUri } from '../../lib/image.js';
 
 const INDUSTRIES = [
   { value: 'legal', label: 'Despacho legal' },
@@ -108,6 +110,35 @@ export default function Profile() {
   const [bizMsg, setBizMsg] = useState('');
   const [bizErr, setBizErr] = useState('');
   const [savingBiz, setSavingBiz] = useState(false);
+
+  // Foto/avatar del negocio: se comprime en el navegador y se guarda al momento.
+  const photoInputRef = useRef(null);
+  const [photoBusy, setPhotoBusy] = useState(false);
+
+  async function savePhoto(photo) {
+    setPhotoBusy(true);
+    try {
+      const { business: updated } = await businessApi.update({ photo });
+      useBusinessStore.setState({ business: updated });
+      toast.success(photo ? 'Foto del negocio actualizada.' : 'Foto eliminada.');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'No se pudo actualizar la foto.');
+    } finally {
+      setPhotoBusy(false);
+    }
+  }
+
+  async function onPhotoPick(e) {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // permite volver a elegir el mismo archivo
+    if (!file) return;
+    try {
+      const dataUri = await fileToAvatarDataUri(file);
+      await savePhoto(dataUri);
+    } catch (err) {
+      toast.error(err.message || 'No se pudo procesar la imagen.');
+    }
+  }
 
   // Cambio de contraseña (flujo simulado vía forgot/reset)
   const [pwMsg, setPwMsg] = useState('');
@@ -267,6 +298,51 @@ export default function Profile() {
       {/* Datos del negocio */}
       <Card>
         <h2 className="mb-4 font-semibold text-fg">Datos del negocio</h2>
+
+        {/* Foto / avatar del negocio (reemplaza la inicial en el panel) */}
+        <div className="mb-5 flex items-center gap-4">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-brand-500/15 text-xl font-bold text-brand-700 dark:text-brand-300">
+            {business?.photo ? (
+              <img src={business.photo} alt="Foto del negocio" className="h-full w-full object-cover" />
+            ) : (
+              business?.name?.charAt(0).toUpperCase() || 'N'
+            )}
+          </div>
+          <div className="min-w-0">
+            <div className="text-sm font-medium text-fg">Foto del negocio</div>
+            <p className="text-xs text-muted">Aparece en tu panel. Cuadrada se ve mejor (JPG o PNG).</p>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <input
+                ref={photoInputRef}
+                type="file"
+                accept="image/*"
+                onChange={onPhotoPick}
+                className="hidden"
+              />
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                disabled={photoBusy}
+                onClick={() => photoInputRef.current?.click()}
+              >
+                <Icon name="camera" size={15} />
+                {photoBusy ? 'Guardando…' : business?.photo ? 'Cambiar' : 'Subir foto'}
+              </Button>
+              {business?.photo && (
+                <button
+                  type="button"
+                  disabled={photoBusy}
+                  onClick={() => savePhoto('')}
+                  className="text-xs font-medium text-muted transition hover:text-red-500 disabled:opacity-50"
+                >
+                  Quitar
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
         {bizMsg && (
           <div className="mb-3">
             <Alert variant="success">{bizMsg}</Alert>
