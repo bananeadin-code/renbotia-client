@@ -479,6 +479,16 @@ export default function Conversations() {
                 </div>
                 <p className="mt-0.5 truncate text-xs text-muted">{c.lastMessage}</p>
                 <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                  {c.channel === 'whatsapp' && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600">
+                      <Icon name="whatsapp" size={10} /> WhatsApp
+                    </span>
+                  )}
+                  {c.channel === 'facebook' && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[#0866FF]/10 px-2 py-0.5 text-[10px] font-medium text-[#0866FF]">
+                      <Icon name="messenger" size={10} /> Messenger
+                    </span>
+                  )}
                   {c.needsAttention && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-600">
                       <Icon name="alert" size={11} /> Requiere atención
