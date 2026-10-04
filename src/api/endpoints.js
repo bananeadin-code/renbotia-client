@@ -160,9 +160,9 @@ export const connectionsApi = {
   get: () => unwrap(api.get('/connections')),
   connectWhatsApp: (body) => unwrap(api.post('/connections/whatsapp', body)),
   disconnectWhatsApp: () => unwrap(api.post('/connections/whatsapp/disconnect')),
-  // Facebook Messenger (Página): conectar con el code del FB Login, elegir Página
-  // si concedió varias, y desconectar.
-  connectMessenger: (code) => unwrap(api.post('/connections/messenger', { code })),
+  // Facebook Messenger (Página): conectar con el token del FB Login (el servidor lo
+  // verifica con Meta), elegir Página si concedió varias, y desconectar.
+  connectMessenger: (accessToken) => unwrap(api.post('/connections/messenger', { accessToken })),
   selectMessengerPage: (pageId) => unwrap(api.post('/connections/messenger/select', { pageId })),
   disconnectMessenger: () => unwrap(api.post('/connections/messenger/disconnect')),
   // Perfil de WhatsApp Business (lo que el cliente ve en el chat).

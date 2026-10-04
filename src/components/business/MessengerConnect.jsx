@@ -50,15 +50,17 @@ export function MessengerConnect({ data, isOwner, sdkReady, onChanged }) {
       (response) => {
         settled = true;
         window.removeEventListener('focus', onFocus);
-        const code = response?.authResponse?.code;
-        if (!code) {
+        // Variación General: el SDK entrega el TOKEN de usuario (no un code). El
+        // servidor lo verifica con Meta antes de usarlo.
+        const accessToken = response?.authResponse?.accessToken;
+        if (!accessToken) {
           setConnecting(false);
           return;
         }
         // El SDK no acepta callbacks async: el trabajo va en una IIFE.
         (async () => {
           try {
-            const res = await connectionsApi.connectMessenger(code);
+            const res = await connectionsApi.connectMessenger(accessToken);
             if (res?.needsSelection) {
               setPages(res.pages || []);
             } else {
@@ -72,11 +74,7 @@ export function MessengerConnect({ data, isOwner, sdkReady, onChanged }) {
           }
         })();
       },
-      {
-        config_id: data.facebook.messengerConfigId,
-        response_type: 'code',
-        override_default_response_type: true,
-      }
+      { config_id: data.facebook.messengerConfigId }
     );
   }
 
