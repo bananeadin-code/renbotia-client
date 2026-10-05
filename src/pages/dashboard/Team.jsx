@@ -13,6 +13,17 @@ import { Icon } from '../../components/ui/Icon.jsx';
  * correo y gestiona; los colaboradores ven la lista. Multiusuario: varias
  * personas configuran el mismo bot sin compartir contraseña.
  */
+// Texto de vigencia de una invitación (vencen a los 7 días de enviarse).
+function expiryLabel(expiresAt) {
+  const ms = new Date(expiresAt).getTime() - Date.now();
+  if (!expiresAt || Number.isNaN(ms)) return { text: 'Pendiente de aceptar', soon: false, expired: false };
+  if (ms <= 0) return { text: 'Venció · reenvíala para darle 7 días más', soon: true, expired: true };
+  const hours = Math.ceil(ms / 3600000);
+  if (hours < 24) return { text: `Vence en ${hours} ${hours === 1 ? 'hora' : 'horas'}`, soon: true, expired: false };
+  const days = Math.ceil(ms / 86400000);
+  return { text: `Vence en ${days} ${days === 1 ? 'día' : 'días'}`, soon: days <= 2, expired: false };
+}
+
 export default function Team() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,6 +31,7 @@ export default function Team() {
   const [inviting, setInviting] = useState(false);
   const [error, setError] = useState('');
   const [devLink, setDevLink] = useState('');
+  const [resending, setResending] = useState(''); // id de la invitación que se reenvía
 
   async function load() {
     try {
@@ -76,6 +88,23 @@ export default function Team() {
       load();
     } catch (err) {
       toast.error(err.response?.data?.message || 'No se pudo quitar.');
+    }
+  }
+
+  // Reenviar = invitar de nuevo al mismo correo: nuevo enlace con 7 días más (el
+  // anterior deja de servir).
+  async function resendInvite(inv) {
+    setResending(inv.id);
+    setDevLink('');
+    try {
+      const res = await membersApi.invite(inv.email);
+      toast.success(`Invitación reenviada a ${inv.email}. Vence en 7 días.`);
+      if (res.devLink) setDevLink(res.devLink);
+      await load();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'No se pudo reenviar.');
+    } finally {
+      setResending('');
     }
   }
 
@@ -189,22 +218,46 @@ export default function Team() {
       {/* Invitaciones pendientes */}
       {data.invitations.length > 0 && (
         <Card>
-          <h2 className="mb-3 font-semibold text-fg">Invitaciones pendientes</h2>
+          <h2 className="font-semibold text-fg">Invitaciones pendientes</h2>
+          <p className="mb-3 text-xs text-muted">
+            Cada invitación vale 7 días. Si la persona no la abrió a tiempo, reenvíala: llega un enlace nuevo.
+          </p>
           <ul className="divide-y divide-line">
-            {data.invitations.map((inv) => (
-              <li key={inv.id} className="flex items-center gap-3 py-3">
-                <Icon name="message" size={18} className="shrink-0 text-subtle" />
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm text-fg">{inv.email}</div>
-                  <div className="text-xs text-subtle">Pendiente de aceptar</div>
-                </div>
-                {isOwner && (
-                  <Button variant="ghost" size="sm" onClick={() => cancelInvite(inv)}>
-                    Cancelar
-                  </Button>
-                )}
-              </li>
-            ))}
+            {data.invitations.map((inv) => {
+              const exp = expiryLabel(inv.expiresAt);
+              return (
+                <li key={inv.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 py-3">
+                  <Icon name="message" size={18} className="shrink-0 text-subtle" />
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm text-fg">{inv.email}</div>
+                    <div
+                      className={`flex items-center gap-1 text-xs ${
+                        exp.expired ? 'text-red-500' : exp.soon ? 'text-amber-600' : 'text-subtle'
+                      }`}
+                    >
+                      <Icon name="clock" size={12} className="shrink-0" />
+                      {exp.text}
+                    </div>
+                  </div>
+                  {isOwner && (
+                    <div className="flex shrink-0 items-center gap-1">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        disabled={Boolean(resending)}
+                        onClick={() => resendInvite(inv)}
+                      >
+                        <Icon name="refresh" size={14} />
+                        {resending === inv.id ? 'Reenviando…' : 'Reenviar'}
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => cancelInvite(inv)}>
+                        Cancelar
+                      </Button>
+                    </div>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </Card>
       )}
