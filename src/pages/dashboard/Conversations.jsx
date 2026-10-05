@@ -357,9 +357,11 @@ export default function Conversations() {
 
   const isManual = thread?.handoffMode === 'manual';
   const isWhatsapp = thread?.channel === 'whatsapp';
-  const isMessenger = thread?.channel === 'facebook';
-  // Ventana de 24h de Meta (WhatsApp y Messenger). Cerrada: WhatsApp reactiva con
-  // plantilla; Messenger espera a que el cliente vuelva a escribir.
+  // Messenger e Instagram (DMs de Meta): fuera de 24 h no se puede escribir.
+  const isMessenger = thread?.channel === 'facebook' || thread?.channel === 'instagram';
+  const dmLabel = thread?.channel === 'instagram' ? 'Instagram' : 'Messenger';
+  // Ventana de 24h de Meta (WhatsApp, Messenger e Instagram). Cerrada: WhatsApp
+  // reactiva con plantilla; los DMs esperan a que el cliente vuelva a escribir.
   const hasWindow = (isWhatsapp || isMessenger) && waWindow;
   const windowClosed = hasWindow && !waWindow.open;
   const waitingCount = list.filter(isWaitingReply).length;
@@ -513,6 +515,11 @@ export default function Conversations() {
                   {c.channel === 'facebook' && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-[#0866FF]/10 px-2 py-0.5 text-[10px] font-medium text-[#0866FF]">
                       <Icon name="messenger" size={10} /> Messenger
+                    </span>
+                  )}
+                  {c.channel === 'instagram' && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[#E1306C]/10 px-2 py-0.5 text-[10px] font-medium text-[#E1306C]">
+                      <Icon name="instagram" size={10} /> Instagram
                     </span>
                   )}
                   {c.channel === 'web' && (
@@ -776,7 +783,7 @@ export default function Conversations() {
                       <Icon name="alert" size={13} className="shrink-0" />
                       <span>
                         {isMessenger
-                          ? 'Pasaron 24 h desde el último mensaje del cliente. Messenger no permite responder hasta que vuelva a escribir.'
+                          ? `Pasaron 24 h desde el último mensaje del cliente. ${dmLabel} no permite responder hasta que vuelva a escribir.`
                           : 'Pasaron 24 h desde el último mensaje del cliente. Solo puedes reactivar con una plantilla.'}
                       </span>
                     </div>
@@ -868,7 +875,7 @@ export default function Conversations() {
                     <p className="flex items-start gap-1.5 text-xs text-muted">
                       <Icon name="clock" size={13} className="mt-0.5 shrink-0 text-amber-500" />
                       <span>
-                        Messenger no permite escribir pasadas 24 h. Cuando el cliente vuelva a escribir podrás
+                        {dmLabel} no permite escribir pasadas 24 h. Cuando el cliente vuelva a escribir podrás
                         responderle desde aquí.
                       </span>
                     </p>

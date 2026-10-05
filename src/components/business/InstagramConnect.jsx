@@ -7,10 +7,11 @@ import { Card, Button, Alert } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
 
 /**
- * Tarjeta de Facebook Messenger en Conexiones. El dueño conecta su Página de
- * Facebook con Facebook Login for Business (config de Páginas); si concedió
- * varias Páginas, elige cuál. Gateada por `messengerEnabled` (App Review de
- * `pages_messaging`) y por el límite de canales del plan (Free = uno a la vez).
+ * Tarjeta de Instagram en Conexiones. El dueño conecta su cuenta profesional de
+ * Instagram (ligada a una Página de Facebook) con Facebook Login for Business
+ * (config de Instagram); si tiene varias, elige cuál. Gateada por
+ * `instagramEnabled` (App Review de `instagram_manage_messages`) y por el límite
+ * de canales del plan (Free = uno a la vez).
  *
  * @param {object} props
  * @param {object} props.data      respuesta de GET /connections
@@ -18,19 +19,19 @@ import { Icon } from '../ui/Icon.jsx';
  * @param {boolean} props.sdkReady SDK de Facebook cargado
  * @param {() => Promise<any>} props.onChanged refresca el estado
  */
-export function MessengerConnect({ data, isOwner, sdkReady, onChanged }) {
+export function InstagramConnect({ data, isOwner, sdkReady, onChanged }) {
   const [connecting, setConnecting] = useState(false);
-  const [pages, setPages] = useState(null); // [{id,name}] cuando hay que elegir
+  const [accounts, setAccounts] = useState(null); // [{id,username,pageName,picture}] cuando hay que elegir
   const [selecting, setSelecting] = useState('');
 
-  const enabled = Boolean(data?.messengerEnabled);
-  const connected = Boolean(data?.messenger?.connected);
+  const enabled = Boolean(data?.instagramEnabled);
+  const connected = Boolean(data?.instagram?.connected);
   // Free con otro canal ya conectado: un canal a la vez.
-  const otherChannel = data?.whatsapp?.connected ? 'WhatsApp' : data?.instagram?.connected ? 'Instagram' : '';
+  const otherChannel = data?.whatsapp?.connected ? 'WhatsApp' : data?.messenger?.connected ? 'Messenger' : '';
   const blockedByPlan = !data?.multiChannel && Boolean(otherChannel) && !connected;
 
   function launchLogin() {
-    if (!window.FB || !data?.facebook?.messengerConfigId) {
+    if (!window.FB || !data?.facebook?.instagramConfigId) {
       toast.error('La conexión no está lista. Recarga e intenta de nuevo.');
       return;
     }
@@ -61,34 +62,34 @@ export function MessengerConnect({ data, isOwner, sdkReady, onChanged }) {
         // El SDK no acepta callbacks async: el trabajo va en una IIFE.
         (async () => {
           try {
-            const res = await connectionsApi.connectMessenger(accessToken);
+            const res = await connectionsApi.connectInstagram(accessToken);
             if (res?.needsSelection) {
-              setPages(res.pages || []);
+              setAccounts(res.accounts || []);
             } else {
               await onChanged?.();
-              toast.success(`¡Messenger conectado! Tu bot ya responde en "${res?.pageName || 'tu Página'}".`);
+              toast.success(`¡Instagram conectado! Tu bot ya responde los mensajes de @${res?.username || 'tu cuenta'}.`);
             }
           } catch (err) {
-            toast.error(err.response?.data?.message || 'No se pudo conectar Messenger. Intenta de nuevo.');
+            toast.error(err.response?.data?.message || 'No se pudo conectar Instagram. Intenta de nuevo.');
           } finally {
             setConnecting(false);
           }
         })();
       },
-      { config_id: data.facebook.messengerConfigId }
+      { config_id: data.facebook.instagramConfigId }
     );
   }
 
-  async function choosePage(pageId) {
-    setSelecting(pageId);
+  async function chooseAccount(accountId) {
+    setSelecting(accountId);
     try {
-      const res = await connectionsApi.selectMessengerPage(pageId);
-      setPages(null);
+      const res = await connectionsApi.selectInstagramAccount(accountId);
+      setAccounts(null);
       await onChanged?.();
-      toast.success(`¡Messenger conectado! Tu bot ya responde en "${res?.pageName || 'tu Página'}".`);
+      toast.success(`¡Instagram conectado! Tu bot ya responde los mensajes de @${res?.username || 'tu cuenta'}.`);
     } catch (err) {
-      toast.error(err.response?.data?.message || 'No se pudo conectar esa Página.');
-      if (err.response?.data?.details?.code === 'SELECTION_EXPIRED') setPages(null);
+      toast.error(err.response?.data?.message || 'No se pudo conectar esa cuenta.');
+      if (err.response?.data?.details?.code === 'SELECTION_EXPIRED') setAccounts(null);
     } finally {
       setSelecting('');
     }
@@ -96,16 +97,16 @@ export function MessengerConnect({ data, isOwner, sdkReady, onChanged }) {
 
   async function disconnect() {
     const ok = await confirm({
-      title: 'Desconectar Messenger',
-      message: 'El bot dejará de responder los mensajes de tu Página de Facebook. ¿Desconectarla?',
+      title: 'Desconectar Instagram',
+      message: 'El bot dejará de responder los mensajes directos de tu cuenta de Instagram. ¿Desconectarla?',
       tone: 'danger',
       confirmLabel: 'Desconectar',
     });
     if (!ok) return;
     try {
-      await connectionsApi.disconnectMessenger();
+      await connectionsApi.disconnectInstagram();
       await onChanged?.();
-      toast.success('Messenger desconectado.');
+      toast.success('Instagram desconectado.');
     } catch (err) {
       toast.error(err.response?.data?.message || 'No se pudo desconectar.');
     }
@@ -114,12 +115,12 @@ export function MessengerConnect({ data, isOwner, sdkReady, onChanged }) {
   return (
     <Card className={enabled && !connected ? 'border-brand-200 dark:border-brand-900/60' : ''}>
       <div className="flex items-start gap-4">
-        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#0866FF]/10 text-[#0866FF]">
-          <Icon name="messenger" size={24} />
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#E1306C]/10 text-[#E1306C]">
+          <Icon name="instagram" size={24} />
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-lg font-semibold text-fg">Facebook Messenger</h2>
+            <h2 className="text-lg font-semibold text-fg">Instagram</h2>
             {connected ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600">
                 <Icon name="check" size={13} /> Conectado
@@ -134,8 +135,8 @@ export function MessengerConnect({ data, isOwner, sdkReady, onChanged }) {
           </div>
           <p className="mt-1 text-sm text-muted">
             {connected
-              ? 'Tu bot responde automáticamente los mensajes que llegan a tu Página de Facebook.'
-              : 'Conecta tu Página de Facebook para que el bot atienda también los mensajes de Messenger.'}
+              ? 'Tu bot responde automáticamente los mensajes directos de tu cuenta de Instagram.'
+              : 'Conecta tu cuenta de Instagram para que el bot atienda también tus mensajes directos.'}
           </p>
         </div>
       </div>
@@ -144,7 +145,7 @@ export function MessengerConnect({ data, isOwner, sdkReady, onChanged }) {
       {connected && (
         <div className="mt-4 space-y-3 border-t border-line pt-4">
           <p className="text-sm text-fg">
-            Página conectada: <span className="font-semibold">{data.messenger.pageName || data.messenger.pageId}</span>
+            Cuenta conectada: <span className="font-semibold">@{data.instagram.username || data.instagram.accountId}</span>
           </p>
           {isOwner && (
             <Button variant="ghost" onClick={disconnect} className="text-red-500 hover:bg-red-500/10">
@@ -158,30 +159,42 @@ export function MessengerConnect({ data, isOwner, sdkReady, onChanged }) {
       {!connected && enabled && (
         <div className="mt-5 border-t border-line pt-5">
           {!isOwner ? (
-            <Alert>Solo el dueño del negocio puede conectar Messenger.</Alert>
-          ) : pages ? (
-            // Concedió varias Páginas: elegir cuál conectar.
+            <Alert>Solo el dueño del negocio puede conectar Instagram.</Alert>
+          ) : accounts ? (
+            // Tiene varias cuentas de IG ligadas a sus Páginas: elegir cuál conectar.
             <div className="animate-fade-up">
-              <p className="mb-2 text-sm font-medium text-fg">¿Qué Página quieres conectar?</p>
+              <p className="mb-2 text-sm font-medium text-fg">¿Qué cuenta de Instagram quieres conectar?</p>
               <div className="space-y-2">
-                {pages.map((p) => (
+                {accounts.map((a) => (
                   <button
-                    key={p.id}
+                    key={a.id}
                     type="button"
                     disabled={Boolean(selecting)}
-                    onClick={() => choosePage(p.id)}
+                    onClick={() => chooseAccount(a.id)}
                     className="flex w-full items-center justify-between gap-3 rounded-xl border border-line bg-surface px-3 py-2.5 text-left text-sm font-medium text-fg transition hover:border-brand-300 disabled:opacity-60"
                   >
-                    <span className="truncate">{p.name}</span>
+                    <span className="flex min-w-0 items-center gap-2.5">
+                      {a.picture ? (
+                        <img src={a.picture} alt="" className="h-7 w-7 shrink-0 rounded-full object-cover" />
+                      ) : (
+                        <Icon name="instagram" size={18} className="shrink-0 text-subtle" />
+                      )}
+                      <span className="min-w-0">
+                        <span className="block truncate">@{a.username || a.id}</span>
+                        {a.pageName && (
+                          <span className="block truncate text-xs font-normal text-subtle">Página: {a.pageName}</span>
+                        )}
+                      </span>
+                    </span>
                     <span className="shrink-0 text-xs text-brand-600">
-                      {selecting === p.id ? 'Conectando…' : 'Elegir'}
+                      {selecting === a.id ? 'Conectando…' : 'Elegir'}
                     </span>
                   </button>
                 ))}
               </div>
               <button
                 type="button"
-                onClick={() => setPages(null)}
+                onClick={() => setAccounts(null)}
                 className="mt-2 text-xs font-medium text-muted hover:text-fg"
               >
                 Cancelar
@@ -205,7 +218,7 @@ export function MessengerConnect({ data, isOwner, sdkReady, onChanged }) {
                   disabled={!sdkReady || connecting}
                   className="w-full justify-center sm:w-auto"
                 >
-                  {connecting ? 'Conectando…' : 'Conectar Messenger'}
+                  {connecting ? 'Conectando…' : 'Conectar Instagram'}
                   {!connecting && <Icon name="link" size={16} className="ml-1.5" />}
                 </Button>
                 {connecting && (
@@ -218,11 +231,32 @@ export function MessengerConnect({ data, isOwner, sdkReady, onChanged }) {
                   </button>
                 )}
               </div>
+              <ul className="mt-4 space-y-1.5 rounded-xl border border-line bg-surface2/40 p-3 text-xs text-muted">
+                <li className="flex items-start gap-1.5">
+                  <Icon name="check" size={13} className="mt-0.5 shrink-0 text-brand-600" />
+                  <span>
+                    Tu Instagram debe ser una cuenta <strong className="text-fg">profesional</strong> (empresa o creador).
+                  </span>
+                </li>
+                <li className="flex items-start gap-1.5">
+                  <Icon name="check" size={13} className="mt-0.5 shrink-0 text-brand-600" />
+                  <span>
+                    Debe estar <strong className="text-fg">vinculada a una Página de Facebook</strong> que administres.
+                  </span>
+                </li>
+                <li className="flex items-start gap-1.5">
+                  <Icon name="check" size={13} className="mt-0.5 shrink-0 text-brand-600" />
+                  <span>
+                    En la app de Instagram: Configuración, Mensajes y respuestas a historias, Herramientas conectadas:
+                    activa <strong className="text-fg">Permitir acceso a los mensajes</strong>.
+                  </span>
+                </li>
+              </ul>
               <p className="mt-3 flex items-start gap-1.5 text-xs text-subtle">
                 <Icon name="shield" size={14} className="mt-0.5 shrink-0" />
                 <span>
-                  Se abrirá una ventana segura de Facebook. Inicia sesión con la cuenta que administra tu Página
-                  y selecciónala cuando te lo pida.
+                  Se abrirá una ventana segura de Facebook. Inicia sesión con la cuenta que administra la Página
+                  ligada a tu Instagram y selecciona tu cuenta cuando te lo pida.
                 </span>
               </p>
             </>

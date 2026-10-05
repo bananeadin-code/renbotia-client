@@ -8,6 +8,7 @@ import { Icon } from '../../components/ui/Icon.jsx';
 import { WhatsAppManage } from '../../components/business/WhatsAppManage.jsx';
 import { ConnectionChecklist, ConnectionHelp } from '../../components/business/ConnectionAssistant.jsx';
 import { MessengerConnect } from '../../components/business/MessengerConnect.jsx';
+import { InstagramConnect } from '../../components/business/InstagramConnect.jsx';
 import { WebWidgetCard } from '../../components/business/WebWidgetCard.jsx';
 
 /**
@@ -61,7 +62,7 @@ export function Connections() {
     refresh()
       .then((d) => {
         // El SDK de Facebook sirve para WhatsApp (Embedded Signup) y Messenger (FB Login).
-        if ((d?.embeddedEnabled || d?.messengerEnabled) && d.facebook?.appId) {
+        if ((d?.embeddedEnabled || d?.messengerEnabled || d?.instagramEnabled) && d.facebook?.appId) {
           loadFacebookSdk(d.facebook.appId, d.facebook.apiVersion)
             .then(() => setSdkReady(true))
             .catch(() => setSdkReady(false));
@@ -362,27 +363,11 @@ export function Connections() {
       {/* Facebook Messenger (Fase 3 multicanal) */}
       <MessengerConnect data={data} isOwner={isOwner} sdkReady={sdkReady} onChanged={refresh} />
 
+      {/* Instagram DMs */}
+      <InstagramConnect data={data} isOwner={isOwner} sdkReady={sdkReady} onChanged={refresh} />
+
       {/* Widget de chat para el sitio web del negocio (Pro/Elite) */}
       <WebWidgetCard isOwner={isOwner} />
-
-      <Card className="border-dashed">
-        <div className="flex items-start gap-4 opacity-70">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-surface2 text-subtle">
-            <Icon name="instagram" size={20} />
-          </span>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="font-semibold text-fg">Instagram</h2>
-              <span className="rounded-full bg-surface2 px-2 py-0.5 text-xs font-medium text-muted">
-                Próximamente
-              </span>
-            </div>
-            <p className="mt-1 text-sm text-muted">
-              Automatiza también tus DMs de Instagram con el mismo bot. En camino.
-            </p>
-          </div>
-        </div>
-      </Card>
     </div>
   );
 }

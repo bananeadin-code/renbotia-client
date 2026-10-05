@@ -28,7 +28,7 @@ export const LEGAL = {
         ul: [
           'De la cuenta: tu nombre, correo electrónico, una contraseña (que guardamos cifrada) y los datos de tu negocio (nombre, giro, número de WhatsApp). Los datos de tu tarjeta los procesa directamente nuestro proveedor de pagos; RenBotIA no los almacena.',
           'Del funcionamiento del bot: el contenido de las conversaciones que tu bot atiende, que puede incluir datos que tus propios clientes proporcionen. Respecto de esos datos de terceros, tú eres el responsable y RenBotIA actúa como encargado que los trata por tu cuenta y siguiendo tus instrucciones.',
-          'De las conexiones con Meta: si conectas WhatsApp Business o tu Página de Facebook (Messenger), guardamos los identificadores de esa cuenta o Página y el token de acceso que Meta nos otorga para recibir y responder los mensajes que tus clientes envían. De quienes escriben a tu Página guardamos el identificador que Meta asigna para esa Página y el contenido de sus mensajes, únicamente para que tu bot les responda y puedas ver la conversación en tu panel.',
+          'De las conexiones con Meta: si conectas WhatsApp Business, tu Página de Facebook (Messenger) o tu cuenta profesional de Instagram, guardamos los identificadores de esa cuenta o Página y el token de acceso que Meta nos otorga para recibir y responder los mensajes que tus clientes envían. De quienes escriben a tu Página o a tu Instagram guardamos el identificador que Meta asigna para esa cuenta, su nombre público y el contenido de sus mensajes, únicamente para que tu bot les responda y puedas ver la conversación en tu panel.',
           'No recabamos de forma deliberada datos personales sensibles.',
         ],
       },
@@ -48,7 +48,7 @@ export const LEGAL = {
       {
         h: '4. Con quién compartimos datos',
         p: [
-          'Nos apoyamos en proveedores que tratan datos por nuestra cuenta (encargados) únicamente para prestar el servicio: procesamiento de inteligencia artificial (Anthropic — Claude), pagos (Stripe), envío de correos (Resend), alojamiento y base de datos, y las plataformas de mensajería de Meta (WhatsApp Business y Facebook Messenger) por las que tu bot recibe y envía mensajes. No vendemos tus datos personales a terceros.',
+          'Nos apoyamos en proveedores que tratan datos por nuestra cuenta (encargados) únicamente para prestar el servicio: procesamiento de inteligencia artificial (Anthropic — Claude), pagos (Stripe), envío de correos (Resend), alojamiento y base de datos, y las plataformas de mensajería de Meta (WhatsApp Business, Facebook Messenger e Instagram) por las que tu bot recibe y envía mensajes. No vendemos tus datos personales a terceros.',
         ],
       },
       {
@@ -76,7 +76,7 @@ export const LEGAL = {
       {
         h: '8. Conservación de los datos',
         p: [
-          'Conservamos tus datos mientras tu cuenta esté activa y durante el tiempo necesario para cumplir obligaciones legales. Si eliminas tu cuenta, borramos tus datos de inmediato, salvo lo que la ley exija conservar. Las conversaciones que atiende el bot (WhatsApp, Messenger, el chat de tu sitio web y el simulador) se eliminan automáticamente tras 30 días sin actividad.',
+          'Conservamos tus datos mientras tu cuenta esté activa y durante el tiempo necesario para cumplir obligaciones legales. Si eliminas tu cuenta, borramos tus datos de inmediato, salvo lo que la ley exija conservar. Las conversaciones que atiende el bot (WhatsApp, Messenger, Instagram, el chat de tu sitio web y el simulador) se eliminan automáticamente tras 30 días sin actividad.',
         ],
       },
       {
@@ -213,7 +213,7 @@ export const LEGAL = {
       {
         h: 'Datos de tu conexión con Facebook / WhatsApp',
         p: [
-          'Si conectaste tu cuenta mediante Facebook o WhatsApp (Meta), al eliminar tu cuenta también removemos el vínculo y la información de esa conexión que guardamos (los identificadores de tu cuenta de WhatsApp Business y de tu número, y el identificador y token de acceso de tu Página de Facebook conectada a Messenger). También puedes desconectar tu Página en cualquier momento desde Conexiones. Los datos que Meta conserva por su cuenta se rigen por las políticas de Meta y puedes gestionarlos desde la configuración de tu cuenta de Facebook.',
+          'Si conectaste tu cuenta mediante Facebook o WhatsApp (Meta), al eliminar tu cuenta también removemos el vínculo y la información de esa conexión que guardamos (los identificadores de tu cuenta de WhatsApp Business y de tu número, el identificador y token de acceso de tu Página de Facebook conectada a Messenger, y el identificador de tu cuenta de Instagram conectada con el token de su Página). También puedes desconectar tu Página o tu cuenta de Instagram en cualquier momento desde Conexiones. Los datos que Meta conserva por su cuenta se rigen por las políticas de Meta y puedes gestionarlos desde la configuración de tu cuenta de Facebook.',
         ],
       },
       {

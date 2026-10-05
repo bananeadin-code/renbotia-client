@@ -165,6 +165,10 @@ export const connectionsApi = {
   connectMessenger: (accessToken) => unwrap(api.post('/connections/messenger', { accessToken })),
   selectMessengerPage: (pageId) => unwrap(api.post('/connections/messenger/select', { pageId })),
   disconnectMessenger: () => unwrap(api.post('/connections/messenger/disconnect')),
+  // Instagram DMs (cuenta profesional ligada a una Página): mismo patrón.
+  connectInstagram: (accessToken) => unwrap(api.post('/connections/instagram', { accessToken })),
+  selectInstagramAccount: (accountId) => unwrap(api.post('/connections/instagram/select', { accountId })),
+  disconnectInstagram: () => unwrap(api.post('/connections/instagram/disconnect')),
   // Perfil de WhatsApp Business (lo que el cliente ve en el chat).
   getProfile: () => unwrap(api.get('/connections/whatsapp/profile')),
   updateProfile: (body) => unwrap(api.put('/connections/whatsapp/profile', body)),

@@ -7,7 +7,7 @@ import { Icon } from '../ui/Icon.jsx';
 /**
  * Panel informativo de canales conectados (solo datos). La conexión real se
  * gestiona en Conexiones; aquí se muestra el número de WhatsApp asociado al bot
- * y, a futuro, los datos de Instagram y Facebook Messenger.
+ * y el de Facebook Messenger e Instagram.
  */
 export function ConnectedChannels() {
   const [data, setData] = useState(null);
@@ -107,18 +107,44 @@ export function ConnectedChannels() {
             </div>
           )}
 
-          {/* Instagram — próximamente */}
-          <div className="flex items-center justify-between gap-3 rounded-lg border border-dashed border-line px-3 py-2.5 opacity-70">
-            <div className="flex items-center gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface2 text-subtle">
-                <Icon name="instagram" size={16} />
-              </span>
-              <div className="text-sm font-medium text-fg">Instagram</div>
+          {/* Instagram */}
+          {data?.instagramEnabled || data?.instagram?.connected ? (
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-line bg-surface2/40 px-3 py-2.5">
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#E1306C]/10 text-[#E1306C]">
+                  <Icon name="instagram" size={18} />
+                </span>
+                <div className="min-w-0">
+                  <div className="text-sm font-medium text-fg">Instagram</div>
+                  <div className="truncate text-xs text-subtle">
+                    {data?.instagram?.connected ? `@${data.instagram.username || 'cuenta conectada'}` : 'Sin conectar'}
+                  </div>
+                </div>
+              </div>
+              {data?.instagram?.connected ? (
+                <Badge color="green">Conectado</Badge>
+              ) : (
+                <Link
+                  to="/dashboard/conexiones"
+                  className="shrink-0 text-xs font-semibold text-brand-600 hover:underline"
+                >
+                  Conectar
+                </Link>
+              )}
             </div>
-            <span className="shrink-0 rounded-full bg-surface2 px-2 py-0.5 text-[10px] font-medium text-muted">
-              Próximamente
-            </span>
-          </div>
+          ) : (
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-dashed border-line px-3 py-2.5 opacity-70">
+              <div className="flex items-center gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface2 text-subtle">
+                  <Icon name="instagram" size={16} />
+                </span>
+                <div className="text-sm font-medium text-fg">Instagram</div>
+              </div>
+              <span className="shrink-0 rounded-full bg-surface2 px-2 py-0.5 text-[10px] font-medium text-muted">
+                Próximamente
+              </span>
+            </div>
+          )}
         </div>
       )}
     </Card>
