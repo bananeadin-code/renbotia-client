@@ -322,8 +322,8 @@ export default function Conversations() {
       loadList();
     } catch (err) {
       if (err.response?.data?.details?.code === 'WINDOW_CLOSED') {
-        toast.error('La ventana de 24 h cerró. Envía una plantilla para reactivar.');
-        openConv(selectedId); // recarga → muestra el panel de plantilla
+        toast.error(err.response?.data?.message || 'La ventana de 24 h cerró.');
+        openConv(selectedId); // recarga → muestra el estado de la ventana
       } else {
         toast.error(err.response?.data?.message || 'No se pudo enviar.');
       }
@@ -342,7 +342,11 @@ export default function Conversations() {
 
   const isManual = thread?.handoffMode === 'manual';
   const isWhatsapp = thread?.channel === 'whatsapp';
-  const windowClosed = isWhatsapp && waWindow && !waWindow.open;
+  const isMessenger = thread?.channel === 'facebook';
+  // Ventana de 24h de Meta (WhatsApp y Messenger). Cerrada: WhatsApp reactiva con
+  // plantilla; Messenger espera a que el cliente vuelva a escribir.
+  const hasWindow = (isWhatsapp || isMessenger) && waWindow;
+  const windowClosed = hasWindow && !waWindow.open;
   const waitingCount = list.filter(isWaitingReply).length;
   const filtered = filterConversations(list, search, datePreset, onlyHot, onlyWaiting);
 
@@ -514,7 +518,7 @@ export default function Conversations() {
                     <Icon name={c.handoffMode === 'manual' ? 'user' : 'bot'} size={11} />
                     {c.handoffMode === 'manual' ? 'Manual' : 'Bot'}
                   </span>
-                  {c.channel === 'whatsapp' && c.whatsappWindow && !c.whatsappWindow.open && (
+                  {c.whatsappWindow && !c.whatsappWindow.open && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-600">
                       <Icon name="alert" size={11} /> Ventana cerrada
                     </span>
@@ -721,8 +725,8 @@ export default function Conversations() {
                   </div>
                 )}
 
-                {/* Estado de la ventana de 24h (solo conversaciones de WhatsApp) */}
-                {isWhatsapp && waWindow && (
+                {/* Estado de la ventana de 24h (WhatsApp y Messenger) */}
+                {hasWindow && (
                   waWindow.open ? (
                     <div className="flex items-center gap-1.5 border-b border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-xs text-emerald-700 dark:text-emerald-300">
                       <Icon name="check" size={13} className="shrink-0" />
@@ -735,7 +739,9 @@ export default function Conversations() {
                     <div className="flex items-center gap-1.5 border-b border-amber-500/20 bg-amber-500/10 px-4 py-2 text-xs text-amber-700 dark:text-amber-300">
                       <Icon name="alert" size={13} className="shrink-0" />
                       <span>
-                        Pasaron 24 h desde el último mensaje del cliente. Solo puedes reactivar con una plantilla.
+                        {isMessenger
+                          ? 'Pasaron 24 h desde el último mensaje del cliente. Messenger no permite responder hasta que vuelva a escribir.'
+                          : 'Pasaron 24 h desde el último mensaje del cliente. Solo puedes reactivar con una plantilla.'}
                       </span>
                     </div>
                   )
@@ -821,7 +827,17 @@ export default function Conversations() {
                 </div>
 
                 {/* Pie: plantilla (ventana cerrada) · responder libre (manual) · aviso (bot) */}
-                {isManual && windowClosed ? (
+                {isManual && windowClosed && isMessenger ? (
+                  <div className="border-t border-line bg-surface p-3">
+                    <p className="flex items-start gap-1.5 text-xs text-muted">
+                      <Icon name="clock" size={13} className="mt-0.5 shrink-0 text-amber-500" />
+                      <span>
+                        Messenger no permite escribir pasadas 24 h. Cuando el cliente vuelva a escribir podrás
+                        responderle desde aquí.
+                      </span>
+                    </p>
+                  </div>
+                ) : isManual && windowClosed ? (
                   <div className="space-y-2 border-t border-line bg-surface p-3">
                     <p className="flex items-start gap-1.5 text-xs text-muted">
                       <Icon name="alert" size={13} className="mt-0.5 shrink-0 text-amber-500" />
