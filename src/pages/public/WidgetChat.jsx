@@ -53,6 +53,16 @@ function richText(str) {
     });
 }
 
+// ¿Corre dentro del iframe del widget? Abierto directo (enlace "Probar el chat"
+// del panel) no hay botón flotante que cerrar, así que se oculta la X.
+function isEmbedded() {
+  try {
+    return window.self !== window.top;
+  } catch {
+    return true; // acceso al padre bloqueado = estamos en un iframe ajeno
+  }
+}
+
 const timeOf = (d) =>
   d ? new Date(d).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }) : '';
 
@@ -151,6 +161,8 @@ export default function WidgetChat() {
     }
   }
 
+  const embedded = isEmbedded();
+
   function close() {
     window.parent?.postMessage({ type: 'renbotia:close' }, '*');
   }
@@ -174,9 +186,11 @@ export default function WidgetChat() {
           <Icon name="message" size={20} />
         </span>
         <p className="text-sm font-medium text-fg">Este chat no está disponible por ahora.</p>
-        <button type="button" onClick={close} className="text-xs font-medium text-muted hover:text-fg">
-          Cerrar
-        </button>
+        {embedded && (
+          <button type="button" onClick={close} className="text-xs font-medium text-muted hover:text-fg">
+            Cerrar
+          </button>
+        )}
       </div>
     );
   }
@@ -199,14 +213,18 @@ export default function WidgetChat() {
           <p className="truncate text-sm font-semibold leading-tight">{config.businessName}</p>
           <p className="truncate text-xs opacity-80">{config.botName} · responde al instante</p>
         </div>
-        <button
-          type="button"
-          onClick={close}
-          aria-label="Cerrar chat"
-          className="flex h-8 w-8 items-center justify-center rounded-full transition hover:bg-black/10"
-        >
-          <Icon name="close" size={18} />
-        </button>
+        {embedded ? (
+          <button
+            type="button"
+            onClick={close}
+            aria-label="Cerrar chat"
+            className="flex h-8 w-8 items-center justify-center rounded-full transition hover:bg-black/10"
+          >
+            <Icon name="close" size={18} />
+          </button>
+        ) : (
+          <span className="shrink-0 rounded-full bg-black/15 px-2 py-0.5 text-[10px] font-semibold">Vista de prueba</span>
+        )}
       </header>
 
       {/* Mensajes */}
