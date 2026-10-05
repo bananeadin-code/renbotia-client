@@ -273,6 +273,31 @@ const ICONS = {
       <circle cx="12" cy="13" r="3.2" {...P} />
     </>
   ),
+  globe: (
+    <>
+      <circle cx="12" cy="12" r="9" {...P} />
+      <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" {...P} />
+    </>
+  ),
+  copy: (
+    <>
+      <rect x="9" y="9" width="11" height="11" rx="2" {...P} />
+      <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" {...P} />
+    </>
+  ),
+  refresh: (
+    <>
+      <path d="M20 11a8 8 0 0 0-14.8-4M4 4v4h4" {...P} />
+      <path d="M4 13a8 8 0 0 0 14.8 4M20 20v-4h-4" {...P} />
+    </>
+  ),
+  repeat: (
+    <>
+      <path d="M17 2l3 3-3 3" {...P} />
+      <path d="M4 11V9a4 4 0 0 1 4-4h12M7 22l-3-3 3-3" {...P} />
+      <path d="M20 13v2a4 4 0 0 1-4 4H4" {...P} />
+    </>
+  ),
 };
 
 export function Icon({ name, size = 20, className = '', title, ...rest }) {

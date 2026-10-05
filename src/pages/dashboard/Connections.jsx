@@ -8,6 +8,7 @@ import { Icon } from '../../components/ui/Icon.jsx';
 import { WhatsAppManage } from '../../components/business/WhatsAppManage.jsx';
 import { ConnectionChecklist, ConnectionHelp } from '../../components/business/ConnectionAssistant.jsx';
 import { MessengerConnect } from '../../components/business/MessengerConnect.jsx';
+import { WebWidgetCard } from '../../components/business/WebWidgetCard.jsx';
 
 /**
  * Módulo "Conexiones": el cliente conecta SU propio WhatsApp mediante Embedded
@@ -360,6 +361,9 @@ export function Connections() {
 
       {/* Facebook Messenger (Fase 3 multicanal) */}
       <MessengerConnect data={data} isOwner={isOwner} sdkReady={sdkReady} onChanged={refresh} />
+
+      {/* Widget de chat para el sitio web del negocio (Pro/Elite) */}
+      <WebWidgetCard isOwner={isOwner} />
 
       <Card className="border-dashed">
         <div className="flex items-start gap-4 opacity-70">

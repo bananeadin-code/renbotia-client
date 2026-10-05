@@ -67,10 +67,24 @@ function filterConversations(list, search, datePreset, onlyHot, onlyWaiting) {
  * amerita y responde como persona. Las escalaciones aparecen como "requiere
  * atención". Hoy opera sobre el simulador; con WhatsApp real se llena solo.
  */
+// Días que le quedan a una conversación antes del borrado automático por
+// inactividad (cuenta desde su última actividad).
+function daysUntilDeletion(lastAt, retentionDays) {
+  if (!lastAt) return Infinity;
+  const ms = new Date(lastAt).getTime() + retentionDays * 86400000 - Date.now();
+  return Math.max(0, Math.ceil(ms / 86400000));
+}
+
+function deletionLabel(days) {
+  if (days <= 1) return 'Se elimina hoy';
+  return `Se elimina en ${days} días`;
+}
+
 export default function Conversations() {
   const [list, setList] = useState([]);
   const [needAttention, setNeedAttention] = useState(0);
   const [hotLeads, setHotLeads] = useState(0);
+  const [retentionDays, setRetentionDays] = useState(30); // borrado automático por inactividad
   const [onlyHot, setOnlyHot] = useState(false);
   const [onlyWaiting, setOnlyWaiting] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -112,6 +126,7 @@ export default function Conversations() {
       setList(data.conversations);
       setNeedAttention(data.needAttention || 0);
       setHotLeads(data.hotLeads || 0);
+      if (data.retentionDays) setRetentionDays(data.retentionDays);
     } catch {
       /* silencioso */
     } finally {
@@ -392,6 +407,13 @@ export default function Conversations() {
           <p className="text-sm text-muted">
             Actividad del bot. Toma el control cuando una conversación lo amerite.
           </p>
+          <p className="mt-1 flex items-start gap-1.5 text-xs text-subtle">
+            <Icon name="clock" size={13} className="mt-0.5 shrink-0" />
+            <span>
+              Las conversaciones sin actividad por {retentionDays} días se eliminan automáticamente para liberar
+              espacio. Cualquier mensaje nuevo reinicia el conteo; exporta a CSV las que quieras conservar.
+            </span>
+          </p>
         </div>
         {list.length > 0 && (
           <Button
@@ -493,9 +515,23 @@ export default function Conversations() {
                       <Icon name="messenger" size={10} /> Messenger
                     </span>
                   )}
+                  {c.channel === 'web' && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-brand-500/10 px-2 py-0.5 text-[10px] font-medium text-brand-600">
+                      <Icon name="globe" size={10} /> Sitio web
+                    </span>
+                  )}
                   {c.needsAttention && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-600">
                       <Icon name="alert" size={11} /> Requiere atención
+                    </span>
+                  )}
+                  {daysUntilDeletion(c.lastAt, retentionDays) <= 5 && (
+                    <span
+                      className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2 py-0.5 text-[10px] font-medium text-red-600"
+                      title="Se eliminará automáticamente por inactividad"
+                    >
+                      <Icon name="trash" size={10} />
+                      {deletionLabel(daysUntilDeletion(c.lastAt, retentionDays))}
                     </span>
                   )}
                   {c.hotLead && (
@@ -757,7 +793,7 @@ export default function Conversations() {
                         <div className="max-w-[80%]">
                           {mine && (
                             <div className={`mb-0.5 text-right text-[10px] font-medium ${agent ? 'text-brand-600' : 'text-subtle'}`}>
-                              {agent ? 'Tú (persona)' : 'Bot'}
+                              {agent ? 'Tú (persona)' : m.followUp ? 'Bot · seguimiento automático' : 'Bot'}
                             </div>
                           )}
                           <div

@@ -30,6 +30,8 @@ const ForgotPassword = lazy(() => import('./pages/public/ForgotPassword.jsx'));
 const ResetPassword = lazy(() => import('./pages/public/ResetPassword.jsx'));
 const AcceptInvitation = lazy(() => import('./pages/public/AcceptInvitation.jsx'));
 const NotFound = lazy(() => import('./pages/public/NotFound.jsx'));
+// Chat del widget web (se abre dentro de un iframe en el sitio del negocio).
+const WidgetChat = lazy(() => import('./pages/public/WidgetChat.jsx'));
 
 // Onboarding
 const OnboardingWizard = lazy(() => import('./pages/onboarding/OnboardingWizard.jsx'));
@@ -62,9 +64,11 @@ export default function App() {
   const initTheme = useThemeStore((s) => s.init);
 
   // Al cargar la app: recupera sesión (cookie de refresh) e inicializa el tema.
+  // El widget web (/w/…) corre en un iframe ajeno y no usa sesión: no se intenta
+  // refrescar la cuenta ahí.
   useEffect(() => {
     initTheme();
-    bootstrap();
+    if (!window.location.pathname.startsWith('/w/')) bootstrap();
   }, [bootstrap, initTheme]);
 
   return (
@@ -89,6 +93,7 @@ export default function App() {
       <Route path="/recuperar" element={<ForgotPassword />} />
       <Route path="/restablecer" element={<ResetPassword />} />
       <Route path="/aceptar-invitacion" element={<AcceptInvitation />} />
+      <Route path="/w/:key" element={<WidgetChat />} />
 
       {/* Onboarding (requiere sesión, pero no negocio) */}
       <Route

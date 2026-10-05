@@ -76,7 +76,7 @@ export const LEGAL = {
       {
         h: '8. Conservación de los datos',
         p: [
-          'Conservamos tus datos mientras tu cuenta esté activa y durante el tiempo necesario para cumplir obligaciones legales. Si eliminas tu cuenta, borramos tus datos de inmediato, salvo lo que la ley exija conservar.',
+          'Conservamos tus datos mientras tu cuenta esté activa y durante el tiempo necesario para cumplir obligaciones legales. Si eliminas tu cuenta, borramos tus datos de inmediato, salvo lo que la ley exija conservar. Las conversaciones que atiende el bot (WhatsApp, Messenger, el chat de tu sitio web y el simulador) se eliminan automáticamente tras 30 días sin actividad.',
         ],
       },
       {

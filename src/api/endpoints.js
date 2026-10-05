@@ -173,6 +173,19 @@ export const connectionsApi = {
   createTemplate: (body) => unwrap(api.post('/connections/whatsapp/templates', body)),
 };
 
+export const widgetApi = {
+  // Panel: configuración del chat incrustable del sitio web (Pro/Elite).
+  get: () => unwrap(api.get('/widget')),
+  update: (body) => unwrap(api.put('/widget', body)),
+  // Público (dentro del iframe /w/:key): apariencia, enviar y sondear mensajes.
+  publicConfig: (key) => unwrap(api.get(`/widget/public/${encodeURIComponent(key)}`)),
+  send: (key, body) => unwrap(api.post(`/widget/public/${encodeURIComponent(key)}/message`, body)),
+  thread: (key, sessionId, after = 0) =>
+    unwrap(
+      api.get(`/widget/public/${encodeURIComponent(key)}/messages`, { params: { sessionId, after } })
+    ),
+};
+
 export const membersApi = {
   list: () => unwrap(api.get('/members')),
   invite: (email) => unwrap(api.post('/members/invite', { email })),

@@ -175,6 +175,12 @@ export default function BotTraining() {
           images: c.images || [],
           documents: c.documents || [],
           quickReplies: c.quickReplies?.length ? c.quickReplies : [''],
+          followUp: {
+            enabled: Boolean(c.followUp?.enabled),
+            delayHours: c.followUp?.delayHours || 4,
+            mode: c.followUp?.mode || 'ai',
+            message: c.followUp?.message || '',
+          },
           // servicesText: string crudo que edita el usuario; se parsea a array al
           // guardar (antes se parseaba en cada tecla y borraba comas/espacios).
           servicesText: (c.businessInfo?.services || []).join(', '),
@@ -322,6 +328,13 @@ export default function BotTraining() {
       return;
     }
 
+    // Seguimiento con texto fijo: necesita el mensaje.
+    if (cfg.followUp?.enabled && cfg.followUp.mode === 'custom' && cfg.followUp.message.trim().length < 5) {
+      setError('Escribe el mensaje de seguimiento o elige que el bot lo redacte.');
+      setFeedbackTick((t) => t + 1);
+      return;
+    }
+
     setSaving(true);
     try {
       const services = cfg.servicesText
@@ -337,6 +350,7 @@ export default function BotTraining() {
         images: cfg.images.filter((img) => img.label.trim() && img.url.trim()),
         documents: (cfg.documents || []).filter((d) => d.text?.trim()),
         quickReplies: (cfg.quickReplies || []).map((s) => s.trim()).filter(Boolean),
+        followUp: { ...cfg.followUp, message: cfg.followUp.message.trim() },
         businessInfo: { ...cfg.businessInfo, services },
       };
       // Sector del negocio (aplica a todos los planes; vive en Business).
@@ -752,6 +766,112 @@ export default function BotTraining() {
           </p>
         </Card>
       )}
+
+      {/* Seguimiento automático (Pro/Elite) */}
+      <Card>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600">
+              <Icon name="repeat" size={18} />
+            </span>
+            <div>
+              <h2 className="font-semibold text-fg">Seguimiento automático</h2>
+              <p className="mt-0.5 text-xs text-muted">
+                Si un cliente deja de responder, el bot le escribe una vez para retomar la conversación. Solo
+                en WhatsApp y Messenger, dentro de las 24 h que Meta permite (sin costo extra de Meta).
+              </p>
+            </div>
+          </div>
+          {limits.followUp && (
+            <button
+              type="button"
+              role="switch"
+              aria-checked={cfg.followUp.enabled}
+              aria-label="Activar seguimiento automático"
+              onClick={() => set('followUp', { ...cfg.followUp, enabled: !cfg.followUp.enabled })}
+              className={`relative mt-1 h-6 w-11 shrink-0 rounded-full transition ${
+                cfg.followUp.enabled ? 'bg-brand-600' : 'bg-surface2 ring-1 ring-inset ring-line'
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
+                  cfg.followUp.enabled ? 'left-[22px]' : 'left-0.5'
+                }`}
+              />
+            </button>
+          )}
+        </div>
+
+        {!limits.followUp ? (
+          <UpgradeNote>Disponible en los planes Pro y Elite.</UpgradeNote>
+        ) : (
+          cfg.followUp.enabled && (
+            <div className="mt-4 space-y-4 border-t border-line pt-4 animate-fade-up">
+              <div>
+                <label htmlFor="fu-delay" className="mb-1.5 block text-sm font-medium text-fg">
+                  Escribirle después de
+                </label>
+                <select
+                  id="fu-delay"
+                  value={cfg.followUp.delayHours}
+                  onChange={(e) => set('followUp', { ...cfg.followUp, delayHours: Number(e.target.value) })}
+                  className="w-full rounded-lg border border-line bg-canvas px-3 py-2 text-sm text-fg outline-none focus:border-brand-500 sm:w-60"
+                >
+                  {[1, 2, 3, 4, 6, 8, 12, 20].map((h) => (
+                    <option key={h} value={h}>
+                      {h === 1 ? '1 hora' : `${h} horas`} sin respuesta
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <p className="mb-1.5 text-sm font-medium text-fg">Mensaje</p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {[
+                    ['ai', 'Que el bot lo redacte', 'Retoma el tema pendiente de cada conversación. Si ya cerró, no escribe.'],
+                    ['custom', 'Usar mi propio texto', 'El mismo mensaje para todos los clientes.'],
+                  ].map(([val, title, desc]) => (
+                    <button
+                      key={val}
+                      type="button"
+                      onClick={() => set('followUp', { ...cfg.followUp, mode: val })}
+                      className={`rounded-xl border p-3 text-left transition ${
+                        cfg.followUp.mode === val
+                          ? 'border-brand-500 bg-brand-500/5 ring-1 ring-brand-500'
+                          : 'border-line hover:border-brand-300'
+                      }`}
+                    >
+                      <span className="block text-sm font-medium text-fg">{title}</span>
+                      <span className="mt-0.5 block text-xs text-muted">{desc}</span>
+                    </button>
+                  ))}
+                </div>
+                {cfg.followUp.mode === 'custom' && (
+                  <div className="mt-3">
+                    <Textarea
+                      rows={2}
+                      maxLength={500}
+                      value={cfg.followUp.message}
+                      onChange={(e) => set('followUp', { ...cfg.followUp, message: e.target.value })}
+                      placeholder="¡Hola! ¿Pudiste revisar la información? Si te quedó alguna duda, aquí estoy para ayudarte."
+                    />
+                  </div>
+                )}
+              </div>
+
+              <p className="flex items-start gap-1.5 text-[11px] text-subtle">
+                <Icon name="shield" size={12} className="mt-0.5 shrink-0" />
+                <span>
+                  Solo un seguimiento por conversación mientras el cliente no conteste. No se envía si tomaste
+                  el control (modo manual) o si la conversación pide atención.
+                  {cfg.followUp.mode === 'ai' ? ' Redactarlo consume muy poco de tu saldo de conversaciones.' : ''}
+                </span>
+              </p>
+            </div>
+          )
+        )}
+      </Card>
 
       {/* Respuestas rápidas (para el agente en Conversaciones) */}
       <Card>
