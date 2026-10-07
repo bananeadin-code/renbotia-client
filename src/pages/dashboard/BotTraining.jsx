@@ -9,6 +9,7 @@ import { Icon } from '../../components/ui/Icon.jsx';
 import { limitsFor } from '../../lib/planLimits.js';
 import { extractTextFromFile } from '../../lib/extractText.js';
 import { INDUSTRY_TEMPLATES } from '../../content/industryTemplates.js';
+import { LearningCard } from '../../components/business/LearningCard.jsx';
 
 const TONES = [
   { value: 'formal', label: 'Formal' },
@@ -582,6 +583,18 @@ export default function BotTraining() {
           />
         </Card>
       )}
+
+      {/* Aprende de ti: lo pendiente por enseñar (solo aparece si hay algo) */}
+      <LearningCard
+        onLearned={(faq) =>
+          // La FAQ ya se guardó en el servidor; se agrega al estado local para que
+          // un "Guardar" posterior no la borre.
+          setCfg((prev) => ({
+            ...prev,
+            faqs: [...prev.faqs.filter((f) => f.question.trim() || f.answer.trim()), { question: faq.question, answer: faq.answer }],
+          }))
+        }
+      />
 
       {/* Datos del negocio */}
       <Card>

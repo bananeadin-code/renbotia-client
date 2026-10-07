@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { conversationsApi, botConfigApi } from '../../api/endpoints.js';
+import { conversationsApi, botConfigApi, learningApi } from '../../api/endpoints.js';
 import { downloadFile } from '../../api/download.js';
 import { toast } from '../../store/toastStore.js';
 import { Card, Button, Badge, Spinner, Alert } from '../../components/ui/index.jsx';
@@ -96,6 +96,22 @@ export default function Conversations() {
   const [exporting, setExporting] = useState(false);
   // Ventana de 24h de WhatsApp + plantillas para reactivar fuera de ella.
   const [waWindow, setWaWindow] = useState(null);
+  // Aprende de ti: tras contestar a mano, se ofrece que el bot aprenda la respuesta.
+  const [learnOffer, setLearnOffer] = useState(null);
+  const [learning, setLearning] = useState(false);
+  async function acceptLearn() {
+    if (!learnOffer) return;
+    setLearning(true);
+    try {
+      await learningApi.accept(learnOffer.id, { question: learnOffer.question, answer: learnOffer.answer });
+      toast.success('Listo, el bot ya sabe responder eso.');
+      setLearnOffer(null);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'No se pudo guardar.');
+    } finally {
+      setLearning(false);
+    }
+  }
   const [templates, setTemplates] = useState([]);
   const [templateReason, setTemplateReason] = useState(null);
   const [templatesLoaded, setTemplatesLoaded] = useState(false);
@@ -320,6 +336,7 @@ export default function Conversations() {
     try {
       const data = await conversationsApi.rate(selectedId, index, next);
       setThread(data.conversation);
+      if (next === 'down') toast.info('Anotado. Enséñale la respuesta correcta en Entrenamiento, en Aprende de ti.');
     } catch {
       toast.error('No se pudo calificar.');
     }
@@ -333,6 +350,8 @@ export default function Conversations() {
       const data = await conversationsApi.reply(selectedId, reply.trim());
       setThread(data.conversation);
       setReply('');
+      // Aprende de ti: ofrecer que el bot aprenda esta respuesta.
+      setLearnOffer(data.suggestion ? { ...data.suggestion, chatId: selectedId } : null);
       if (data.sendWarning) toast.error(data.sendWarning); // p.ej. falta pago en Meta
       loadList();
     } catch (err) {
@@ -956,6 +975,28 @@ export default function Conversations() {
                   </div>
                 ) : isManual ? (
                   <div className="border-t border-line bg-surface">
+                    {/* Aprende de ti: ofrecer que el bot aprenda lo que acabas de responder */}
+                    {learnOffer && learnOffer.chatId === selectedId && (
+                      <div className="flex flex-wrap items-center gap-2 border-b border-line bg-brand-500/[0.06] px-3 py-2 animate-fade-up">
+                        <Icon name="sparkles" size={14} className="shrink-0 text-brand-600" />
+                        <p className="min-w-0 flex-1 text-xs text-fg">
+                          ¿Quieres que el bot aprenda esta respuesta para la próxima vez que pregunten{' '}
+                          <span className="font-medium">“{learnOffer.question.slice(0, 60)}{learnOffer.question.length > 60 ? '…' : ''}”</span>?
+                        </p>
+                        <div className="flex shrink-0 items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setLearnOffer(null)}
+                            className="rounded-md px-2 py-1 text-xs font-medium text-muted hover:text-fg"
+                          >
+                            Ahora no
+                          </button>
+                          <Button size="sm" disabled={learning} onClick={acceptLearn}>
+                            {learning ? 'Guardando…' : 'Enseñar'}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                     {quickReplies.length > 0 && (
                       <div className="flex gap-1.5 overflow-x-auto px-2.5 pt-2.5">
                         {quickReplies.map((qr, i) => (

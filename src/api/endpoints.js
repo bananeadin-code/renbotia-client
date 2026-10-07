@@ -196,6 +196,13 @@ export const widgetApi = {
     ),
 };
 
+export const learningApi = {
+  // "Aprende de ti": lo que el bot podría aprender de la operación diaria.
+  list: () => unwrap(api.get('/learning')),
+  accept: (id, body) => unwrap(api.post(`/learning/${id}/accept`, body)),
+  dismiss: (id) => unwrap(api.post(`/learning/${id}/dismiss`)),
+};
+
 export const membersApi = {
   list: () => unwrap(api.get('/members')),
   invite: (email) => unwrap(api.post('/members/invite', { email })),
