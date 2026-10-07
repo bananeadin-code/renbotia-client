@@ -62,7 +62,11 @@ export function ChannelSettings({ channel, settings, isOwner, onChanged }) {
           <p className="text-sm font-medium text-fg">Bot activo en {LABEL[channel]}</p>
           <p className="mt-0.5 text-xs text-muted">
             {paused
-              ? 'En pausa: los mensajes llegan a Conversaciones y los contestas tú. El canal sigue conectado.'
+              ? `En pausa${
+                  settings?.pausedUntil
+                    ? ` hasta ${new Date(settings.pausedUntil).toLocaleString('es-MX', { weekday: 'short', hour: '2-digit', minute: '2-digit' })}`
+                    : ''
+                }: los mensajes llegan a Conversaciones y los contestas tú. El canal sigue conectado.`
               : 'Pausa el bot sin desconectar el canal, por ejemplo si prefieres atender este canal tú mismo.'}
           </p>
         </div>

@@ -12,6 +12,8 @@ import { MessengerConnect } from '../../components/business/MessengerConnect.jsx
 import { InstagramConnect } from '../../components/business/InstagramConnect.jsx';
 import { WebWidgetCard } from '../../components/business/WebWidgetCard.jsx';
 import { ChannelSettings } from '../../components/business/ChannelSettings.jsx';
+import { OwnerControlCard } from '../../components/business/OwnerControlCard.jsx';
+import { useBusinessStore } from '../../store/businessStore.js';
 
 /**
  * Módulo "Conexiones": un selector de canales (WhatsApp, Messenger, Instagram,
@@ -150,6 +152,7 @@ function loadFacebookSdk(appId, version) {
 export function Connections() {
   // Puede administrar conexiones: el dueño o un colaborador con ese permiso.
   const isOwner = useCan('connections');
+  const role = useBusinessStore((s) => s.role);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [sdkReady, setSdkReady] = useState(false);
@@ -417,6 +420,8 @@ export function Connections() {
         <ChannelSettings channel="whatsapp" settings={data?.settings?.whatsapp} isOwner={isOwner} onChanged={refresh} />
       )}
       {connected && <WhatsAppManage isOwner={isOwner} />}
+      {/* Manejar el bot desde el WhatsApp del dueño (solo el dueño, no colaboradores) */}
+      {connected && role === 'owner' && <OwnerControlCard />}
 
       {/* Ayuda (atascos + contacto) debajo de la tarjeta, mientras no conecta */}
       {!connected && data?.embeddedEnabled && isOwner && <ConnectionHelp />}

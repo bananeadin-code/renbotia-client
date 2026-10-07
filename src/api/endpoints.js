@@ -55,6 +55,10 @@ export const subscriptionApi = {
 export const botConfigApi = {
   get: () => unwrap(api.get('/botconfig')),
   update: (body) => unwrap(api.put('/botconfig', body)),
+  // Avisos temporales (vencen solos; también se ponen desde el WhatsApp del dueño).
+  notices: () => unwrap(api.get('/botconfig/notices')),
+  addNotice: (body) => unwrap(api.post('/botconfig/notices', body)),
+  removeNotice: (id) => unwrap(api.delete(`/botconfig/notices/${id}`)),
 };
 
 export const usageApi = {
@@ -198,6 +202,13 @@ export const widgetApi = {
         params: { sessionId, after, ...(host ? { host } : {}) },
       })
     ),
+};
+
+export const ownerControlApi = {
+  // Manejar el bot desde el WhatsApp del dueño (solo el dueño).
+  get: () => unwrap(api.get('/owner-control')),
+  linkCode: () => unwrap(api.post('/owner-control/link-code')),
+  unlink: (id) => unwrap(api.delete(`/owner-control/${id}`)),
 };
 
 export const referralApi = {

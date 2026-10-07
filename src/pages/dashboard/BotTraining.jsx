@@ -11,6 +11,7 @@ import { extractTextFromFile } from '../../lib/extractText.js';
 import { INDUSTRY_TEMPLATES } from '../../content/industryTemplates.js';
 import { LearningCard } from '../../components/business/LearningCard.jsx';
 import { ImportTraining } from '../../components/business/ImportTraining.jsx';
+import { NoticesCard } from '../../components/business/NoticesCard.jsx';
 
 const TONES = [
   { value: 'formal', label: 'Formal' },
@@ -701,6 +702,9 @@ export default function BotTraining() {
           <Input label="Precios base" value={cfg.businessInfo.basePricing} onChange={(e) => setInfo('basePricing', e.target.value)} placeholder="Consulta desde $500 MXN" />
         </div>
       </Card>
+
+      {/* Avisos temporales (vencen solos) */}
+      <NoticesCard />
 
       {/* Horario de atención (todos los planes) */}
       <Card>
