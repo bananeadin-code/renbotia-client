@@ -9,7 +9,7 @@ const unwrap = (p) => p.then((res) => res.data.data);
 export const authApi = {
   register: (body) => unwrap(api.post('/auth/register', body)),
   login: (body) => unwrap(api.post('/auth/login', body)),
-  google: (credential) => unwrap(api.post('/auth/google', { credential })),
+  google: (credential, ref) => unwrap(api.post('/auth/google', { credential, ...(ref ? { ref } : {}) })),
   config: () => unwrap(api.get('/auth/config')),
   logout: () => api.post('/auth/logout'),
   refresh: () => unwrap(api.post('/auth/refresh')),
@@ -197,6 +197,11 @@ export const widgetApi = {
         params: { sessionId, after, ...(host ? { host } : {}) },
       })
     ),
+};
+
+export const referralApi = {
+  // Invita y gana: enlace y avance hacia el próximo mes de Pro.
+  get: () => unwrap(api.get('/referrals')),
 };
 
 export const importApi = {

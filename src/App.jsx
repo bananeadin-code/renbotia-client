@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import { useAuthStore } from './store/authStore.js';
 import { useThemeStore } from './store/themeStore.js';
 import { ProtectedRoute } from './router/ProtectedRoute.jsx';
+import { captureReferral } from './lib/referral.js';
 import ScrollToTop from './router/ScrollToTop.jsx';
 import { Toaster } from './components/ui/Toaster.jsx';
 import { ConfirmDialog } from './components/ui/ConfirmDialog.jsx';
@@ -67,6 +68,7 @@ export default function App() {
   // El widget web (/w/…) corre en un iframe ajeno y no usa sesión: no se intenta
   // refrescar la cuenta ahí.
   useEffect(() => {
+    captureReferral(); // ?ref=CODIGO de un enlace de invitación
     initTheme();
     if (!window.location.pathname.startsWith('/w/')) bootstrap();
   }, [bootstrap, initTheme]);

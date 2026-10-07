@@ -15,6 +15,7 @@ import { Card, Badge, Spinner, Button } from '../../components/ui/index.jsx';
 import { SpotlightCard } from '../../components/ui/SpotlightCard.jsx';
 import { OnboardingChecklist } from '../../components/dashboard/OnboardingChecklist.jsx';
 import { ImpactCard } from '../../components/dashboard/ImpactCard.jsx';
+import { ReferralCard } from '../../components/dashboard/ReferralCard.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { fmtConversations } from '../../lib/usage.js';
 
@@ -126,6 +127,9 @@ export default function Dashboard() {
 
       {/* Lo que generó tu bot: datos reales + estimación en pesos (retención) */}
       <ImpactCard impact={impact} onChange={setImpact} />
+
+      {/* Invita y gana: 1 mes de Pro por cada 3 negocios */}
+      <ReferralCard />
 
       {/* Barra de consumo (en conversaciones, tono tranquilo) */}
       <Card>

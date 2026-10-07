@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { authApi } from '../api/endpoints.js';
 import { setAccessToken } from '../api/axios.js';
+import { getReferral } from '../lib/referral.js';
 
 /**
  * Estado de autenticación. El access token se guarda en memoria (y se inyecta
@@ -23,7 +24,8 @@ export const useAuthStore = create((set, get) => ({
   // { needsEmailVerification, email, devCode? } para que el usuario confirme el
   // código enviado a su correo (verifyEmail).
   async register(body) {
-    return authApi.register(body);
+    // Código de referido del enlace de invitación (si llegó por uno).
+    return authApi.register({ ...body, ...(getReferral() ? { ref: getReferral() } : {}) });
   },
 
   // Login: puede devolver la sesión, o un estado pendiente
@@ -50,7 +52,7 @@ export const useAuthStore = create((set, get) => ({
   },
 
   async googleLogin(credential) {
-    const { user, accessToken } = await authApi.google(credential);
+    const { user, accessToken } = await authApi.google(credential, getReferral());
     get().setSession(user, accessToken);
     return user;
   },

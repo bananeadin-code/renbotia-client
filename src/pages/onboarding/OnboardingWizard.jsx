@@ -11,6 +11,7 @@ import { Logo } from '../../components/ui/Logo.jsx';
 import { ThemeToggle } from '../../components/ui/ThemeToggle.jsx';
 import { limitsFor } from '../../lib/planLimits.js';
 import { DEMO_PROFILE_KEY } from '../../lib/demoProfile.js';
+import { clearReferral } from '../../lib/referral.js';
 import { ImportTraining } from '../../components/business/ImportTraining.jsx';
 
 const STEPS = ['Tu negocio', 'Elige un plan', 'Entrena tu bot'];
@@ -29,6 +30,7 @@ const clearSaved = () => {
   try {
     localStorage.removeItem(SAVE_KEY);
     localStorage.removeItem(DEMO_PROFILE_KEY); // la demo ya se usó para crear el negocio
+    clearReferral(); // el referido ya quedó registrado en la cuenta
   } catch {
     /* noop */
   }
