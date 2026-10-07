@@ -23,7 +23,7 @@ export default function Status() {
 
   async function check() {
     try {
-      const res = await fetch('/api/health', { cache: 'no-store' });
+      const res = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/health`, { cache: 'no-store' });
       const data = await res.json();
       const components = { web: 'ok', ...(data.components || {}) };
       const ok = res.ok && Object.values(components).every((v) => v === 'ok');
