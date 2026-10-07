@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { referralApi } from '../../api/endpoints.js';
 import { toast } from '../../store/toastStore.js';
@@ -63,10 +63,13 @@ export function ReferralCard() {
   return (
     <section
       id="invita"
-      className="relative scroll-mt-20 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-600 via-brand-600 to-emerald-500 p-5 text-white shadow-pop sm:p-6"
+      className="relative scroll-mt-20 rounded-2xl bg-gradient-to-br from-brand-600 via-brand-600 to-emerald-500 p-5 text-white shadow-pop sm:p-6"
     >
-      {/* Brillo decorativo */}
-      <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-16 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
+      {/* Brillo decorativo (recortado en su propia capa, para que el menú de
+          compartir no se corte con el borde de la tarjeta) */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
+        <div className="absolute -right-10 -top-16 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
+      </div>
       <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center">
         <div className="min-w-0 flex-1">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-xs font-semibold">
@@ -113,17 +116,87 @@ export function ReferralCard() {
               {copied ? 'Copiado' : 'Copiar'}
             </button>
           </div>
-          <a
-            href={`https://wa.me/?text=${encodeURIComponent(message)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:opacity-90"
-          >
-            <Icon name="whatsapp" size={17} /> Compartir por WhatsApp
-          </a>
+          <ShareButton link={link} message={message} />
         </div>
       </div>
     </section>
+  );
+}
+
+/**
+ * Compartir el enlace: usa el menú nativo del sistema (celular, Windows, macOS)
+ * con todas las apps del usuario. Si el navegador no lo tiene (p. ej. Firefox de
+ * escritorio), muestra un menú propio con las opciones más comunes.
+ */
+function ShareButton({ link, message }) {
+  const [open, setOpen] = useState(false);
+  const boxRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const onDown = (e) => !boxRef.current?.contains(e.target) && setOpen(false);
+    const onKey = (e) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  async function share() {
+    const text = message.replace(` ${link}`, '');
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'RenBotIA', text, url: link });
+        return;
+      } catch (err) {
+        if (err?.name === 'AbortError') return; // el usuario cerró el menú
+      }
+    }
+    setOpen((v) => !v);
+  }
+
+  const enc = encodeURIComponent;
+  const options = [
+    ['whatsapp', 'WhatsApp', `https://wa.me/?text=${enc(message)}`],
+    ['messenger', 'Facebook', `https://www.facebook.com/sharer/sharer.php?u=${enc(link)}`],
+    ['send', 'Telegram', `https://t.me/share/url?url=${enc(link)}&text=${enc(message.replace(` ${link}`, ''))}`],
+    ['mail', 'Correo', `mailto:?subject=${enc('Te recomiendo RenBotIA')}&body=${enc(message)}`],
+  ];
+
+  return (
+    <div ref={boxRef} className="relative">
+      <button
+        type="button"
+        onClick={share}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-brand-700 shadow-sm transition hover:bg-white/90 active:scale-[0.98]"
+      >
+        <Icon name="share" size={17} /> Compartir
+      </button>
+      {open && (
+        <div
+          role="menu"
+          className="absolute right-0 top-full z-20 mt-2 w-full overflow-hidden rounded-xl border border-line bg-surface py-1 text-fg shadow-pop animate-fade-up"
+        >
+          {options.map(([icon, label, href]) => (
+            <a
+              key={label}
+              role="menuitem"
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm transition hover:bg-surface2"
+            >
+              <Icon name={icon} size={16} className="text-muted" /> {label}
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
