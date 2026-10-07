@@ -47,7 +47,7 @@ function channelStatus(key, data, widget) {
   }
 }
 
-const DOT = { on: 'bg-emerald-500', off: 'bg-slate-300 dark:bg-slate-600', soon: 'bg-brand-400' };
+const DOT = { on: 'bg-emerald-500', off: 'bg-slate-300 dark:bg-slate-600', soon: 'bg-amber-400' };
 
 /** Selector de canales: tablist accesible (flechas, Inicio/Fin) en cuadrícula. */
 function ChannelSwitcher({ active, onSelect, data, widget }) {
@@ -65,7 +65,14 @@ function ChannelSwitcher({ active, onSelect, data, widget }) {
     refs.current[next.key]?.focus();
   }
   return (
-    <div role="tablist" aria-label="Canales" onKeyDown={onKeyDown} className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+    // Móvil: control segmentado compacto (4 en fila: ícono con punto de estado y
+    // nombre, sin textos cortados). Desde sm: tarjetas con el detalle del estado.
+    <div
+      role="tablist"
+      aria-label="Canales"
+      onKeyDown={onKeyDown}
+      className="grid grid-cols-4 gap-1 rounded-2xl border border-line bg-surface p-1 shadow-card sm:grid-cols-2 sm:gap-2 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none lg:grid-cols-4"
+    >
       {CHANNELS.map((c) => {
         const st = channelStatus(c.key, data, widget);
         const selected = c.key === active;
@@ -80,20 +87,30 @@ function ChannelSwitcher({ active, onSelect, data, widget }) {
             aria-controls={`panel-${c.key}`}
             tabIndex={selected ? 0 : -1}
             onClick={() => onSelect(c.key)}
-            className={`group flex min-h-[64px] items-center gap-3 rounded-2xl border px-3 py-2.5 text-left transition-[border-color,background-color,box-shadow] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 ${
+            className={`group flex min-h-[64px] flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 transition-[border-color,background-color,box-shadow,transform] duration-150 ease-out active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 sm:flex-row sm:justify-start sm:gap-3 sm:rounded-2xl sm:border sm:px-3 sm:py-2.5 sm:text-left sm:active:scale-100 ${
               selected
-                ? 'border-brand-500 bg-surface shadow-card ring-1 ring-brand-500'
-                : 'border-line bg-surface/60 hover:border-brand-300 hover:bg-surface'
+                ? 'bg-brand-500/10 sm:border-brand-500 sm:bg-surface sm:shadow-card sm:ring-1 sm:ring-brand-500'
+                : 'hover:bg-surface2 sm:border-line sm:bg-surface/60 sm:hover:border-brand-300 sm:hover:bg-surface'
             }`}
           >
-            <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${c.tint}`}>
-              <Icon name={c.icon} size={20} />
+            <span className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:h-10 sm:w-10 ${c.tint}`}>
+              <Icon name={c.icon} size={19} />
+              {/* Punto de estado sobre el ícono (solo móvil). */}
+              <span
+                className={`absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-surface sm:hidden ${DOT[st.tone]}`}
+                aria-hidden="true"
+              />
             </span>
-            <span className="min-w-0 flex-1">
-              <span className={`block truncate text-sm font-semibold ${selected ? 'text-fg' : 'text-fg/90'}`}>
+            <span className="min-w-0 max-w-full sm:flex-1">
+              <span
+                className={`block truncate text-[11px] font-semibold sm:text-sm ${
+                  selected ? 'text-brand-700 dark:text-brand-300 sm:text-fg' : 'text-muted sm:text-fg/90'
+                }`}
+              >
                 {c.label}
               </span>
-              <span className="mt-0.5 flex items-center gap-1.5 text-xs text-muted">
+              <span className="sr-only sm:hidden">{st.text}</span>
+              <span className="mt-0.5 hidden items-center gap-1.5 text-xs text-muted sm:flex">
                 <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${DOT[st.tone]}`} aria-hidden="true" />
                 <span className="truncate">{st.text}</span>
               </span>
@@ -277,7 +294,7 @@ export function Connections() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-fg">Conexiones</h1>
-        <p className="mt-1 text-muted">
+        <p className="mt-1 text-sm text-muted sm:text-base">
           Elige un canal para conectarlo o ajustarlo. El bot responde igual en todos, con el mismo entrenamiento.
         </p>
       </div>
