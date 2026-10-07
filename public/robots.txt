@@ -7,5 +7,6 @@ Disallow: /onboarding
 Disallow: /login
 Disallow: /registro
 Disallow: /recuperar
+Disallow: /w/
 
 Sitemap: https://renbotia.com/sitemap.xml

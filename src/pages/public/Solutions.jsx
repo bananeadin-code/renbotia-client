@@ -5,6 +5,7 @@ import { SpotlightCard } from '../../components/ui/SpotlightCard.jsx';
 import { Reveal } from '../../components/ui/Reveal.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { SOLUTIONS } from '../../content/solutions.js';
+import { CITIES } from '../../content/cities.js';
 import { useSeo, SITE_URL } from '../../lib/seo.js';
 
 /** Índice de soluciones por industria (hub de enlazado interno + SEO). */
@@ -12,7 +13,7 @@ export default function Solutions() {
   useSeo({
     title: 'Soluciones por industria — Bot de WhatsApp con IA | RenBotIA',
     description:
-      'Bots de WhatsApp con IA para despachos legales, contadores, consultoras, agencias y restaurantes en México. Encuentra la solución para tu sector.',
+      'Bots de WhatsApp con IA para despachos, consultorios, clínicas, estéticas, inmobiliarias, gimnasios, escuelas, tiendas y restaurantes en todo México. Encuentra la solución para tu sector y tu ciudad.',
     path: '/soluciones',
     image: `${SITE_URL}/og-cover.png`,
   });
@@ -57,6 +58,23 @@ export default function Solutions() {
             </Reveal>
           ))}
         </div>
+
+        {/* Por ciudad (SEO local en todo México) */}
+        <Reveal className="mt-14">
+          <h2 className="text-xl font-bold text-fg sm:text-2xl">En tu ciudad</h2>
+          <p className="mt-1 text-sm text-muted">RenBotIA funciona en todo México. Mira cómo lo usan los negocios de tu ciudad.</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {CITIES.map((c) => (
+              <Link
+                key={c.slug}
+                to={`/bot-whatsapp/${c.slug}`}
+                className="rounded-full border border-line bg-surface px-3 py-1.5 text-sm text-fg transition hover:border-brand-300 hover:text-brand-700 dark:hover:text-brand-300"
+              >
+                {c.name}
+              </Link>
+            ))}
+          </div>
+        </Reveal>
       </main>
 
       <PublicFooter />

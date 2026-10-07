@@ -178,6 +178,244 @@ export const SOLUTIONS = [
       },
     ],
   },
+  {
+    slug: 'consultorios-dentales',
+    industry: 'Dentistas y consultorios dentales',
+    icon: 'calendarCheck',
+    title: 'Bot de WhatsApp con IA para dentistas y consultorios dentales | RenBotIA',
+    description:
+      'Agenda citas, responde precios de limpiezas y tratamientos y confirma pacientes por WhatsApp las 24 horas, sin cargar a tu recepción.',
+    h1: 'Un asistente de WhatsApp para tu consultorio dental',
+    lede: 'Responde al instante precios, tratamientos y horarios, y agenda la cita del paciente con tu disponibilidad real, aunque estés en consulta.',
+    pains: [
+      'Mientras atiendes a un paciente, otros escriben preguntando por precios de limpieza, blanqueamiento u ortodoncia.',
+      'Los mensajes de la noche y el fin de semana se quedan sin responder y el paciente agenda en otro lado.',
+      'Las citas que no se confirman terminan en huecos en tu agenda.',
+    ],
+    benefits: [
+      'Contesta precios, tratamientos, formas de pago y ubicación con la información de tu consultorio.',
+      'Agenda citas según tu horario real y deja anotado el motivo de la consulta.',
+      'Detecta pacientes listos para agendar y te avisa para que les des seguimiento prioritario.',
+    ],
+    example: {
+      user: '¿Cuánto cuesta una limpieza y tienen espacio esta semana?',
+      bot: 'La limpieza dental cuesta $450 e incluye revisión. Esta semana tengo espacio el jueves a las 11:00 o el viernes a las 5:00 pm. ¿Cuál te aparto?',
+    },
+    faqs: [
+      {
+        q: '¿El bot da diagnósticos?',
+        a: 'No. Responde dudas de precios, tratamientos y horarios, y agenda la valoración. El diagnóstico siempre lo da el dentista.',
+      },
+      {
+        q: '¿Puede atender urgencias?',
+        a: 'Cuando detecta una urgencia, como dolor fuerte o una infección, marca la conversación para que la atienda una persona del consultorio y te avisa.',
+      },
+    ],
+  },
+  {
+    slug: 'clinicas-y-consultorios-medicos',
+    industry: 'Clínicas y consultorios médicos',
+    icon: 'shieldCheck',
+    title: 'Bot de WhatsApp con IA para clínicas y consultorios médicos | RenBotIA',
+    description:
+      'Atiende por WhatsApp las dudas de tus pacientes, agenda consultas y orienta sobre especialidades y estudios las 24 horas, con un trato profesional.',
+    h1: 'Atención por WhatsApp para tu clínica, sin saturar la recepción',
+    lede: 'Un asistente con IA responde especialidades, costos de consulta, estudios y horarios, y agenda pacientes con criterio, mientras tu equipo atiende a quien está en la clínica.',
+    pains: [
+      'La recepción no alcanza a contestar teléfono, WhatsApp y a los pacientes presentes al mismo tiempo.',
+      'Te preguntan mil veces lo mismo: costo de consulta, qué especialistas hay, si aceptan seguros.',
+      'Los pacientes que escriben de noche no reciben respuesta hasta el día siguiente.',
+    ],
+    benefits: [
+      'Responde especialidades, costos, preparación para estudios y horarios con la información de tu clínica.',
+      'Agenda consultas por especialidad y deja los datos del paciente listos para confirmar.',
+      'Pide ayuda a una persona cuando el caso lo requiere, en lugar de improvisar.',
+    ],
+    example: {
+      user: '¿Cuánto cuesta la consulta con el pediatra y qué días viene?',
+      bot: 'La consulta de pediatría cuesta $700. La pediatra atiende lunes, miércoles y viernes de 9:00 a 14:00. ¿Te agendo una cita para tu hijo?',
+    },
+    faqs: [
+      {
+        q: '¿El bot da indicaciones médicas?',
+        a: 'No. Da información administrativa (costos, horarios, especialidades, preparación para estudios que tú definas) y agenda. Las indicaciones médicas las da tu equipo.',
+      },
+      {
+        q: '¿Puedo pedir que ciertas preguntas las conteste una persona?',
+        a: 'Sí. El bot escala a una persona cuando detecta un tema delicado, y tú puedes tomar cualquier conversación en modo manual desde la bandeja.',
+      },
+    ],
+  },
+  {
+    slug: 'esteticas-y-barberias',
+    industry: 'Estéticas, barberías y spas',
+    icon: 'sparkles',
+    title: 'Bot de WhatsApp con IA para estéticas, barberías y spas | RenBotIA',
+    description:
+      'Agenda citas, responde precios de cortes, uñas y tratamientos y llena tu agenda por WhatsApp, Instagram y tu sitio, aunque tengas las manos ocupadas.',
+    h1: 'Tu agenda llena por WhatsApp, aunque estés atendiendo',
+    lede: 'Mientras cortas, pintas o das un masaje, un asistente con IA responde precios y agenda la siguiente cita con el horario disponible.',
+    pains: [
+      'No puedes contestar el celular con las manos ocupadas y los mensajes se acumulan.',
+      'Te preguntan los mismos precios todos los días: corte, tinte, uñas, faciales.',
+      'Las citas que se agendan por mensaje se cruzan o se olvidan.',
+    ],
+    benefits: [
+      'Responde precios, servicios, promociones y ubicación con tu forma de hablar.',
+      'Agenda citas sin cruces y te deja la lista del día organizada.',
+      'Atiende también los mensajes directos de Instagram, donde te descubren tus clientes.',
+    ],
+    example: {
+      user: 'Hola, ¿cuánto el corte con barba? ¿Tienes hoy en la tarde?',
+      bot: 'Corte con barba cuesta $200. Hoy tengo libre a las 5:30 y a las 7:00. ¿Te aparto alguna?',
+    },
+    faqs: [
+      {
+        q: '¿Puede atender mi Instagram?',
+        a: 'Sí. El mismo bot responde WhatsApp, los mensajes directos de Instagram, Messenger y el chat de tu sitio web.',
+      },
+      {
+        q: '¿Cómo aprende mis precios?',
+        a: 'Puedes escribirlos o importar tus chats de WhatsApp: el bot aprende las preguntas que más te hacen y cómo las respondes tú.',
+      },
+    ],
+  },
+  {
+    slug: 'inmobiliarias',
+    industry: 'Inmobiliarias y asesores inmobiliarios',
+    icon: 'home',
+    title: 'Bot de WhatsApp con IA para inmobiliarias y asesores | RenBotIA',
+    description:
+      'Responde al instante por WhatsApp a quienes preguntan por tus propiedades, filtra prospectos por presupuesto y zona y agenda visitas las 24 horas.',
+    h1: 'Responde cada prospecto inmobiliario en segundos',
+    lede: 'Quien pregunta por una casa o un departamento escribe a varios asesores a la vez: el primero que responde se queda con el cliente. Tu asistente con IA responde al instante, califica y agenda la visita.',
+    pains: [
+      'Los anuncios generan decenas de mensajes y no alcanzas a contestar a tiempo.',
+      'Muchos prospectos no tienen el presupuesto o buscan otra zona, y te quitan tiempo.',
+      'Coordinar visitas por mensaje es un ir y venir interminable.',
+    ],
+    benefits: [
+      'Responde precio, ubicación, metros, requisitos y formas de pago de cada propiedad.',
+      'Pregunta presupuesto, zona y tipo de crédito, y te marca los prospectos calientes.',
+      'Agenda visitas con tu disponibilidad y te deja los datos del interesado.',
+    ],
+    example: {
+      user: 'Hola, ¿sigue disponible la casa de 3 recámaras? ¿Aceptan Infonavit?',
+      bot: 'Sí, sigue disponible: 3 recámaras, 2 baños, $1,850,000, y sí aceptamos crédito Infonavit. ¿Te gustaría visitarla este sábado por la mañana?',
+    },
+    faqs: [
+      {
+        q: '¿Puede enviar fotos de las propiedades?',
+        a: 'En el plan Elite el bot envía las imágenes que cargues (fachadas, planos, interiores) cuando el cliente las pide.',
+      },
+      {
+        q: '¿Cómo sé quién está realmente interesado?',
+        a: 'El bot detecta la intención de compra y marca esas conversaciones como leads calientes; además te avisa por correo para que llames primero a esos.',
+      },
+    ],
+  },
+  {
+    slug: 'gimnasios',
+    industry: 'Gimnasios y estudios fitness',
+    icon: 'zap',
+    title: 'Bot de WhatsApp con IA para gimnasios y estudios fitness | RenBotIA',
+    description:
+      'Responde por WhatsApp precios de mensualidad, horarios de clases y promociones, y convierte a quien pregunta en socio, las 24 horas.',
+    h1: 'Convierte cada mensaje en un nuevo socio',
+    lede: 'Quien pregunta por tu gimnasio quiere empezar ya. Tu asistente responde mensualidades, clases y horarios al momento e invita a la clase de prueba.',
+    pains: [
+      'Te escriben de noche o muy temprano y nadie contesta hasta horas después.',
+      'Las mismas preguntas todo el día: mensualidad, inscripción, horarios de clases.',
+      'Los interesados que no reciben respuesta rápida se inscriben en otro lado.',
+    ],
+    benefits: [
+      'Responde mensualidades, inscripción, promociones y horarios de cada clase.',
+      'Invita a la clase de prueba y deja anotado al interesado.',
+      'Da seguimiento automático a quien preguntó y dejó de responder.',
+    ],
+    example: {
+      user: '¿Cuánto es la mensualidad y a qué hora son las clases de spinning?',
+      bot: 'La mensualidad es de $650 y la inscripción está en promoción este mes. Spinning es de lunes a viernes a las 7:00 am y 7:00 pm. ¿Quieres venir a una clase de prueba gratis?',
+    },
+    faqs: [
+      {
+        q: '¿Puede dar seguimiento a quien no se inscribió?',
+        a: 'Sí. Con el seguimiento automático, el bot le escribe una vez a quien dejó de responder para retomar la conversación.',
+      },
+      {
+        q: '¿Funciona en Instagram?',
+        a: 'Sí. El mismo bot atiende WhatsApp, Instagram, Messenger y el chat de tu sitio web.',
+      },
+    ],
+  },
+  {
+    slug: 'escuelas-y-cursos',
+    industry: 'Escuelas, academias y cursos',
+    icon: 'academic',
+    title: 'Bot de WhatsApp con IA para escuelas, academias y cursos | RenBotIA',
+    description:
+      'Informa colegiaturas, horarios, requisitos de inscripción y fechas de inicio por WhatsApp y capta a los interesados las 24 horas.',
+    h1: 'Inscripciones por WhatsApp, sin saturar a control escolar',
+    lede: 'Padres y alumnos preguntan lo mismo en cada temporada de inscripción. Tu asistente con IA lo responde al instante y te deja a los interesados listos para inscribir.',
+    pains: [
+      'En temporada de inscripciones los mensajes se multiplican y nadie se da abasto.',
+      'Colegiaturas, requisitos, horarios y fechas de inicio: siempre las mismas preguntas.',
+      'Los interesados que no reciben respuesta a tiempo eligen otra escuela.',
+    ],
+    benefits: [
+      'Responde colegiaturas, requisitos, horarios, becas y fechas de inicio.',
+      'Agenda visitas o clases muestra y registra a los interesados.',
+      'Marca como prioridad a quienes están listos para inscribirse.',
+    ],
+    example: {
+      user: '¿Cuándo empieza el curso de inglés y cuánto cuesta?',
+      bot: 'El siguiente grupo empieza el lunes 3. Son clases de lunes a jueves de 6 a 8 pm y la mensualidad es de $1,200. ¿Te aparto un lugar o prefieres una clase muestra?',
+    },
+    faqs: [
+      {
+        q: '¿Puede atender a muchos interesados al mismo tiempo?',
+        a: 'Sí. Atiende a todos en paralelo, sin filas ni esperas, a cualquier hora.',
+      },
+      {
+        q: '¿Puedo poner información distinta por nivel o curso?',
+        a: 'Sí. Cargas la información de cada nivel o curso y el bot responde según lo que pregunte cada persona.',
+      },
+    ],
+  },
+  {
+    slug: 'tiendas-en-linea',
+    industry: 'Tiendas en línea y comercios',
+    icon: 'cart',
+    title: 'Bot de WhatsApp con IA para tiendas en línea y comercios | RenBotIA',
+    description:
+      'Responde existencias, precios, tallas, envíos y formas de pago por WhatsApp, Instagram y tu sitio, y toma pedidos las 24 horas.',
+    h1: 'Vende por WhatsApp e Instagram aunque estés dormido',
+    lede: 'Tus clientes preguntan antes de comprar. Tu asistente con IA responde precios, tallas, envíos y formas de pago al momento, y toma el pedido.',
+    pains: [
+      'Las ventas se pierden porque el cliente preguntó y nadie respondió a tiempo.',
+      'Tallas, colores, envíos, formas de pago: respondes lo mismo decenas de veces.',
+      'Los pedidos por mensaje se desordenan entre WhatsApp, Instagram y Facebook.',
+    ],
+    benefits: [
+      'Responde catálogo, precios, tallas, envíos y métodos de pago con tu información.',
+      'Toma pedidos y los deja organizados en tu panel para que solo confirmes.',
+      'Atiende WhatsApp, Instagram, Messenger y tu sitio desde una sola bandeja.',
+    ],
+    example: {
+      user: '¿Tienen la funda en negro para iPhone 16 y cuánto tarda el envío?',
+      bot: 'Sí, la tenemos en negro a $349. El envío a todo México tarda de 2 a 4 días hábiles y es gratis en compras desde $599. ¿Te la aparto?',
+    },
+    faqs: [
+      {
+        q: '¿Puede mostrar fotos de los productos?',
+        a: 'En el plan Elite el bot envía las fotos de tu catálogo cuando el cliente las pide.',
+      },
+      {
+        q: '¿Se conecta con mi sitio web?',
+        a: 'Sí. Pegas una línea de código en tu sitio y aparece un chat con el mismo bot, que también atiende WhatsApp e Instagram.',
+      },
+    ],
+  },
 ];
 
 export function getSolution(slug) {

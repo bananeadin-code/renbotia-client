@@ -22,6 +22,7 @@ const Blog = lazy(() => import('./pages/public/Blog.jsx'));
 const BlogPost = lazy(() => import('./pages/public/BlogPost.jsx'));
 const Solutions = lazy(() => import('./pages/public/Solutions.jsx'));
 const Solution = lazy(() => import('./pages/public/Solution.jsx'));
+const CityHub = lazy(() => import('./pages/public/CityHub.jsx'));
 const Status = lazy(() => import('./pages/public/Status.jsx'));
 const Contact = lazy(() => import('./pages/public/Contact.jsx'));
 const Legal = lazy(() => import('./pages/public/Legal.jsx'));
@@ -85,6 +86,8 @@ export default function App() {
       <Route path="/blog/:slug" element={<BlogPost />} />
       <Route path="/soluciones" element={<Solutions />} />
       <Route path="/soluciones/:slug" element={<Solution />} />
+      <Route path="/soluciones/:slug/:ciudad" element={<Solution />} />
+      <Route path="/bot-whatsapp/:ciudad" element={<CityHub />} />
       <Route path="/status" element={<Status />} />
       <Route path="/contacto" element={<Contact />} />
       <Route path="/privacidad" element={<Legal slug="privacidad" />} />

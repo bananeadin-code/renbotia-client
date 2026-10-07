@@ -7,32 +7,57 @@ import { Button } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { Breadcrumbs } from '../../components/ui/Breadcrumbs.jsx';
 import { getSolution, SOLUTIONS } from '../../content/solutions.js';
+import { CITIES, getCity, nearbyCities, localCopy } from '../../content/cities.js';
 import { useSeo, SITE_URL } from '../../lib/seo.js';
 
-/** Página por industria (SEO programático). Incluye FAQPage para rich results. */
+/**
+ * Página por industria (SEO programático) y, con `:ciudad`, por industria en una
+ * ciudad de México ("bot de WhatsApp para dentistas en Monterrey"). Incluye
+ * FAQPage y el servicio con su área de cobertura para rich results.
+ */
 export default function Solution() {
-  const { slug } = useParams();
+  const { slug, ciudad } = useParams();
   const sol = getSolution(slug);
+  const city = ciudad ? getCity(ciudad) : null;
+  const notFound = !sol || (ciudad && !city);
+  const local = sol && city ? localCopy(sol, city) : null;
+  const faqs = sol ? (local ? [local.faq, ...sol.faqs] : sol.faqs) : [];
+  const path = sol ? `/soluciones/${sol.slug}${city ? `/${city.slug}` : ''}` : '/soluciones';
 
   useSeo({
-    title: sol ? sol.title : 'Solución no encontrada | RenBotIA',
-    description: sol?.description,
-    path: sol ? `/soluciones/${sol.slug}` : '/soluciones',
+    title: notFound ? 'Solución no encontrada | RenBotIA' : local?.title || sol.title,
+    description: local?.description || sol?.description,
+    path,
     image: `${SITE_URL}/og-cover.png`,
-    jsonLd: sol?.faqs?.length
-      ? {
-          '@context': 'https://schema.org',
-          '@type': 'FAQPage',
-          mainEntity: sol.faqs.map((f) => ({
-            '@type': 'Question',
-            name: f.q,
-            acceptedAnswer: { '@type': 'Answer', text: f.a },
-          })),
-        }
-      : undefined,
+    noindex: notFound,
+    jsonLd: notFound
+      ? undefined
+      : [
+          {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: faqs.map((f) => ({
+              '@type': 'Question',
+              name: f.q,
+              acceptedAnswer: { '@type': 'Answer', text: f.a },
+            })),
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Service',
+            name: local?.h1 || sol.h1,
+            serviceType: 'Asistente de WhatsApp con inteligencia artificial',
+            provider: { '@type': 'Organization', name: 'RenBotIA', url: SITE_URL },
+            areaServed: city
+              ? { '@type': 'City', name: city.name, containedInPlace: { '@type': 'State', name: city.state } }
+              : { '@type': 'Country', name: 'México' },
+            audience: { '@type': 'BusinessAudience', name: sol.industry },
+            url: `${SITE_URL}${path}`,
+          },
+        ],
   });
 
-  if (!sol) {
+  if (notFound) {
     return (
       <div className="min-h-screen bg-canvas">
         <PublicNav />
@@ -47,7 +72,8 @@ export default function Solution() {
     );
   }
 
-  const others = SOLUTIONS.filter((s) => s.slug !== sol.slug).slice(0, 3);
+  const others = SOLUTIONS.filter((s) => s.slug !== sol.slug).slice(0, city ? 6 : 3);
+  const nearby = city ? nearbyCities(city, 6) : [];
 
   return (
     <div className="min-h-screen bg-canvas">
@@ -61,13 +87,16 @@ export default function Solution() {
             items={[
               { name: 'Inicio', to: '/' },
               { name: 'Soluciones', to: '/soluciones' },
-              { name: sol.slug.replace(/-/g, ' ').replace(/^\w/, (c) => c.toUpperCase()) },
+              city
+                ? { name: sol.industry, to: `/soluciones/${sol.slug}` }
+                : { name: sol.industry },
+              ...(city ? [{ name: city.name }] : []),
             ]}
           />
           <h1 className="mt-3 max-w-3xl text-3xl font-extrabold leading-[1.08] tracking-tight text-fg sm:text-5xl">
-            {sol.h1}
+            {local?.h1 || sol.h1}
           </h1>
-          <p className="mt-5 max-w-2xl text-lg text-muted">{sol.lede}</p>
+          <p className="mt-5 max-w-2xl text-lg text-muted">{local?.lede || sol.lede}</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link to="/registro">
               <Button size="lg" className="shine-cta w-full sm:w-auto">
@@ -114,6 +143,17 @@ export default function Solution() {
           </div>
         </Reveal>
 
+        {/* Contexto local (solo en la página de ciudad) */}
+        {local && (
+          <Reveal className="mt-12 rounded-2xl border border-line bg-surface p-6">
+            <h2 className="flex items-center gap-2 text-lg font-bold text-fg">
+              <Icon name="building" size={18} className="text-brand-600" />
+              {sol.industry} en {city.name}
+            </h2>
+            <p className="mt-2 text-[15px] leading-relaxed text-muted">{local.local}</p>
+          </Reveal>
+        )}
+
         {/* Ejemplo de conversación */}
         {sol.example && (
           <Reveal className="mt-12">
@@ -136,11 +176,11 @@ export default function Solution() {
         )}
 
         {/* FAQs */}
-        {sol.faqs?.length > 0 && (
+        {faqs.length > 0 && (
           <Reveal className="mt-12">
             <h2 className="text-xl font-bold text-fg sm:text-2xl">Preguntas frecuentes</h2>
             <div className="mt-4 divide-y divide-line border-y border-line">
-              {sol.faqs.map((f) => (
+              {faqs.map((f) => (
                 <div key={f.q} className="py-4">
                   <h3 className="font-medium text-fg">{f.q}</h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-muted">{f.a}</p>
@@ -158,21 +198,52 @@ export default function Solution() {
           <p className="mx-auto mt-2 max-w-md text-sm text-muted">
             Crea tu cuenta gratis, entrena tu bot en minutos y pruébalo en el simulador. Sin tarjeta.
           </p>
-          <Link to="/registro" className="mt-5 inline-block">
-            <Button size="lg">
-              Empezar gratis <Icon name="arrowRight" size={18} />
-            </Button>
-          </Link>
+          <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link to="/registro">
+              <Button size="lg">
+                Empezar gratis <Icon name="arrowRight" size={18} />
+              </Button>
+            </Link>
+            <Link to="/#pruebalo" className="text-sm font-medium text-brand-700 hover:underline dark:text-brand-300">
+              O pruébalo con tu sitio, sin registrarte
+            </Link>
+          </div>
+        </Reveal>
+
+        {/* Ciudades (enlazado interno local) */}
+        <Reveal className="mt-14">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-subtle">
+            {city ? `Cerca de ${city.name}` : `${sol.industry} en tu ciudad`}
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {(city ? nearby : CITIES).map((c) => (
+              <Link
+                key={c.slug}
+                to={`/soluciones/${sol.slug}/${c.slug}`}
+                className="rounded-full border border-line bg-surface px-3 py-1.5 text-sm text-fg transition hover:border-brand-300 hover:text-brand-700 dark:hover:text-brand-300"
+              >
+                {c.name}
+              </Link>
+            ))}
+            {city && (
+              <Link
+                to={`/soluciones/${sol.slug}`}
+                className="rounded-full px-3 py-1.5 text-sm font-medium text-brand-700 hover:underline dark:text-brand-300"
+              >
+                Todo México
+              </Link>
+            )}
+          </div>
         </Reveal>
 
         {/* Otras industrias (enlazado interno) */}
         <Reveal className="mt-14">
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-subtle">
-            Para otros sectores
+            {city ? `Otros negocios en ${city.name}` : 'Para otros sectores'}
           </h2>
           <div className="grid gap-3 sm:grid-cols-3">
             {others.map((o) => (
-              <Link key={o.slug} to={`/soluciones/${o.slug}`}>
+              <Link key={o.slug} to={`/soluciones/${o.slug}${city ? `/${city.slug}` : ''}`}>
                 <SpotlightCard className="group h-full p-4">
                   <div className="relative z-[2] flex items-center gap-3">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600">
