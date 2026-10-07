@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { connectionsApi, widgetApi } from '../../api/endpoints.js';
-import { useBusinessStore } from '../../store/businessStore.js';
+import { useCan } from '../../router/RequirePermission.jsx';
 import { toast } from '../../store/toastStore.js';
 import { confirm } from '../../store/confirmStore.js';
 import { Card, Button, Alert, Spinner } from '../../components/ui/index.jsx';
@@ -148,8 +148,8 @@ function loadFacebookSdk(appId, version) {
 }
 
 export function Connections() {
-  const role = useBusinessStore((s) => s.role);
-  const isOwner = role !== 'colaborador';
+  // Puede administrar conexiones: el dueño o un colaborador con ese permiso.
+  const isOwner = useCan('connections');
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [sdkReady, setSdkReady] = useState(false);

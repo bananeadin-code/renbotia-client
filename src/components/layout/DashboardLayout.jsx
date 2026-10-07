@@ -44,7 +44,7 @@ export function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuthStore();
-  const { hasBusiness, business, subscription, role, load } = useBusinessStore();
+  const { hasBusiness, business, subscription, role, permissions, load } = useBusinessStore();
   const [checking, setChecking] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -70,8 +70,16 @@ export function DashboardLayout() {
     const i = NAV.findIndex((n) => n.to === '/dashboard/simulador');
     nav = [...NAV.slice(0, i + 1), { to: '/dashboard/gestion', label: 'Gestión de trabajo', icon: 'calendarCheck' }, ...NAV.slice(i + 1)];
   }
-  // Los colaboradores no ven Facturación (es solo del dueño).
-  if (role === 'colaborador') nav = nav.filter((n) => n.to !== '/dashboard/facturacion');
+  // Los colaboradores no ven Facturación (es solo del dueño) ni lo que el dueño
+  // no les permitió (simulador, entrenamiento) en Equipo.
+  if (role === 'colaborador') {
+    nav = nav.filter(
+      (n) =>
+        n.to !== '/dashboard/facturacion' &&
+        !(n.to === '/dashboard/simulador' && !permissions?.simulator) &&
+        !(n.to === '/dashboard/entrenamiento' && !permissions?.training)
+    );
+  }
   if (user?.role === 'admin')
     nav = [
       ...nav,

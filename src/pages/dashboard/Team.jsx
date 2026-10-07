@@ -13,6 +13,14 @@ import { Icon } from '../../components/ui/Icon.jsx';
  * correo y gestiona; los colaboradores ven la lista. Multiusuario: varias
  * personas configuran el mismo bot sin compartir contraseña.
  */
+// Permisos que el dueño puede dar o quitar a cada colaborador.
+const PERMS = [
+  ['simulator', 'Simulador', 'message'],
+  ['training', 'Entrenar el bot', 'academic'],
+  ['profile', 'Datos del negocio', 'building'],
+  ['connections', 'Conexiones', 'link'],
+];
+
 // Texto de vigencia de una invitación (vencen a los 7 días de enviarse).
 function expiryLabel(expiresAt) {
   const ms = new Date(expiresAt).getTime() - Date.now();
@@ -108,6 +116,21 @@ export default function Team() {
     }
   }
 
+  async function togglePermission(m, key) {
+    const next = !m.permissions?.[key];
+    // Optimista: se ve el cambio al instante y se revierte si falla.
+    setData((d) => ({
+      ...d,
+      members: d.members.map((x) => (x.userId === m.userId ? { ...x, permissions: { ...x.permissions, [key]: next } } : x)),
+    }));
+    try {
+      await membersApi.setPermissions(m.userId, { [key]: next });
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'No se pudo cambiar el permiso.');
+      load();
+    }
+  }
+
   async function cancelInvite(inv) {
     try {
       await membersApi.cancelInvite(inv.id);
@@ -157,7 +180,8 @@ export default function Team() {
         <Card>
           <h2 className="mb-1 font-semibold text-fg">Invitar colaborador</h2>
           <p className="mb-4 text-sm text-muted">
-            Podrá entrenar el bot, usar el simulador y la gestión — pero no la facturación.
+            Al entrar podrá usar el simulador y entrenar el bot. Debajo de su nombre le das o quitas permisos
+            (datos del negocio, conexiones…). Nunca ve la facturación.
           </p>
           <form onSubmit={invite} className="flex flex-col gap-2 sm:flex-row">
             <Input
@@ -188,7 +212,8 @@ export default function Team() {
         <h2 className="mb-3 font-semibold text-fg">Miembros</h2>
         <ul className="divide-y divide-line">
           {data.members.map((m) => (
-            <li key={m.userId} className="flex items-center gap-3 py-3">
+            <li key={m.userId} className="py-3">
+              <div className="flex items-center gap-3">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-500/15 text-sm font-bold text-brand-700 dark:text-brand-300">
                 {(m.name || m.email).charAt(0).toUpperCase()}
               </span>
@@ -209,6 +234,39 @@ export default function Team() {
                 >
                   <Icon name="trash" size={16} />
                 </button>
+              )}
+              </div>
+              {m.role !== 'owner' && (
+                <div className="mt-2 pl-12">
+                  {isOwner ? (
+                    <div className="flex flex-wrap gap-1.5" role="group" aria-label={`Permisos de ${m.name || m.email}`}>
+                      {PERMS.map(([key, label, icon]) => {
+                        const on = Boolean(m.permissions?.[key]);
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            aria-pressed={on}
+                            onClick={() => togglePermission(m, key)}
+                            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium transition ${
+                              on
+                                ? 'border-brand-500 bg-brand-500/10 text-brand-700 dark:text-brand-300'
+                                : 'border-line text-subtle line-through decoration-1 hover:text-fg'
+                            }`}
+                          >
+                            <Icon name={on ? 'check' : icon} size={12} /> {label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+                  {m.simulator?.tokens > 0 && (
+                    <p className="mt-1.5 text-xs text-subtle">
+                      Simulador este mes: {m.simulator.tokens.toLocaleString('es-MX')} tokens en {m.simulator.messages}{' '}
+                      {m.simulator.messages === 1 ? 'mensaje' : 'mensajes'}
+                    </p>
+                  )}
+                </div>
               )}
             </li>
           ))}

@@ -86,6 +86,9 @@ export default function Conversations() {
   const [hotLeads, setHotLeads] = useState(0);
   const [retentionDays, setRetentionDays] = useState(30); // borrado automático por inactividad
   const [onlyHot, setOnlyHot] = useState(false);
+  // Clientes reales vs. pruebas del Simulador (aparte, con quién y cuántos tokens).
+  const [scope, setScope] = useState('real');
+  const [simulatorCount, setSimulatorCount] = useState(0);
   const [onlyWaiting, setOnlyWaiting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
@@ -136,10 +139,11 @@ export default function Conversations() {
       .catch(() => {});
   }, []);
 
-  async function loadList() {
+  async function loadList(sc = scope) {
     try {
-      const data = await conversationsApi.list();
+      const data = await conversationsApi.list(sc);
       setList(data.conversations);
+      setSimulatorCount(data.simulatorCount || 0);
       setNeedAttention(data.needAttention || 0);
       setHotLeads(data.hotLeads || 0);
       if (data.retentionDays) setRetentionDays(data.retentionDays);
@@ -150,8 +154,18 @@ export default function Conversations() {
     }
   }
   useEffect(() => {
-    loadList();
-  }, []);
+    loadList(scope);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scope]);
+
+  function switchScope(next) {
+    if (next === scope) return;
+    setSelectedId(null);
+    setThread(null);
+    setOnlyHot(false);
+    setOnlyWaiting(false);
+    setScope(next);
+  }
 
   async function openConv(id) {
     setSelectedId(id);
@@ -383,7 +397,9 @@ export default function Conversations() {
   // reactiva con plantilla; los DMs esperan a que el cliente vuelva a escribir.
   const hasWindow = (isWhatsapp || isMessenger) && waWindow;
   const windowClosed = hasWindow && !waWindow.open;
-  const waitingCount = list.filter(isWaitingReply).length;
+  const isSim = scope === 'simulator';
+  const threadIsSim = thread?.channel === 'simulator';
+  const waitingCount = isSim ? 0 : list.filter(isWaitingReply).length;
   const filtered = filterConversations(list, search, datePreset, onlyHot, onlyWaiting);
 
   return (
@@ -392,13 +408,13 @@ export default function Conversations() {
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-2xl font-bold text-fg">Conversaciones</h1>
-            {needAttention > 0 && (
+            {!isSim && needAttention > 0 && (
               <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-600">
                 <Icon name="alert" size={13} />
                 {needAttention} {needAttention === 1 ? 'requiere' : 'requieren'} atención
               </span>
             )}
-            {hotLeads > 0 && (
+            {!isSim && hotLeads > 0 && (
               <button
                 type="button"
                 onClick={() => setOnlyHot((v) => !v)}
@@ -426,7 +442,9 @@ export default function Conversations() {
             )}
           </div>
           <p className="text-sm text-muted">
-            Actividad del bot. Toma el control cuando una conversación lo amerite.
+            {isSim
+              ? 'Pruebas de tu equipo en el Simulador: quién las hizo y cuántos tokens gastó. No llegan a clientes.'
+              : 'Actividad del bot con tus clientes. Toma el control cuando una conversación lo amerite.'}
           </p>
           <p className="mt-1 flex items-start gap-1.5 text-xs text-subtle">
             <Icon name="clock" size={13} className="mt-0.5 shrink-0" />
@@ -436,7 +454,7 @@ export default function Conversations() {
             </span>
           </p>
         </div>
-        {list.length > 0 && (
+        {!isSim && list.length > 0 && (
           <Button
             variant="secondary"
             size="sm"
@@ -459,15 +477,48 @@ export default function Conversations() {
         )}
       </div>
 
+      {/* Clientes reales | Pruebas del simulador */}
+      <div role="tablist" aria-label="Tipo de conversaciones" className="mb-4 inline-flex rounded-xl border border-line bg-surface p-1">
+        {[
+          ['real', 'Clientes', 'inbox'],
+          ['simulator', 'Simulador', 'message'],
+        ].map(([val, label, icon]) => (
+          <button
+            key={val}
+            type="button"
+            role="tab"
+            aria-selected={scope === val}
+            onClick={() => switchScope(val)}
+            className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+              scope === val ? 'bg-brand-600 text-white' : 'text-muted hover:text-fg'
+            }`}
+          >
+            <Icon name={icon} size={15} /> {label}
+            {val === 'simulator' && simulatorCount > 0 && (
+              <span
+                className={`rounded-full px-1.5 text-[11px] tabular ${
+                  scope === val ? 'bg-white/20 text-white' : 'bg-surface2 text-muted'
+                }`}
+              >
+                {simulatorCount}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+
       {list.length === 0 ? (
         <Card className="py-12 text-center">
           <Icon name="message" size={30} className="mx-auto mb-2 text-subtle" />
           <p className="text-sm text-muted">
-            Aún no hay conversaciones. Prueba tu bot en el{' '}
-            <Link to="/dashboard/simulador" className="font-medium text-brand-600 hover:underline">
-              Simulador
-            </Link>{' '}
-            para generar actividad.
+            {isSim ? 'Aún no hay pruebas en el ' : 'Aún no hay conversaciones con clientes. Conecta un canal en '}
+            <Link
+              to={isSim ? '/dashboard/simulador' : '/dashboard/conexiones'}
+              className="font-medium text-brand-600 hover:underline"
+            >
+              {isSim ? 'Simulador' : 'Conexiones'}
+            </Link>
+            {isSim ? '.' : ' o prueba tu bot en el Simulador.'}
           </p>
         </Card>
       ) : (
@@ -525,6 +576,19 @@ export default function Conversations() {
                   <span className="shrink-0 text-[11px] text-subtle">{dayOf(c.lastAt)}</span>
                 </div>
                 <p className="mt-0.5 truncate text-xs text-muted">{c.lastMessage}</p>
+                {isSim ? (
+                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-surface2 px-2 py-0.5 text-[10px] font-medium text-muted">
+                      <Icon name="user" size={10} /> {c.startedBy?.name || 'Prueba anterior'}
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-brand-500/10 px-2 py-0.5 text-[10px] font-medium text-brand-700 dark:text-brand-300">
+                      <Icon name="zap" size={10} /> {(c.tokens || 0).toLocaleString('es-MX')} tokens
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-surface2 px-2 py-0.5 text-[10px] font-medium text-muted">
+                      {c.messageCount} mensajes
+                    </span>
+                  </div>
+                ) : (
                 <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                   {c.channel === 'whatsapp' && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600">
@@ -596,6 +660,7 @@ export default function Conversations() {
                     </span>
                   ))}
                 </div>
+                )}
               </button>
             ))}
             </div>
@@ -665,7 +730,8 @@ export default function Conversations() {
                       {thread.title}
                     </button>
                   )}
-                  {/* Selector de modo */}
+                  {/* Selector de modo (no aplica a pruebas del simulador) */}
+                  {!threadIsSim && (
                   <div className="flex shrink-0 rounded-lg border border-line p-0.5 text-xs">
                     <button
                       onClick={() => !isManual || setMode('bot')}
@@ -684,9 +750,29 @@ export default function Conversations() {
                       Manual
                     </button>
                   </div>
+                  )}
                 </div>
 
-                {/* Barra: etiquetas + resumen IA */}
+                {/* Prueba del simulador: quién la hizo y lo que gastó */}
+                {threadIsSim && (
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-line bg-surface2/50 px-4 py-2 text-xs text-muted">
+                    <span className="inline-flex items-center gap-1">
+                      <Icon name="message" size={13} /> Prueba del Simulador
+                    </span>
+                    {(() => {
+                      const item = list.find((x) => x.id === selectedId);
+                      return item ? (
+                        <>
+                          <span>Por <strong className="text-fg">{item.startedBy?.name || 'prueba anterior'}</strong></span>
+                          <span>{(item.tokens || 0).toLocaleString('es-MX')} tokens</span>
+                        </>
+                      ) : null;
+                    })()}
+                  </div>
+                )}
+
+                {/* Barra: etiquetas + resumen IA (solo clientes reales) */}
+                {!threadIsSim && (
                 <div className="flex flex-wrap items-center gap-2 border-b border-line bg-surface px-4 py-2">
                   <div className="flex flex-wrap items-center gap-1.5">
                     {(thread.tags || []).map((t) => (
@@ -722,6 +808,7 @@ export default function Conversations() {
                     <Icon name="bot" size={14} /> {summarizing ? 'Resumiendo…' : 'Resumen IA'}
                   </button>
                 </div>
+                )}
 
                 {/* Panel de resumen con IA */}
                 {(summarizing || summary) && (
@@ -911,8 +998,16 @@ export default function Conversations() {
                   })}
                 </div>
 
-                {/* Pie: plantilla (ventana cerrada) · responder libre (manual) · aviso (bot) */}
-                {isManual && windowClosed && isMessenger ? (
+                {/* Pie: simulador (solo lectura) · plantilla (ventana cerrada) · responder libre (manual) · aviso (bot) */}
+                {threadIsSim ? (
+                  <div className="border-t border-line bg-surface px-4 py-3 text-center text-xs text-muted">
+                    Es una prueba interna: no llegó a ningún cliente. Para seguir probando, abre el{' '}
+                    <Link to="/dashboard/simulador" className="font-semibold text-brand-600 hover:underline">
+                      Simulador
+                    </Link>
+                    .
+                  </div>
+                ) : isManual && windowClosed && isMessenger ? (
                   <div className="border-t border-line bg-surface p-3">
                     <p className="flex items-start gap-1.5 text-xs text-muted">
                       <Icon name="clock" size={13} className="mt-0.5 shrink-0 text-amber-500" />

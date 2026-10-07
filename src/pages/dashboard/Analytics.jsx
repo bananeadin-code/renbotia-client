@@ -105,7 +105,12 @@ export default function Analytics() {
 
   const totalRecords = recordsByType.reduce((a, r) => a + r.count, 0);
   const totalChannels = channels.reduce((a, c) => a + c.count, 0);
-  const hasActivity = monthly.some((m) => m.conversations > 0 || m.records > 0);
+  const impact = data?.impact || null;
+  const sim = data?.simulator || { byUser: [], tokensThisMonth: 0, conversationsThisMonth: 0 };
+  const learning = data?.learning || { taughtThisMonth: 0, pending: 0 };
+  const money = (n) => `$${Math.round(n || 0).toLocaleString('es-MX')}`;
+  const hasActivity =
+    monthly.some((m) => m.conversations > 0 || m.records > 0) || sim.tokensThisMonth > 0 || learning.pending > 0;
 
   return (
     <div className="space-y-6">
@@ -161,6 +166,41 @@ export default function Analytics() {
               icon="clock"
               value={fmtMins(t.avgResponseMins)}
               sub="Tiempo promedio del bot"
+            />
+          </div>
+
+          {/* Resultados del mes: valor, fuera de horario, seguimientos y prospectos del sitio */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <StatCard
+              label="Valor generado (estimado)"
+              icon="chart"
+              value={impact?.settings?.configured ? `≈ ${money(impact.value?.total)}` : '—'}
+              sub={
+                impact?.settings?.configured
+                  ? impact.roiMultiple >= 1
+                    ? `≈ ${impact.roiMultiple}× el costo de tu plan`
+                    : 'Con tu ticket promedio'
+                  : 'Define tu ticket promedio en Inicio'
+              }
+              color="text-brand-600"
+            />
+            <StatCard
+              label="Atendidos fuera de horario"
+              icon="clock"
+              value={impact?.outsideHours != null ? fmt(impact.outsideHours) : '—'}
+              sub={impact?.outsideHours != null ? 'Clientes que escribieron con el negocio cerrado' : 'Activa tu horario en Entrenamiento'}
+            />
+            <StatCard
+              label="Seguimientos enviados"
+              icon="repeat"
+              value={fmt(t.followUpsSent)}
+              sub="A clientes que dejaron de responder"
+            />
+            <StatCard
+              label="Prospectos del sitio web"
+              icon="globe"
+              value={fmt(t.webLeads)}
+              sub="Dejaron nombre y contacto en tu chat"
             />
           </div>
 
@@ -277,8 +317,64 @@ export default function Analytics() {
             </Card>
           </div>
 
+          <div className="grid gap-4 lg:grid-cols-2">
+            {/* Aprende de ti */}
+            <Card>
+              <h2 className="mb-1 flex items-center gap-2 font-semibold text-fg">
+                <Icon name="sparkles" size={17} className="text-brand-600" /> Aprende de ti
+              </h2>
+              <p className="mb-4 text-xs text-subtle">Lo que tu equipo le enseñó al bot desde conversaciones reales.</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="tabular text-2xl font-extrabold text-fg">{fmt(learning.taughtThisMonth)}</div>
+                  <div className="text-xs text-muted">Respuestas enseñadas este mes</div>
+                </div>
+                <div>
+                  <div className={`tabular text-2xl font-extrabold ${learning.pending ? 'text-amber-600' : 'text-fg'}`}>
+                    {fmt(learning.pending)}
+                  </div>
+                  <div className="text-xs text-muted">Pendientes por enseñar</div>
+                </div>
+              </div>
+              {learning.pending > 0 && (
+                <Link to="/dashboard/entrenamiento#aprender" className="mt-4 inline-flex text-sm font-semibold text-brand-600 hover:underline">
+                  Enseñárselas ahora
+                </Link>
+              )}
+            </Card>
+
+            {/* Uso del Simulador por persona del equipo */}
+            <Card>
+              <h2 className="mb-1 flex items-center gap-2 font-semibold text-fg">
+                <Icon name="message" size={17} className="text-brand-600" /> Uso del simulador
+              </h2>
+              <p className="mb-4 text-xs text-subtle">
+                Pruebas internas de este mes: {fmt(sim.conversationsThisMonth)} conversaciones ·{' '}
+                {fmt(sim.tokensThisMonth)} tokens de tu plan.
+              </p>
+              {sim.byUser.length === 0 ? (
+                <p className="py-4 text-center text-sm text-subtle">Nadie ha usado el simulador este mes.</p>
+              ) : (
+                <div className="space-y-3">
+                  {sim.byUser.map((u) => (
+                    <BreakdownBar
+                      key={u.name}
+                      label={`${u.name} · ${fmt(u.messages)} ${u.messages === 1 ? 'mensaje' : 'mensajes'}`}
+                      count={u.tokens}
+                      total={sim.tokensThisMonth}
+                      color="bg-indigo-500"
+                    />
+                  ))}
+                </div>
+              )}
+              <Link to="/dashboard/conversaciones" className="mt-4 inline-flex text-xs font-medium text-muted hover:text-fg">
+                Ver las pruebas en Conversaciones → Simulador
+              </Link>
+            </Card>
+          </div>
+
           <p className="text-xs text-subtle">
-            Datos de la actividad de tu propio bot. El tiempo de primera respuesta es una estimación
+            Datos de la actividad de tu propio bot con clientes reales (las pruebas del simulador se cuentan aparte). El tiempo de primera respuesta es una estimación
             a partir de tus conversaciones recientes.
           </p>
         </>

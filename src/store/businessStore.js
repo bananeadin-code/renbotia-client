@@ -12,6 +12,7 @@ export const useBusinessStore = create((set, get) => ({
   subscription: null,
   balance: null,
   role: null, // rol del usuario en el negocio: 'owner' | 'colaborador'
+  permissions: null, // permisos del colaborador (simulador, entrenar, datos, conexiones)
   hasBusiness: null, // null = aún no se sabe
   projects: [], // [{ id, name, role }]
   smsEnabled: false, // ¿hay proveedor de SMS para verificar el número?
@@ -20,13 +21,14 @@ export const useBusinessStore = create((set, get) => ({
   async load(_retry = false) {
     set({ loading: true });
     try {
-      const [{ business, role, smsEnabled }, subData] = await Promise.all([
+      const [{ business, role, permissions, smsEnabled }, subData] = await Promise.all([
         businessApi.me(),
         subscriptionApi.me(),
       ]);
       set({
         business,
         role,
+        permissions: permissions || null,
         smsEnabled: Boolean(smsEnabled),
         subscription: subData.subscription,
         balance: subData.balance,
@@ -82,6 +84,7 @@ export const useBusinessStore = create((set, get) => ({
       subscription: null,
       balance: null,
       role: null,
+      permissions: null,
       hasBusiness: null,
       projects: [],
     });

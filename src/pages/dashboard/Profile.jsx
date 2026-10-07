@@ -11,6 +11,7 @@ import { Card, Button, Input, Select, Alert } from '../../components/ui/index.js
 import { Icon } from '../../components/ui/Icon.jsx';
 import { fileToAvatarDataUri } from '../../lib/image.js';
 import { v } from '../../lib/useForm.js';
+import { useCan } from '../../router/RequirePermission.jsx';
 
 const INDUSTRIES = [
   { value: 'legal', label: 'Despacho legal' },
@@ -120,6 +121,8 @@ export default function Profile() {
   const [bizErr, setBizErr] = useState('');
   const [bizNameErr, setBizNameErr] = useState('');
   const [savingBiz, setSavingBiz] = useState(false);
+  // Datos del negocio: el dueño o un colaborador con permiso (Equipo).
+  const canProfile = useCan('profile');
 
   // Foto/avatar del negocio: se comprime en el navegador y se guarda al momento.
   const photoInputRef = useRef(null);
@@ -317,6 +320,13 @@ export default function Profile() {
       <Card>
         <h2 className="mb-4 font-semibold text-fg">Datos del negocio</h2>
 
+        {!canProfile && (
+          <p className="mb-4 flex items-start gap-1.5 rounded-lg bg-surface2/60 px-3 py-2 text-xs text-muted">
+            <Icon name="shield" size={13} className="mt-0.5 shrink-0" />
+            Solo lectura: el dueño no te ha dado permiso para cambiar los datos del negocio.
+          </p>
+        )}
+        <fieldset disabled={!canProfile} className="min-w-0 disabled:opacity-70">
         {/* Foto / avatar del negocio (reemplaza la inicial en el panel) */}
         <div className="mb-5 flex items-center gap-4">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-brand-500/15 text-xl font-bold text-brand-700 dark:text-brand-300">
@@ -398,6 +408,7 @@ export default function Profile() {
             </Button>
           </div>
         </form>
+        </fieldset>
       </Card>
 
       {/* Canales conectados (informativo) */}

@@ -123,7 +123,8 @@ export const billingApi = {
 };
 
 export const conversationsApi = {
-  list: () => unwrap(api.get('/conversations')),
+  // scope: 'real' (clientes de los canales) | 'simulator' (pruebas del equipo).
+  list: (scope = 'real') => unwrap(api.get('/conversations', { params: { scope } })),
   get: (id) => unwrap(api.get(`/conversations/${id}`)),
   setMode: (id, handoffMode) => unwrap(api.patch(`/conversations/${id}`, { handoffMode })),
   rename: (id, title) => unwrap(api.patch(`/conversations/${id}`, { title })),
@@ -222,6 +223,8 @@ export const membersApi = {
   accept: (token) => unwrap(api.post('/members/accept', { token })),
   cancelInvite: (id) => api.delete(`/members/invite/${id}`),
   remove: (userId) => api.delete(`/members/${userId}`),
+  // El dueño da o quita permisos a un colaborador.
+  setPermissions: (userId, body) => unwrap(api.patch(`/members/${userId}/permissions`, body)),
 };
 
 export const adminApi = {

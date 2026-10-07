@@ -4,6 +4,7 @@ import { useAuthStore } from './store/authStore.js';
 import { useThemeStore } from './store/themeStore.js';
 import { ProtectedRoute } from './router/ProtectedRoute.jsx';
 import { captureReferral } from './lib/referral.js';
+import { RequirePermission } from './router/RequirePermission.jsx';
 import ScrollToTop from './router/ScrollToTop.jsx';
 import { Toaster } from './components/ui/Toaster.jsx';
 import { ConfirmDialog } from './components/ui/ConfirmDialog.jsx';
@@ -120,8 +121,8 @@ export default function App() {
         }
       >
         <Route index element={<Dashboard />} />
-        <Route path="entrenamiento" element={<BotTraining />} />
-        <Route path="simulador" element={<Simulator />} />
+        <Route path="entrenamiento" element={<RequirePermission perm="training"><BotTraining /></RequirePermission>} />
+        <Route path="simulador" element={<RequirePermission perm="simulator"><Simulator /></RequirePermission>} />
         <Route path="conversaciones" element={<Conversations />} />
         <Route path="analiticas" element={<Analytics />} />
         <Route path="conexiones" element={<Connections />} />
