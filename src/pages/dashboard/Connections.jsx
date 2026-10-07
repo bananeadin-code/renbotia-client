@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
-import { connectionsApi } from '../../api/endpoints.js';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { connectionsApi, widgetApi } from '../../api/endpoints.js';
 import { useBusinessStore } from '../../store/businessStore.js';
 import { toast } from '../../store/toastStore.js';
 import { confirm } from '../../store/confirmStore.js';
@@ -12,10 +13,97 @@ import { InstagramConnect } from '../../components/business/InstagramConnect.jsx
 import { WebWidgetCard } from '../../components/business/WebWidgetCard.jsx';
 
 /**
- * Módulo "Conexiones": el cliente conecta SU propio WhatsApp mediante Embedded
- * Signup (Facebook Login for Business). Mientras Meta no apruebe el App Review,
- * el backend expone `embeddedEnabled=false` y aquí mostramos "Próximamente".
+ * Módulo "Conexiones": un selector de canales (WhatsApp, Messenger, Instagram,
+ * Sitio web) con su estado, y debajo el panel del canal elegido. Así cada canal
+ * se configura con calma y ninguno queda escondido al fondo de la página. El
+ * canal activo vive en la URL (?canal=…) para poder enlazarlo directo.
  */
+
+const CHANNELS = [
+  { key: 'whatsapp', label: 'WhatsApp', icon: 'whatsapp', tint: 'bg-emerald-500/10 text-emerald-600' },
+  { key: 'messenger', label: 'Messenger', icon: 'messenger', tint: 'bg-[#0866FF]/10 text-[#0866FF]' },
+  { key: 'instagram', label: 'Instagram', icon: 'instagram', tint: 'bg-[#E1306C]/10 text-[#E1306C]' },
+  { key: 'web', label: 'Sitio web', icon: 'globe', tint: 'bg-brand-500/10 text-brand-600' },
+];
+
+/** Estado corto de cada canal para el selector. tone: on | off | soon */
+function channelStatus(key, data, widget) {
+  switch (key) {
+    case 'whatsapp':
+      if (data?.whatsapp?.connected) return { text: data.whatsapp.phoneNumber || 'Conectado', tone: 'on' };
+      return data?.embeddedEnabled ? { text: 'Sin conectar', tone: 'off' } : { text: 'Próximamente', tone: 'soon' };
+    case 'messenger':
+      if (data?.messenger?.connected) return { text: data.messenger.pageName || 'Conectado', tone: 'on' };
+      return data?.messengerEnabled ? { text: 'Sin conectar', tone: 'off' } : { text: 'Próximamente', tone: 'soon' };
+    case 'instagram':
+      if (data?.instagram?.connected) return { text: `@${data.instagram.username || 'conectado'}`, tone: 'on' };
+      return data?.instagramEnabled ? { text: 'Sin conectar', tone: 'off' } : { text: 'Próximamente', tone: 'soon' };
+    case 'web':
+      if (!widget) return { text: '…', tone: 'off' };
+      if (!widget.allowed) return { text: 'Pro y Elite', tone: 'soon' };
+      return widget.enabled ? { text: 'Activo', tone: 'on' } : { text: 'Apagado', tone: 'off' };
+    default:
+      return { text: '', tone: 'off' };
+  }
+}
+
+const DOT = { on: 'bg-emerald-500', off: 'bg-slate-300 dark:bg-slate-600', soon: 'bg-brand-400' };
+
+/** Selector de canales: tablist accesible (flechas, Inicio/Fin) en cuadrícula. */
+function ChannelSwitcher({ active, onSelect, data, widget }) {
+  const refs = useRef({});
+  function onKeyDown(e) {
+    const i = CHANNELS.findIndex((c) => c.key === active);
+    let next = null;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = CHANNELS[(i + 1) % CHANNELS.length];
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = CHANNELS[(i - 1 + CHANNELS.length) % CHANNELS.length];
+    if (e.key === 'Home') next = CHANNELS[0];
+    if (e.key === 'End') next = CHANNELS[CHANNELS.length - 1];
+    if (!next) return;
+    e.preventDefault();
+    onSelect(next.key);
+    refs.current[next.key]?.focus();
+  }
+  return (
+    <div role="tablist" aria-label="Canales" onKeyDown={onKeyDown} className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+      {CHANNELS.map((c) => {
+        const st = channelStatus(c.key, data, widget);
+        const selected = c.key === active;
+        return (
+          <button
+            key={c.key}
+            ref={(el) => (refs.current[c.key] = el)}
+            type="button"
+            role="tab"
+            id={`tab-${c.key}`}
+            aria-selected={selected}
+            aria-controls={`panel-${c.key}`}
+            tabIndex={selected ? 0 : -1}
+            onClick={() => onSelect(c.key)}
+            className={`group flex min-h-[64px] items-center gap-3 rounded-2xl border px-3 py-2.5 text-left transition-[border-color,background-color,box-shadow] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 ${
+              selected
+                ? 'border-brand-500 bg-surface shadow-card ring-1 ring-brand-500'
+                : 'border-line bg-surface/60 hover:border-brand-300 hover:bg-surface'
+            }`}
+          >
+            <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${c.tint}`}>
+              <Icon name={c.icon} size={20} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className={`block truncate text-sm font-semibold ${selected ? 'text-fg' : 'text-fg/90'}`}>
+                {c.label}
+              </span>
+              <span className="mt-0.5 flex items-center gap-1.5 text-xs text-muted">
+                <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${DOT[st.tone]}`} aria-hidden="true" />
+                <span className="truncate">{st.text}</span>
+              </span>
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 // Carga perezosa del SDK de Facebook (una sola vez). Resuelve cuando FB está listo.
 let fbSdkPromise = null;
@@ -51,6 +139,13 @@ export function Connections() {
   const [checklistReady, setChecklistReady] = useState(false);
   // Datos que el Embedded Signup envía por postMessage (número + WABA).
   const sessionInfo = useRef({ phoneNumberId: '', wabaId: '' });
+  // Canal visible (en la URL para poder enlazarlo: /dashboard/conexiones?canal=web).
+  const [params, setParams] = useSearchParams();
+  const active = CHANNELS.some((c) => c.key === params.get('canal')) ? params.get('canal') : 'whatsapp';
+  const selectChannel = (key) => setParams(key === 'whatsapp' ? {} : { canal: key }, { replace: true });
+  // Estado del widget web (para el selector); lo actualiza también su tarjeta.
+  const [widget, setWidget] = useState(null);
+  const onWidgetStatus = useCallback((w) => setWidget(w), []);
 
   async function refresh() {
     const d = await connectionsApi.get();
@@ -59,6 +154,7 @@ export function Connections() {
   }
 
   useEffect(() => {
+    widgetApi.get().then(setWidget).catch(() => {});
     refresh()
       .then((d) => {
         // El SDK de Facebook sirve para WhatsApp (Embedded Signup) y Messenger (FB Login).
@@ -181,9 +277,22 @@ export function Connections() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-fg">Conexiones</h1>
-        <p className="mt-1 text-muted">Conecta tus canales para que el bot atienda a tus clientes.</p>
+        <p className="mt-1 text-muted">
+          Elige un canal para conectarlo o ajustarlo. El bot responde igual en todos, con el mismo entrenamiento.
+        </p>
       </div>
 
+      <ChannelSwitcher active={active} onSelect={selectChannel} data={data} widget={widget} />
+
+      <div
+        key={active}
+        role="tabpanel"
+        id={`panel-${active}`}
+        aria-labelledby={`tab-${active}`}
+        className="animate-fade-up space-y-6"
+      >
+      {active === 'whatsapp' && (
+      <>
       <Card className={!connected && data?.embeddedEnabled ? 'border-brand-200 dark:border-brand-900/60' : ''}>
         <div className="flex items-start gap-4">
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-500/10 text-brand-600">
@@ -360,14 +469,22 @@ export function Connections() {
         </Card>
       )}
 
-      {/* Facebook Messenger (Fase 3 multicanal) */}
-      <MessengerConnect data={data} isOwner={isOwner} sdkReady={sdkReady} onChanged={refresh} />
+      </>
+      )}
+
+      {/* Facebook Messenger */}
+      {active === 'messenger' && (
+        <MessengerConnect data={data} isOwner={isOwner} sdkReady={sdkReady} onChanged={refresh} />
+      )}
 
       {/* Instagram DMs */}
-      <InstagramConnect data={data} isOwner={isOwner} sdkReady={sdkReady} onChanged={refresh} />
+      {active === 'instagram' && (
+        <InstagramConnect data={data} isOwner={isOwner} sdkReady={sdkReady} onChanged={refresh} />
+      )}
 
       {/* Widget de chat para el sitio web del negocio (Pro/Elite) */}
-      <WebWidgetCard isOwner={isOwner} />
+      {active === 'web' && <WebWidgetCard isOwner={isOwner} onStatus={onWidgetStatus} />}
+      </div>
     </div>
   );
 }

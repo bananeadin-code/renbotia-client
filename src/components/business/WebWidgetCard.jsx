@@ -15,11 +15,16 @@ import { Icon } from '../ui/Icon.jsx';
 const SWATCHES = ['#4f46e5', '#059669', '#0866ff', '#e11d48', '#ea580c', '#0f172a'];
 const SITE = typeof window !== 'undefined' ? window.location.origin : 'https://renbotia.com';
 
-export function WebWidgetCard({ isOwner }) {
+export function WebWidgetCard({ isOwner, onStatus }) {
   const [w, setW] = useState(null);
   const [form, setForm] = useState({ color: '#4f46e5', position: 'right', greeting: '' });
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // Informa al selector de canales si el widget está activo.
+  useEffect(() => {
+    if (w && !w.error) onStatus?.(w);
+  }, [w, onStatus]);
 
   useEffect(() => {
     widgetApi

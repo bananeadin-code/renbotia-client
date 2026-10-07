@@ -86,7 +86,7 @@ export function ConnectedChannels() {
                 <Badge color="green">Conectado</Badge>
               ) : (
                 <Link
-                  to="/dashboard/conexiones"
+                  to="/dashboard/conexiones?canal=messenger"
                   className="shrink-0 text-xs font-semibold text-brand-600 hover:underline"
                 >
                   Conectar
@@ -125,7 +125,7 @@ export function ConnectedChannels() {
                 <Badge color="green">Conectado</Badge>
               ) : (
                 <Link
-                  to="/dashboard/conexiones"
+                  to="/dashboard/conexiones?canal=instagram"
                   className="shrink-0 text-xs font-semibold text-brand-600 hover:underline"
                 >
                   Conectar
