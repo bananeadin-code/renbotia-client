@@ -3,7 +3,7 @@ import { PublicNav, PublicFooter } from '../../components/layout/PublicNav.jsx';
 import { Button } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { AnimatedChatDemo } from '../../components/whatsapp/AnimatedChatDemo.jsx';
-import { DemoChat } from '../../components/whatsapp/DemoChat.jsx';
+import { TryYourBusiness } from '../../components/landing/TryYourBusiness.jsx';
 import { AuroraBackground } from '../../components/ui/AuroraBackground.jsx';
 import { SpotlightCard } from '../../components/ui/SpotlightCard.jsx';
 import { Reveal } from '../../components/ui/Reveal.jsx';
@@ -127,38 +127,9 @@ export default function Landing() {
       </section>
 
       {/* Demo interactiva sin registro — el punto de conversión más fuerte */}
-      <section className="border-y border-line bg-surface2/40">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-20 lg:grid-cols-2">
-          <Reveal>
-            <h2 className="text-4xl font-bold tracking-tight text-fg sm:text-5xl">
-              Habla con un bot de ejemplo, sin registrarte
-            </h2>
-            <p className="mt-4 max-w-md text-muted">
-              Escríbele como si fueras un cliente. Está entrenado con la información de un negocio de
-              ejemplo — el tuyo respondería igual, pero con tus datos, tu tono y tus servicios.
-            </p>
-            <ul className="mt-6 space-y-2.5">
-              {['Responde con información real del negocio', 'Mantiene el contexto de la conversación', 'Se niega a salirse de su rol'].map(
-                (t) => (
-                  <li key={t} className="flex items-center gap-2.5 text-sm text-fg">
-                    <Icon name="check" size={17} className="shrink-0 text-brand-600" />
-                    {t}
-                  </li>
-                )
-              )}
-            </ul>
-            <div className="mt-7">
-              <Link to="/registro">
-                <Button className="shine-cta">
-                  Crear mi bot gratis <Icon name="arrowRight" size={18} />
-                </Button>
-              </Link>
-            </div>
-          </Reveal>
-          <Reveal delay={120}>
-            <DemoChat className="mx-auto w-full max-w-md" heightClass="h-[440px]" />
-          </Reveal>
-        </div>
+      {/* Pruébalo con tu negocio: demo con el sitio o la descripción del visitante */}
+      <section id="pruebalo" className="scroll-mt-20 border-y border-line bg-surface2/40">
+        <TryYourBusiness />
       </section>
 
       {/* Características (bento con glow que sigue el cursor) */}

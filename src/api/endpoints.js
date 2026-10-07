@@ -76,7 +76,10 @@ export const simulatorApi = {
 
 export const demoApi = {
   // Demo pública (sin registro). history = [{role, content}] corto.
-  send: (message, history = []) => unwrap(api.post('/demo/message', { message, history })),
+  send: (message, history = [], profileToken) =>
+    unwrap(api.post('/demo/message', { message, history, ...(profileToken ? { profileToken } : {}) })),
+  // "Pruébalo con tu negocio": arma un bot con el sitio o la descripción del visitante.
+  profile: (body) => unwrap(api.post('/demo/profile', body)),
 };
 
 export const contactApi = {

@@ -10,6 +10,7 @@ import { Icon } from '../../components/ui/Icon.jsx';
 import { Logo } from '../../components/ui/Logo.jsx';
 import { ThemeToggle } from '../../components/ui/ThemeToggle.jsx';
 import { limitsFor } from '../../lib/planLimits.js';
+import { DEMO_PROFILE_KEY } from '../../lib/demoProfile.js';
 
 const STEPS = ['Tu negocio', 'Elige un plan', 'Entrena tu bot'];
 
@@ -26,6 +27,7 @@ const loadSaved = () => {
 const clearSaved = () => {
   try {
     localStorage.removeItem(SAVE_KEY);
+    localStorage.removeItem(DEMO_PROFILE_KEY); // la demo ya se usó para crear el negocio
   } catch {
     /* noop */
   }
@@ -77,19 +79,50 @@ export default function OnboardingWizard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
+  // Si viene de "Pruébalo con tu negocio" (landing), arrancamos con lo que el bot
+  // ya aprendió de su sitio o descripción (vale por 2 días).
+  const [demo] = useState(() => {
+    if (saved) return null;
+    try {
+      const d = JSON.parse(localStorage.getItem(DEMO_PROFILE_KEY) || 'null');
+      return d?.name && Date.now() - (d.savedAt || 0) < 2 * 24 * 60 * 60 * 1000 ? d : null;
+    } catch {
+      return null;
+    }
+  });
   const [business, setBusiness] = useState(
-    saved?.business ?? { name: '', industry: 'legal', industryOther: '', whatsappNumber: '' }
+    saved?.business ??
+      (demo
+        ? { name: demo.name, industry: 'otro', industryOther: demo.sector || '', whatsappNumber: '' }
+        : { name: '', industry: 'legal', industryOther: '', whatsappNumber: '' })
   );
   const [planKey, setPlanKey] = useState(saved?.planKey ?? 'free');
   const [bot, setBot] = useState(
-    saved?.bot ?? { botName: '', tone: 'cercano', hours: '', location: '' }
+    saved?.bot ??
+      (demo
+        ? {
+            botName: demo.botName || '',
+            tone: 'cercano',
+            hours: demo.hours || '',
+            location: demo.location || '',
+            services: demo.services || [],
+            basePricing: demo.basePricing || '',
+          }
+        : { botName: '', tone: 'cercano', hours: '', location: '' })
   );
   const [faqs, setFaqs] = useState(
-    saved?.faqs ?? [
-      { question: '', answer: '' },
-      { question: '', answer: '' },
-    ]
+    saved?.faqs ??
+      (demo?.faqs?.length
+        ? demo.faqs.map((f) => ({ question: f.question, answer: f.answer }))
+        : [
+            { question: '', answer: '' },
+            { question: '', answer: '' },
+          ])
   );
+  useEffect(() => {
+    if (demo) toast.info(`Cargamos lo que tu bot aprendió de ${demo.name}. Revísalo y ajusta lo que quieras.`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Persiste el progreso en el navegador ante cada cambio.
   useEffect(() => {
@@ -130,7 +163,13 @@ export default function OnboardingWizard() {
         botName: bot.botName || business.name || undefined,
         tone: limits.tone ? bot.tone : 'neutral', // Free siempre neutral
         faqs: cleanFaqs,
-        businessInfo: { hours: bot.hours, location: bot.location },
+        businessInfo: {
+          hours: bot.hours,
+          location: bot.location,
+          // Lo que la demo aprendió (no se edita en este asistente; sí en Entrenamiento).
+          ...(bot.services?.length ? { services: bot.services } : {}),
+          ...(bot.basePricing ? { basePricing: bot.basePricing } : {}),
+        },
       };
 
       if (isFree) {
