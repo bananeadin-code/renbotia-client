@@ -33,6 +33,39 @@ function getSessionId(key) {
   }
 }
 
+// Sitio donde está incrustado el chat. En Chrome/Edge/Safari el navegador dice
+// el origen real del padre (ancestorOrigins); si no, se usa el que manda el
+// snippet en la URL. Vacío = abierto directo en renbotia.com.
+function embeddingHost() {
+  try {
+    const anc = window.location.ancestorOrigins;
+    if (anc && anc.length) return new URL(anc[0]).hostname;
+  } catch {
+    /* sin acceso: cae al parámetro */
+  }
+  return (new URLSearchParams(window.location.search).get('host') || '').slice(0, 253);
+}
+
+const contactKey = (key) => `rb_w_contact_${key}`;
+function readContact(key) {
+  try {
+    const c = JSON.parse(localStorage.getItem(contactKey(key)) || 'null');
+    return c?.name && c?.value ? c : null;
+  } catch {
+    return null;
+  }
+}
+function storeContact(key, c) {
+  try {
+    if (c) localStorage.setItem(contactKey(key), JSON.stringify(c));
+    else localStorage.removeItem(contactKey(key));
+  } catch {
+    /* sin almacenamiento: vive solo en memoria */
+  }
+}
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const PHONE_RE = /^\+?[\d\s().-]{7,20}$/;
+
 // Texto legible sobre el color de marca del negocio.
 function textOn(hex) {
   const m = /^#?([0-9a-f]{6})$/i.exec(hex || '');
@@ -74,6 +107,12 @@ export default function WidgetChat() {
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
   const [notice, setNotice] = useState('');
+  // Captura de prospectos (si el negocio la activó).
+  const [hasContact, setHasContact] = useState(false);
+  const [contact, setContact] = useState(() => readContact(key));
+  const [contactForm, setContactForm] = useState({ name: '', value: '' });
+  const [contactError, setContactError] = useState('');
+  const hostRef = useRef(embeddingHost());
 
   const sessionRef = useRef(null);
   const serverCount = useRef(0); // mensajes que el servidor ya confirmó
@@ -88,14 +127,15 @@ export default function WidgetChat() {
     let alive = true;
     (async () => {
       try {
-        const cfg = await widgetApi.publicConfig(key);
+        const cfg = await widgetApi.publicConfig(key, hostRef.current);
         if (!alive) return;
         setConfig(cfg);
-        const t = await widgetApi.thread(key, sessionRef.current, 0).catch(() => null);
+        const t = await widgetApi.thread(key, sessionRef.current, 0, hostRef.current).catch(() => null);
         if (!alive) return;
         if (t?.messages) {
           setMessages(t.messages);
           serverCount.current = t.total || t.messages.length;
+          setHasContact(Boolean(t.hasContact));
         }
         setStatus('ready');
       } catch {
@@ -114,7 +154,7 @@ export default function WidgetChat() {
     const id = setInterval(async () => {
       if (busy.current || document.hidden || serverCount.current === 0) return;
       try {
-        const t = await widgetApi.thread(key, sessionRef.current, serverCount.current);
+        const t = await widgetApi.thread(key, sessionRef.current, serverCount.current, hostRef.current);
         if (busy.current || !t || t.total <= serverCount.current) return;
         const base = serverCount.current;
         setMessages((prev) => [...prev.slice(0, base), ...t.messages]);
@@ -130,9 +170,9 @@ export default function WidgetChat() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, sending]);
 
-  async function send(e) {
-    e.preventDefault();
-    const msg = text.trim();
+  async function send(e, preset) {
+    e?.preventDefault();
+    const msg = (preset ?? text).trim();
     if (!msg || sending) return;
     setText('');
     setNotice('');
@@ -141,7 +181,14 @@ export default function WidgetChat() {
     const base = serverCount.current;
     setMessages((prev) => [...prev, { role: 'user', content: msg, at: new Date().toISOString(), pending: true }]);
     try {
-      const res = await widgetApi.send(key, { sessionId: sessionRef.current, message: msg, after: base });
+      const res = await widgetApi.send(key, {
+        sessionId: sessionRef.current,
+        message: msg,
+        after: base,
+        host: hostRef.current,
+        ...(config?.requireContact && !hasContact && contact ? { contact } : {}),
+      });
+      if (contact) setHasContact(true);
       if (res.messages) {
         setMessages((prev) => [...prev.slice(0, base), ...res.messages]);
         serverCount.current = res.total;
@@ -153,7 +200,14 @@ export default function WidgetChat() {
     } catch (err) {
       setMessages((prev) => prev.filter((m) => !m.pending));
       setText(msg);
-      setNotice(err.response?.data?.message || 'No se pudo enviar. Revisa tu conexión e intenta de nuevo.');
+      if (err.response?.data?.details?.code === 'CONTACT_REQUIRED') {
+        // El negocio pide datos y aún no los tenemos: vuelve al formulario.
+        storeContact(key, null);
+        setContact(null);
+        setHasContact(false);
+      } else {
+        setNotice(err.response?.data?.message || 'No se pudo enviar. Revisa tu conexión e intenta de nuevo.');
+      }
     } finally {
       busy.current = false;
       setSending(false);
@@ -162,6 +216,24 @@ export default function WidgetChat() {
   }
 
   const embedded = isEmbedded();
+
+  function submitContact(e) {
+    e.preventDefault();
+    const name = contactForm.name.trim();
+    const value = contactForm.value.trim();
+    if (name.length < 2) return setContactError('Escribe tu nombre.');
+    if (!EMAIL_RE.test(value) && !PHONE_RE.test(value)) {
+      return setContactError('Escribe un correo o un número de WhatsApp válido.');
+    }
+    const c = { name, value };
+    storeContact(key, c);
+    setContact(c);
+    setContactError('');
+    setTimeout(() => inputRef.current?.focus(), 50);
+  }
+
+  const askContact = Boolean(config?.requireContact) && !hasContact && !contact;
+  const showSuggestions = !askContact && messages.length === 0 && !sending && (config?.suggestions || []).length > 0;
 
   function close() {
     window.parent?.postMessage({ type: 'renbotia:close' }, '*');
@@ -271,8 +343,66 @@ export default function WidgetChat() {
         </p>
       )}
 
+      {askContact ? (
+        // Captura de prospectos: nombre + correo o WhatsApp antes de chatear.
+        <form onSubmit={submitContact} noValidate className="shrink-0 space-y-2 border-t border-line bg-surface p-3">
+          <p className="text-xs font-medium text-fg">Antes de empezar, ¿cómo te contactamos?</p>
+          <input
+            value={contactForm.name}
+            onChange={(e) => setContactForm((f) => ({ ...f, name: e.target.value }))}
+            placeholder="Tu nombre"
+            maxLength={60}
+            autoComplete="name"
+            aria-label="Tu nombre"
+            className="w-full rounded-lg border border-line bg-canvas px-3 py-2 text-sm text-fg outline-none transition focus:border-brand-500"
+          />
+          <input
+            value={contactForm.value}
+            onChange={(e) => setContactForm((f) => ({ ...f, value: e.target.value }))}
+            placeholder="Correo o WhatsApp"
+            maxLength={120}
+            autoComplete="email"
+            aria-label="Correo o WhatsApp"
+            className="w-full rounded-lg border border-line bg-canvas px-3 py-2 text-sm text-fg outline-none transition focus:border-brand-500"
+          />
+          {contactError && (
+            <p className="text-xs text-red-500" role="alert">
+              {contactError}
+            </p>
+          )}
+          <button
+            type="submit"
+            className="w-full rounded-lg py-2.5 text-sm font-semibold transition hover:opacity-90"
+            style={{ background: color, color: fg }}
+          >
+            Empezar a chatear
+          </button>
+          <p className="text-center text-[10px] text-subtle">Solo para responderte. No enviamos publicidad.</p>
+        </form>
+      ) : (
+      <>
+      {/* Preguntas sugeridas (antes del primer mensaje) */}
+      {showSuggestions && (
+        <div className="flex shrink-0 flex-wrap gap-1.5 border-t border-line bg-surface px-2.5 pt-2.5">
+          {config.suggestions.map((q) => (
+            <button
+              key={q}
+              type="button"
+              onClick={() => send(null, q)}
+              className="rounded-full border px-3 py-1.5 text-xs font-medium transition hover:opacity-80"
+              style={{ borderColor: color, color }}
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Entrada */}
-      <form onSubmit={send} className="flex shrink-0 items-center gap-2 border-t border-line bg-surface p-2.5">
+      <form
+        onSubmit={send}
+        className={`flex shrink-0 items-center gap-2 bg-surface p-2.5 ${showSuggestions ? '' : 'border-t border-line'}`}
+      >
         <input
           ref={inputRef}
           value={text}
@@ -292,6 +422,8 @@ export default function WidgetChat() {
           <Icon name="send" size={17} />
         </button>
       </form>
+      </>
+      )}
       <a
         href="https://renbotia.com/?ref=widget"
         target="_blank"

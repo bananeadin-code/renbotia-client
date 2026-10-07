@@ -221,6 +221,9 @@ export function WebWidgetCard({ isOwner, onStatus }) {
             </div>
           )}
 
+          {/* Opciones del chat: preguntas sugeridas, apertura, prospectos, dominios… */}
+          <WidgetOptions w={w} isOwner={isOwner} saving={saving} onSave={save} />
+
           {/* Código para pegar */}
           {w.key && (
             <div>
@@ -271,5 +274,256 @@ export function WebWidgetCard({ isOwner, onStatus }) {
         </div>
       )}
     </Card>
+  );
+}
+
+const AUTO_OPEN = [
+  [0, 'Nunca'],
+  [5, 'A los 5 s'],
+  [10, 'A los 10 s'],
+  [20, 'A los 20 s'],
+  [30, 'A los 30 s'],
+  [60, 'Al minuto'],
+];
+
+function Switch({ checked, onChange, label, disabled }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
+      disabled={disabled}
+      onClick={() => onChange(!checked)}
+      className={`relative h-6 w-11 shrink-0 rounded-full transition disabled:opacity-50 ${
+        checked ? 'bg-brand-600' : 'bg-surface2 ring-1 ring-inset ring-line'
+      }`}
+    >
+      <span
+        className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${checked ? 'left-[22px]' : 'left-0.5'}`}
+      />
+    </button>
+  );
+}
+
+/**
+ * Opciones avanzadas del widget. Se editan juntas y se guardan con un botón
+ * (los interruptores también esperan a "Guardar opciones" para no hacer una
+ * petición por clic).
+ */
+function WidgetOptions({ w, isOwner, saving, onSave }) {
+  const fromW = (x) => ({
+    suggestions: x.suggestions?.length ? [...x.suggestions] : [],
+    autoOpenSeconds: x.autoOpenSeconds || 0,
+    requireContact: Boolean(x.requireContact),
+    hideOnMobile: Boolean(x.hideOnMobile),
+    buttonText: x.buttonText || '',
+    domainsText: (x.allowedDomains || []).join('\n'),
+  });
+  const [o, setO] = useState(() => fromW(w));
+  const [open, setOpen] = useState(false);
+  useEffect(() => setO(fromW(w)), [w]);
+
+  const domains = o.domainsText
+    .split(/[\n,]/)
+    .map((d) => d.trim())
+    .filter(Boolean);
+  const suggestions = o.suggestions.map((q) => q.trim()).filter(Boolean);
+  const dirty =
+    JSON.stringify(suggestions) !== JSON.stringify(w.suggestions || []) ||
+    o.autoOpenSeconds !== (w.autoOpenSeconds || 0) ||
+    o.requireContact !== Boolean(w.requireContact) ||
+    o.hideOnMobile !== Boolean(w.hideOnMobile) ||
+    o.buttonText.trim() !== (w.buttonText || '') ||
+    JSON.stringify(domains) !== JSON.stringify(w.allowedDomains || []);
+  const tooShort = suggestions.some((q) => q.length < 2);
+  const active = [
+    suggestions.length && `${suggestions.length} preguntas sugeridas`,
+    w.requireContact && 'pide datos',
+    w.autoOpenSeconds && 'se abre solo',
+    (w.allowedDomains || []).length && 'dominios limitados',
+    w.hideOnMobile && 'oculto en celular',
+  ].filter(Boolean);
+
+  return (
+    <div className="rounded-xl border border-line">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-3 px-3 py-3 text-left"
+      >
+        <span className="min-w-0">
+          <span className="block text-sm font-medium text-fg">Más opciones del chat</span>
+          <span className="block truncate text-xs text-muted">
+            {active.length ? active.join(' · ') : 'Preguntas sugeridas, pedir datos, dominios y más'}
+          </span>
+        </span>
+        <Icon
+          name="chevronRight"
+          size={16}
+          className={`shrink-0 text-subtle transition-transform duration-200 ${open ? 'rotate-90' : ''}`}
+        />
+      </button>
+
+      {open && (
+        <div className="space-y-5 border-t border-line px-3 pb-4 pt-4 animate-fade-up">
+          {/* Preguntas sugeridas */}
+          <div>
+            <p className="text-sm font-medium text-fg">Preguntas sugeridas</p>
+            <p className="mt-0.5 text-xs text-muted">Botones dentro del chat para que el visitante empiece con un toque.</p>
+            <div className="mt-2 space-y-2">
+              {o.suggestions.map((q, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <input
+                    value={q}
+                    maxLength={60}
+                    disabled={!isOwner}
+                    onChange={(e) =>
+                      setO((x) => ({ ...x, suggestions: x.suggestions.map((y, j) => (j === i ? e.target.value : y)) }))
+                    }
+                    placeholder={['¿Cuánto cuesta?', '¿Tienen disponibilidad hoy?', '¿Dónde están?', 'Quiero una cotización'][i]}
+                    aria-label={`Pregunta sugerida ${i + 1}`}
+                    className="min-w-0 flex-1 rounded-lg border border-line bg-canvas px-3 py-2 text-sm text-fg outline-none transition focus:border-brand-500"
+                  />
+                  {isOwner && (
+                    <button
+                      type="button"
+                      onClick={() => setO((x) => ({ ...x, suggestions: x.suggestions.filter((_, j) => j !== i) }))}
+                      aria-label={`Quitar pregunta ${i + 1}`}
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted transition hover:bg-red-500/10 hover:text-red-500"
+                    >
+                      <Icon name="trash" size={15} />
+                    </button>
+                  )}
+                </div>
+              ))}
+              {isOwner && o.suggestions.length < 4 && (
+                <button
+                  type="button"
+                  onClick={() => setO((x) => ({ ...x, suggestions: [...x.suggestions, ''] }))}
+                  className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium text-brand-600 transition hover:bg-brand-500/10"
+                >
+                  <Icon name="plus" size={15} /> Agregar pregunta
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Pedir datos */}
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-fg">Pedir nombre y contacto antes de chatear</p>
+              <p className="mt-0.5 text-xs text-muted">
+                El visitante deja su nombre y su correo o WhatsApp. Cada conversación queda como prospecto en tu bandeja.
+              </p>
+            </div>
+            <Switch
+              checked={o.requireContact}
+              disabled={!isOwner}
+              label="Pedir nombre y contacto"
+              onChange={(v) => setO((x) => ({ ...x, requireContact: v }))}
+            />
+          </div>
+
+          {/* Apertura automática + texto del botón */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="w-autoopen" className="text-sm font-medium text-fg">
+                Abrir el chat solo
+              </label>
+              <select
+                id="w-autoopen"
+                value={o.autoOpenSeconds}
+                disabled={!isOwner}
+                onChange={(e) => setO((x) => ({ ...x, autoOpenSeconds: Number(e.target.value) }))}
+                className="mt-1.5 w-full rounded-lg border border-line bg-canvas px-3 py-2 text-sm text-fg outline-none focus:border-brand-500"
+              >
+                {AUTO_OPEN.map(([v, l]) => (
+                  <option key={v} value={v}>
+                    {l}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-[11px] text-subtle">Una vez por visita y nunca en celular.</p>
+            </div>
+            <div>
+              <label htmlFor="w-btntext" className="text-sm font-medium text-fg">
+                Texto del botón <span className="font-normal text-subtle">(opcional)</span>
+              </label>
+              <input
+                id="w-btntext"
+                value={o.buttonText}
+                maxLength={30}
+                disabled={!isOwner}
+                onChange={(e) => setO((x) => ({ ...x, buttonText: e.target.value }))}
+                placeholder="¿Te ayudamos?"
+                className="mt-1.5 w-full rounded-lg border border-line bg-canvas px-3 py-2 text-sm text-fg outline-none transition focus:border-brand-500"
+              />
+              <p className="mt-1 text-[11px] text-subtle">Vacío = solo el ícono.</p>
+            </div>
+          </div>
+
+          {/* Ocultar en celular */}
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-fg">Ocultar en celular</p>
+              <p className="mt-0.5 text-xs text-muted">El botón solo aparece en computadora y tableta.</p>
+            </div>
+            <Switch
+              checked={o.hideOnMobile}
+              disabled={!isOwner}
+              label="Ocultar en celular"
+              onChange={(v) => setO((x) => ({ ...x, hideOnMobile: v }))}
+            />
+          </div>
+
+          {/* Dominios permitidos */}
+          <div>
+            <label htmlFor="w-domains" className="text-sm font-medium text-fg">
+              Dominios permitidos <span className="font-normal text-subtle">(recomendado)</span>
+            </label>
+            <p className="mt-0.5 text-xs text-muted">
+              Uno por línea, por ejemplo <span className="font-mono">misitio.com</span>. Incluye sus subdominios. Si alguien
+              copia tu código en otro sitio, el chat no aparece y no gasta tu saldo. Vacío = cualquier sitio.
+            </p>
+            <textarea
+              id="w-domains"
+              rows={2}
+              value={o.domainsText}
+              disabled={!isOwner}
+              onChange={(e) => setO((x) => ({ ...x, domainsText: e.target.value }))}
+              placeholder="misitio.com"
+              className="mt-2 w-full resize-y rounded-lg border border-line bg-canvas px-3 py-2 font-mono text-sm text-fg outline-none transition focus:border-brand-500"
+            />
+          </div>
+
+          {isOwner && dirty && (
+            <div className="flex justify-end">
+              <Button
+                size="sm"
+                disabled={saving || tooShort || domains.length > 5}
+                onClick={() =>
+                  onSave(
+                    {
+                      suggestions,
+                      autoOpenSeconds: o.autoOpenSeconds,
+                      requireContact: o.requireContact,
+                      hideOnMobile: o.hideOnMobile,
+                      buttonText: o.buttonText.trim(),
+                      allowedDomains: domains,
+                    },
+                    'Opciones del chat guardadas.'
+                  )
+                }
+              >
+                {saving ? 'Guardando…' : 'Guardar opciones'}
+              </Button>
+            </div>
+          )}
+          {domains.length > 5 && <p className="text-xs text-red-500">Máximo 5 dominios.</p>}
+        </div>
+      )}
+    </div>
   );
 }

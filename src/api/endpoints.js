@@ -169,6 +169,8 @@ export const connectionsApi = {
   connectInstagram: (accessToken) => unwrap(api.post('/connections/instagram', { accessToken })),
   selectInstagramAccount: (accountId) => unwrap(api.post('/connections/instagram/select', { accountId })),
   disconnectInstagram: () => unwrap(api.post('/connections/instagram/disconnect')),
+  // Ajustes por canal: pausa del bot, preguntas iniciales y saludo de Messenger.
+  updateSettings: (body) => unwrap(api.put('/connections/settings', body)),
   // Perfil de WhatsApp Business (lo que el cliente ve en el chat).
   getProfile: () => unwrap(api.get('/connections/whatsapp/profile')),
   updateProfile: (body) => unwrap(api.put('/connections/whatsapp/profile', body)),
@@ -182,11 +184,15 @@ export const widgetApi = {
   get: () => unwrap(api.get('/widget')),
   update: (body) => unwrap(api.put('/widget', body)),
   // Público (dentro del iframe /w/:key): apariencia, enviar y sondear mensajes.
-  publicConfig: (key) => unwrap(api.get(`/widget/public/${encodeURIComponent(key)}`)),
+  // `host`: sitio donde está incrustado el chat (para "dominios permitidos").
+  publicConfig: (key, host = '') =>
+    unwrap(api.get(`/widget/public/${encodeURIComponent(key)}`, { params: host ? { host } : {} })),
   send: (key, body) => unwrap(api.post(`/widget/public/${encodeURIComponent(key)}/message`, body)),
-  thread: (key, sessionId, after = 0) =>
+  thread: (key, sessionId, after = 0, host = '') =>
     unwrap(
-      api.get(`/widget/public/${encodeURIComponent(key)}/messages`, { params: { sessionId, after } })
+      api.get(`/widget/public/${encodeURIComponent(key)}/messages`, {
+        params: { sessionId, after, ...(host ? { host } : {}) },
+      })
     ),
 };
 

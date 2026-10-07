@@ -11,6 +11,7 @@ import { ConnectionChecklist, ConnectionHelp } from '../../components/business/C
 import { MessengerConnect } from '../../components/business/MessengerConnect.jsx';
 import { InstagramConnect } from '../../components/business/InstagramConnect.jsx';
 import { WebWidgetCard } from '../../components/business/WebWidgetCard.jsx';
+import { ChannelSettings } from '../../components/business/ChannelSettings.jsx';
 
 /**
  * Módulo "Conexiones": un selector de canales (WhatsApp, Messenger, Instagram,
@@ -30,12 +31,15 @@ const CHANNELS = [
 function channelStatus(key, data, widget) {
   switch (key) {
     case 'whatsapp':
+      if (data?.whatsapp?.connected && data?.settings?.whatsapp?.paused) return { text: 'Bot en pausa', tone: 'soon' };
       if (data?.whatsapp?.connected) return { text: data.whatsapp.phoneNumber || 'Conectado', tone: 'on' };
       return data?.embeddedEnabled ? { text: 'Sin conectar', tone: 'off' } : { text: 'Próximamente', tone: 'soon' };
     case 'messenger':
+      if (data?.messenger?.connected && data?.settings?.facebook?.paused) return { text: 'Bot en pausa', tone: 'soon' };
       if (data?.messenger?.connected) return { text: data.messenger.pageName || 'Conectado', tone: 'on' };
       return data?.messengerEnabled ? { text: 'Sin conectar', tone: 'off' } : { text: 'Próximamente', tone: 'soon' };
     case 'instagram':
+      if (data?.instagram?.connected && data?.settings?.instagram?.paused) return { text: 'Bot en pausa', tone: 'soon' };
       if (data?.instagram?.connected) return { text: `@${data.instagram.username || 'conectado'}`, tone: 'on' };
       return data?.instagramEnabled ? { text: 'Sin conectar', tone: 'off' } : { text: 'Próximamente', tone: 'soon' };
     case 'web':
@@ -408,7 +412,10 @@ export function Connections() {
         )}
       </Card>
 
-      {/* Gestión del WhatsApp conectado: perfil + plantillas */}
+      {/* Ajustes y gestión del WhatsApp conectado: pausa, perfil y plantillas */}
+      {connected && (
+        <ChannelSettings channel="whatsapp" settings={data?.settings?.whatsapp} isOwner={isOwner} onChanged={refresh} />
+      )}
       {connected && <WhatsAppManage isOwner={isOwner} />}
 
       {/* Ayuda (atascos + contacto) debajo de la tarjeta, mientras no conecta */}
@@ -491,12 +498,22 @@ export function Connections() {
 
       {/* Facebook Messenger */}
       {active === 'messenger' && (
-        <MessengerConnect data={data} isOwner={isOwner} sdkReady={sdkReady} onChanged={refresh} />
+        <>
+          <MessengerConnect data={data} isOwner={isOwner} sdkReady={sdkReady} onChanged={refresh} />
+          {data?.messenger?.connected && (
+            <ChannelSettings channel="facebook" settings={data?.settings?.facebook} isOwner={isOwner} onChanged={refresh} />
+          )}
+        </>
       )}
 
       {/* Instagram DMs */}
       {active === 'instagram' && (
-        <InstagramConnect data={data} isOwner={isOwner} sdkReady={sdkReady} onChanged={refresh} />
+        <>
+          <InstagramConnect data={data} isOwner={isOwner} sdkReady={sdkReady} onChanged={refresh} />
+          {data?.instagram?.connected && (
+            <ChannelSettings channel="instagram" settings={data?.settings?.instagram} isOwner={isOwner} onChanged={refresh} />
+          )}
+        </>
       )}
 
       {/* Widget de chat para el sitio web del negocio (Pro/Elite) */}

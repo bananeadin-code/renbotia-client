@@ -44,7 +44,10 @@
   }
 
   function mount(cfg) {
+    // Ocultar en celular (ajuste del negocio).
+    if (cfg.hideOnMobile && window.innerWidth < 480) return;
     var color = /^#[0-9a-f]{6}$/i.test(cfg.color || '') ? cfg.color : '#4f46e5';
+    var label = String(cfg.buttonText || '').slice(0, 30);
     var side = cfg.position === 'left' ? 'left' : 'right';
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var open = false;
@@ -54,13 +57,19 @@
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.setAttribute('aria-label', 'Abrir chat de ' + (cfg.businessName || 'atención'));
-    btn.innerHTML = CHAT_ICON;
+    function closedContent() {
+      if (!label) return CHAT_ICON;
+      var span = document.createElement('span');
+      span.textContent = label; // texto escapado (lo escribe el negocio)
+      return CHAT_ICON + '<span style="margin-' + (side === 'left' ? 'right' : 'left') + ':8px;font:600 15px/1 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;white-space:nowrap">' + span.innerHTML + '</span>';
+    }
+    btn.innerHTML = closedContent();
     css(btn, {
       position: 'fixed',
       bottom: '20px',
-      width: '58px',
+      'min-width': '58px',
       height: '58px',
-      'border-radius': '50%',
+      'border-radius': '29px',
       border: '0',
       padding: '0',
       margin: '0',
@@ -70,6 +79,9 @@
       display: 'flex',
       'align-items': 'center',
       'justify-content': 'center',
+      'flex-direction': side === 'left' ? 'row-reverse' : 'row',
+      'padding-left': label ? '18px' : '0',
+      'padding-right': label ? '20px' : '0',
       'box-shadow': '0 8px 24px rgba(15,23,42,.22)',
       'z-index': String(Z),
       transition: reduce ? 'none' : 'transform .18s cubic-bezier(.23,1,.32,1)',
@@ -170,10 +182,13 @@
       open = typeof next === 'boolean' ? next : !open;
       hideBubble();
       if (open && !loaded) {
-        frame.src = origin + '/w/' + encodeURIComponent(key);
+        frame.src = origin + '/w/' + encodeURIComponent(key) + '?host=' + encodeURIComponent(window.location.hostname);
         loaded = true;
       }
-      btn.innerHTML = open ? CLOSE_ICON : CHAT_ICON;
+      btn.innerHTML = open ? CLOSE_ICON : closedContent();
+      // Abierto: botón redondo con la X; cerrado: vuelve la pastilla con texto.
+      btn.style.setProperty('padding-left', open || !label ? '0' : '18px', 'important');
+      btn.style.setProperty('padding-right', open || !label ? '0' : '20px', 'important');
       btn.setAttribute('aria-label', open ? 'Cerrar chat' : 'Abrir chat de ' + (cfg.businessName || 'atención'));
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
       if (open) {
@@ -208,6 +223,23 @@
     if (bubble) document.body.appendChild(bubble);
     document.body.appendChild(btn);
     applyMobile();
+
+    var autoOpen = Number(cfg.autoOpenSeconds) || 0;
+    if (autoOpen > 0 && window.innerWidth >= 480) {
+      var opened = false;
+      try {
+        opened = sessionStorage.getItem('rb_w_auto') === '1';
+      } catch (e) {}
+      if (!opened) {
+        setTimeout(function () {
+          if (open) return;
+          try {
+            sessionStorage.setItem('rb_w_auto', '1');
+          } catch (e) {}
+          toggle(true);
+        }, autoOpen * 1000);
+      }
+    }
   }
 
   function start() {

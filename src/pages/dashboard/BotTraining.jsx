@@ -100,6 +100,38 @@ function fileToCompressedDataUri(file) {
   });
 }
 
+// Horario de atención: valores por defecto (lunes a viernes 9 a 18 h).
+const DAY_LABELS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0]; // la semana empieza en lunes
+const TIMEZONES = [
+  ['America/Mexico_City', 'Ciudad de México (centro)'],
+  ['America/Tijuana', 'Tijuana (noroeste)'],
+  ['America/Hermosillo', 'Hermosillo (Sonora)'],
+  ['America/Mazatlan', 'Mazatlán (Pacífico)'],
+  ['America/Cancun', 'Cancún (sureste)'],
+  ['America/Bogota', 'Bogotá'],
+  ['America/Lima', 'Lima'],
+  ['America/Santiago', 'Santiago de Chile'],
+  ['America/Argentina/Buenos_Aires', 'Buenos Aires'],
+  ['America/Guatemala', 'Guatemala / Centroamérica'],
+  ['Europe/Madrid', 'Madrid'],
+];
+function defaultSchedule(saved) {
+  const days = DAY_ORDER.map((d) => {
+    const s = (saved?.days || []).find((x) => x.day === d);
+    return s
+      ? { day: d, enabled: Boolean(s.enabled), open: s.open || '09:00', close: s.close || '18:00' }
+      : { day: d, enabled: d >= 1 && d <= 5, open: '09:00', close: '18:00' };
+  });
+  return {
+    enabled: Boolean(saved?.enabled),
+    timezone: saved?.timezone || 'America/Mexico_City',
+    botMode: saved?.botMode || 'always',
+    closedMessage: saved?.closedMessage || '',
+    days,
+  };
+}
+
 function UpgradeNote({ children }) {
   return (
     <p className="mt-3 text-xs text-muted">
@@ -175,6 +207,7 @@ export default function BotTraining() {
           images: c.images || [],
           documents: c.documents || [],
           quickReplies: c.quickReplies?.length ? c.quickReplies : [''],
+          schedule: defaultSchedule(c.schedule),
           followUp: {
             enabled: Boolean(c.followUp?.enabled),
             delayHours: c.followUp?.delayHours || 4,
@@ -328,6 +361,21 @@ export default function BotTraining() {
       return;
     }
 
+    // Horario: cada día marcado necesita apertura y cierre distintos, y al menos un día.
+    if (cfg.schedule?.enabled) {
+      if (!cfg.schedule.days.some((d) => d.enabled)) {
+        setError('Marca al menos un día en el horario de atención.');
+        setFeedbackTick((t) => t + 1);
+        return;
+      }
+      const bad = cfg.schedule.days.find((d) => d.enabled && d.open === d.close);
+      if (bad) {
+        setError(`En el horario, ${DAY_LABELS[bad.day].toLowerCase()} abre y cierra a la misma hora.`);
+        setFeedbackTick((t) => t + 1);
+        return;
+      }
+    }
+
     // Seguimiento con texto fijo: necesita el mensaje.
     if (cfg.followUp?.enabled && cfg.followUp.mode === 'custom' && cfg.followUp.message.trim().length < 5) {
       setError('Escribe el mensaje de seguimiento o elige que el bot lo redacte.');
@@ -351,6 +399,7 @@ export default function BotTraining() {
         documents: (cfg.documents || []).filter((d) => d.text?.trim()),
         quickReplies: (cfg.quickReplies || []).map((s) => s.trim()).filter(Boolean),
         followUp: { ...cfg.followUp, message: cfg.followUp.message.trim() },
+        schedule: { ...cfg.schedule, closedMessage: cfg.schedule.closedMessage.trim() },
         businessInfo: { ...cfg.businessInfo, services },
       };
       // Sector del negocio (aplica a todos los planes; vive en Business).
@@ -766,6 +815,146 @@ export default function BotTraining() {
           </p>
         </Card>
       )}
+
+      {/* Horario de atención (todos los planes) */}
+      <Card>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600">
+              <Icon name="clock" size={18} />
+            </span>
+            <div>
+              <h2 className="font-semibold text-fg">Horario de atención</h2>
+              <p className="mt-0.5 text-xs text-muted">
+                Dile al bot cuándo está abierto tu negocio: puede contestar siempre (y avisar cuando estés cerrado) o
+                solo fuera de tu horario, mientras tú atiendes en horario.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={cfg.schedule.enabled}
+            aria-label="Activar horario de atención"
+            onClick={() => set('schedule', { ...cfg.schedule, enabled: !cfg.schedule.enabled })}
+            className={`relative mt-1 h-6 w-11 shrink-0 rounded-full transition ${
+              cfg.schedule.enabled ? 'bg-brand-600' : 'bg-surface2 ring-1 ring-inset ring-line'
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
+                cfg.schedule.enabled ? 'left-[22px]' : 'left-0.5'
+              }`}
+            />
+          </button>
+        </div>
+
+        {cfg.schedule.enabled && (
+          <div className="mt-4 space-y-5 border-t border-line pt-4 animate-fade-up">
+            <div>
+              <p className="mb-1.5 text-sm font-medium text-fg">¿Cuándo contesta el bot?</p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {[
+                  ['always', 'Siempre', 'Contesta a toda hora. Cuando estés cerrado, lo sabe y avisa que atenderán en horario.'],
+                  ['closed_only', 'Solo fuera de horario', 'En horario contestas tú desde Conversaciones; el bot cubre noches y días libres.'],
+                ].map(([val, title, desc]) => (
+                  <button
+                    key={val}
+                    type="button"
+                    onClick={() => set('schedule', { ...cfg.schedule, botMode: val })}
+                    className={`rounded-xl border p-3 text-left transition ${
+                      cfg.schedule.botMode === val
+                        ? 'border-brand-500 bg-brand-500/5 ring-1 ring-brand-500'
+                        : 'border-line hover:border-brand-300'
+                    }`}
+                  >
+                    <span className="block text-sm font-medium text-fg">{title}</span>
+                    <span className="mt-0.5 block text-xs text-muted">{desc}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-medium text-fg">Días y horas</p>
+                <select
+                  value={cfg.schedule.timezone}
+                  onChange={(e) => set('schedule', { ...cfg.schedule, timezone: e.target.value })}
+                  aria-label="Zona horaria"
+                  className="rounded-lg border border-line bg-canvas px-2.5 py-1.5 text-xs text-fg outline-none focus:border-brand-500"
+                >
+                  {TIMEZONES.map(([tz, label]) => (
+                    <option key={tz} value={tz}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="divide-y divide-line rounded-xl border border-line">
+                {cfg.schedule.days.map((d, i) => {
+                  const setDay = (patch) =>
+                    set('schedule', {
+                      ...cfg.schedule,
+                      days: cfg.schedule.days.map((x, j) => (j === i ? { ...x, ...patch } : x)),
+                    });
+                  return (
+                    <div key={d.day} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2.5">
+                      <label className="flex w-28 shrink-0 cursor-pointer items-center gap-2 text-sm text-fg">
+                        <input
+                          type="checkbox"
+                          checked={d.enabled}
+                          onChange={(e) => setDay({ enabled: e.target.checked })}
+                          className="h-4 w-4 rounded border-line accent-brand-600"
+                        />
+                        {DAY_LABELS[d.day]}
+                      </label>
+                      {d.enabled ? (
+                        <div className="flex items-center gap-2 text-sm">
+                          <input
+                            type="time"
+                            value={d.open}
+                            onChange={(e) => setDay({ open: e.target.value })}
+                            aria-label={`${DAY_LABELS[d.day]}: abre`}
+                            className="rounded-lg border border-line bg-canvas px-2 py-1 text-fg outline-none focus:border-brand-500"
+                          />
+                          <span className="text-subtle">a</span>
+                          <input
+                            type="time"
+                            value={d.close}
+                            onChange={(e) => setDay({ close: e.target.value })}
+                            aria-label={`${DAY_LABELS[d.day]}: cierra`}
+                            className="rounded-lg border border-line bg-canvas px-2 py-1 text-fg outline-none focus:border-brand-500"
+                          />
+                        </div>
+                      ) : (
+                        <span className="text-sm text-subtle">Cerrado</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="mt-1.5 text-[11px] text-subtle">
+                Si cierras después de medianoche (por ejemplo 20:00 a 02:00), el horario se cuenta hasta la madrugada.
+              </p>
+            </div>
+
+            {cfg.schedule.botMode === 'always' && (
+              <div>
+                <Textarea
+                  label="Aviso cuando estés cerrado (opcional)"
+                  rows={2}
+                  maxLength={300}
+                  value={cfg.schedule.closedMessage}
+                  onChange={(e) => set('schedule', { ...cfg.schedule, closedMessage: e.target.value })}
+                  placeholder="Ej. Abrimos mañana a las 9:00. Si es urgente, déjanos tu número y te llamamos."
+                />
+                <p className="mt-1 text-[11px] text-subtle">El bot lo comunica con sus palabras cuando aplique.</p>
+              </div>
+            )}
+          </div>
+        )}
+      </Card>
 
       {/* Seguimiento automático (Pro/Elite) */}
       <Card>

@@ -768,6 +768,29 @@ export default function Conversations() {
                   </div>
                 )}
 
+                {/* Datos que dejó el visitante del sitio web (captura de prospectos) */}
+                {thread.customerContact && (
+                  <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 border-b border-line bg-surface px-4 py-2 text-xs text-muted">
+                    <Icon name="user" size={13} className="shrink-0" />
+                    <span className="font-medium text-fg">{thread.customerName || 'Visitante'}</span>
+                    <span aria-hidden="true">·</span>
+                    {thread.customerContact.includes('@') ? (
+                      <a href={`mailto:${thread.customerContact}`} className="text-brand-600 hover:underline">
+                        {thread.customerContact}
+                      </a>
+                    ) : (
+                      <a
+                        href={`https://wa.me/${thread.customerContact.replace(/\D/g, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-brand-600 hover:underline"
+                      >
+                        {thread.customerContact}
+                      </a>
+                    )}
+                  </div>
+                )}
+
                 {/* Estado de la ventana de 24h (WhatsApp y Messenger) */}
                 {hasWindow && (
                   waWindow.open ? (
