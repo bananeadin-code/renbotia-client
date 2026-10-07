@@ -10,7 +10,7 @@ export const LEGAL = {
   privacidad: {
     slug: 'privacidad',
     title: 'Aviso de Privacidad',
-    updated: '20 de agosto de 2026',
+    updated: '7 de octubre de 2026',
     description:
       'Aviso de Privacidad de RenBotIA: qué datos recabamos, para qué, con quién los compartimos y cómo ejercer tus derechos ARCO.',
     intro:
@@ -26,7 +26,7 @@ export const LEGAL = {
         h: '2. Qué datos recabamos',
         p: ['Tratamos dos tipos de datos:'],
         ul: [
-          'De la cuenta: tu nombre, correo electrónico, una contraseña (que guardamos cifrada) y los datos de tu negocio (nombre, giro, número de WhatsApp). Los datos de tu tarjeta los procesa directamente nuestro proveedor de pagos; RenBotIA no los almacena.',
+          'De la cuenta: tu nombre, correo electrónico, una contraseña (que guardamos cifrada) y los datos de tu negocio (nombre, giro, número de WhatsApp). Los datos de tu tarjeta los procesa y resguarda directamente nuestro proveedor de pagos (Stripe); RenBotIA no almacena el número de tu tarjeta, solo su marca, los últimos 4 dígitos y su vencimiento para que puedas identificarla.',
           'Del funcionamiento del bot: el contenido de las conversaciones que tu bot atiende, que puede incluir datos que tus propios clientes proporcionen. Respecto de esos datos de terceros, tú eres el responsable y RenBotIA actúa como encargado que los trata por tu cuenta y siguiendo tus instrucciones.',
           'De las conexiones con Meta: si conectas WhatsApp Business, tu Página de Facebook (Messenger) o tu cuenta profesional de Instagram, guardamos los identificadores de esa cuenta o Página y el token de acceso que Meta nos otorga para recibir y responder los mensajes que tus clientes envían. De quienes escriben a tu Página o a tu Instagram guardamos el identificador que Meta asigna para esa cuenta, su nombre público y el contenido de sus mensajes, únicamente para que tu bot les responda y puedas ver la conversación en tu panel.',
           'No recabamos de forma deliberada datos personales sensibles.',
@@ -97,7 +97,7 @@ export const LEGAL = {
   terminos: {
     slug: 'terminos',
     title: 'Términos y Condiciones',
-    updated: '20 de agosto de 2026',
+    updated: '7 de octubre de 2026',
     description:
       'Términos y Condiciones de uso de RenBotIA: qué es el servicio, planes y pagos, uso aceptable, contenido generado por IA y responsabilidades.',
     intro:
@@ -119,6 +119,7 @@ export const LEGAL = {
         h: '3. Planes, créditos y pagos',
         p: [
           'Ofrecemos planes de suscripción y paquetes de créditos (tokens de uso), en pesos mexicanos, procesados por nuestro proveedor de pagos (Stripe). Los créditos se consumen conforme al uso del bot: a mayor cantidad de información y contexto configurados, y al enviar o interpretar imágenes, el bot consume más tokens, por la naturaleza propia de la inteligencia artificial y del manejo de contexto y caché. Salvo que la ley disponga lo contrario, los pagos no son reembolsables. Puedes cancelar la renovación cuando quieras; conservarás el acceso hasta que termine el periodo ya pagado.',
+          'Tarjeta y renovación automática: para comprar un plan o créditos primero guardas una tarjeta, que procesa y resguarda Stripe (RenBotIA solo conserva la marca, los últimos 4 dígitos y la fecha de vencimiento para identificarla). Los planes de pago se renuevan automáticamente cada mes y se cobran a esa tarjeta en la fecha de renovación; te avisamos por correo unos días antes con el monto y la fecha. Si el cobro no se puede realizar, te avisamos y lo reintentamos durante 3 días; si para entonces no se resuelve, tu cuenta pasa al plan Free, conservando tu bot, tu entrenamiento y los créditos que hayas comprado. Puedes cambiar tu tarjeta en cualquier momento desde Facturación; para quitarla sin reemplazo, primero cancela la renovación.',
           'Conexión con WhatsApp y costos de Meta: para operar tu bot en WhatsApp conectas tu propia cuenta de WhatsApp Business a través de Meta, usando un número de teléfono dedicado a tu negocio. Las conversaciones de WhatsApp las cobra Meta directamente a tu cuenta, conforme a sus tarifas vigentes (que incluyen un volumen mensual gratuito). Ese costo es independiente de tu plan RenBotIA, no lo cobra ni lo determina RenBotIA, y corresponde a tu relación con Meta.',
         ],
       },

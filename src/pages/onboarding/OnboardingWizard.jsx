@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { onboardingApi, planApi } from '../../api/endpoints.js';
+import { onboardingApi, planApi, botConfigApi } from '../../api/endpoints.js';
 import { useBusinessStore } from '../../store/businessStore.js';
 import { toast } from '../../store/toastStore.js';
 import { PlanCards } from '../../components/PlanCards.jsx';
@@ -203,15 +203,19 @@ export default function OnboardingWizard() {
         return;
       }
 
-      // Planes de pago: pago embebido dentro del sitio (sin redirect). Los datos
-      // de onboarding viajan al confirmar el pago, y ahí se crea el negocio.
+      // Planes de pago ("tarjeta primero"): se crea la cuenta en Free, y luego se
+      // abre el pago: agregar tarjeta → cobrar → mejora al plan elegido. Si cierra
+      // el pago, su cuenta queda en Free y puede mejorar desde Facturación.
+      await onboardingApi.complete({ business, planKey: 'free', botConfig });
+      clearSaved();
+      await loadBusiness();
       const plan = plans.find((p) => p.key === planKey);
       setCheckout({
         kind: 'plan',
         planKey,
         itemName: `Plan ${plan?.name || ''}`.trim(),
         amountMXN: plan?.priceMXN ?? 0,
-        onboarding: { business, botConfig },
+        botConfig,
       });
       setSubmitting(false);
     } catch (err) {
@@ -220,11 +224,22 @@ export default function OnboardingWizard() {
     }
   }
 
-  // Tras confirmar el pago del plan: el negocio ya quedó creado; al panel.
+  // Tras pagar: ya en el plan de pago, se reaplica lo que Free había recortado
+  // (tono, preguntas extra) y se entra al panel.
   async function onPaidSuccess() {
+    const cfg = checkout?.botConfig;
     setCheckout(null);
-    clearSaved();
+    if (cfg) {
+      await botConfigApi.update({ tone: cfg.tone, faqs: cfg.faqs }).catch(() => {});
+    }
     await loadBusiness();
+    navigate('/dashboard', { replace: true });
+  }
+
+  // Cerró el pago sin pagar: su cuenta ya existe en Free.
+  function onCheckoutClose() {
+    setCheckout(null);
+    toast.info('Tu cuenta quedó en el plan Free. Puedes mejorar cuando quieras desde Facturación.');
     navigate('/dashboard', { replace: true });
   }
 
@@ -471,17 +486,15 @@ export default function OnboardingWizard() {
         </div>
       </div>
 
-      {/* Pago embebido del plan (sin salir del sitio). Usuario nuevo: sin tarjeta guardada. */}
+      {/* Pago del plan: primero la tarjeta, luego el cobro (sin salir del sitio). */}
       {checkout && (
         <CheckoutDialog
           open={Boolean(checkout)}
-          onClose={() => setCheckout(null)}
+          onClose={onCheckoutClose}
           kind={checkout.kind}
           planKey={checkout.planKey}
           itemName={checkout.itemName}
           amountMXN={checkout.amountMXN}
-          onboarding={checkout.onboarding}
-          savedCard={null}
           onSuccess={onPaidSuccess}
         />
       )}

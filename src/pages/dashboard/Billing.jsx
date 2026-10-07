@@ -55,6 +55,15 @@ export default function Billing() {
   const renewalStr = subscription
     ? new Date(subscription.renewalDate).toLocaleDateString('es-MX')
     : '—';
+  // Renovación con cobro: plan que sigue y monto; vencida = cobro pendiente.
+  const nextPlanKey = subscription?.nextPlanKey || currentKey;
+  const nextPlanName = plans.find((p) => p.key === nextPlanKey)?.name || nextPlanKey;
+  const renewalAmount = subscription?.renewalAmountMXN || 0;
+  const pastDue = status === 'vencida' || Boolean(subscription?.renewalDue);
+  const graceStr = subscription?.graceEndsAt
+    ? new Date(subscription.graceEndsAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'long' })
+    : '';
+  const money = (n) => `$${Number(n || 0).toLocaleString('es-MX')} MXN`;
 
   async function refresh() {
     await load();
@@ -85,11 +94,19 @@ export default function Billing() {
     const okMsg =
       result?.type === 'credits'
         ? '¡Créditos acreditados! Ya están en tu balance.'
-        : result?.upgraded
-          ? '¡Plan mejorado! Tus nuevas ventajas ya están activas.'
-          : '¡Pago confirmado!';
+        : result?.type === 'renewal'
+          ? '¡Renovación pagada! Tu plan ya está al corriente.'
+          : result?.upgraded
+            ? '¡Plan mejorado! Tus nuevas ventajas ya están activas.'
+            : '¡Pago confirmado!';
     setMsg(okMsg);
     toast.success(okMsg);
+  }
+
+  // La tarjeta cambió (módulo de método de pago o dentro del pago): refresca.
+  async function onCardChange(card) {
+    setSavedCard(card);
+    await refresh();
   }
 
   async function doAction(fn, okMsg) {
@@ -135,6 +152,18 @@ export default function Billing() {
     return doAction(() => billingApi.changePlan(planKey), 'Cambio de plan programado.');
   }
 
+  // Pagar ahora una renovación vencida (p. ej. el banco pidió confirmar el pago).
+  function payRenewal() {
+    setError('');
+    setMsg('');
+    setCheckout({
+      kind: 'renewal',
+      itemName: `Renovación Plan ${nextPlanName}`,
+      amountMXN: renewalAmount,
+      note: 'Paga ahora para mantener tu plan.',
+    });
+  }
+
   const onChangePlan = (planKey) =>
     doAction(() => billingApi.changePlan(planKey), 'Cambio de plan programado.');
   const onCancel = () =>
@@ -162,6 +191,30 @@ export default function Billing() {
       {error && <Alert variant="error">{error}</Alert>}
 
       {/* Avisos de estado del plan */}
+      {pastDue && renewalAmount > 0 && (
+        <Alert variant="error">
+          No pudimos cobrar la renovación de tu plan <strong>{nextPlanName}</strong> ({money(renewalAmount)})
+          {subscription?.lastRenewalError === 'no_card'
+            ? ' porque no hay una tarjeta guardada.'
+            : subscription?.lastRenewalError === 'authentication_required'
+              ? ' porque tu banco pide confirmar el pago.'
+              : '.'}{' '}
+          {graceStr
+            ? <>Tienes hasta el <strong>{graceStr}</strong>; después tu cuenta pasará a Free. </>
+            : 'Resuélvelo para mantener tu plan. '}
+          {paidPlansLive && (
+            <button onClick={payRenewal} className="font-semibold underline underline-offset-2">
+              Pagar ahora
+            </button>
+          )}
+        </Alert>
+      )}
+      {!pastDue && renewalAmount > 0 && !savedCard && paidPlansLive && (
+        <Alert variant="warning">
+          Tu plan se renueva el <strong>{renewalStr}</strong> por {money(renewalAmount)}. Agrega una tarjeta abajo
+          para no perder tus ventajas.
+        </Alert>
+      )}
       {status === 'cancelada' && (
         <Alert variant="warning">
           Tu plan <strong>no se renovará</strong>. Conservas acceso y tus tokens hasta el{' '}
@@ -196,7 +249,9 @@ export default function Billing() {
             <div className="text-sm text-muted">Plan actual</div>
             <div className="text-xl font-bold text-fg">{subscription?.plan?.name || '—'}</div>
           </div>
-          <Badge color={status === 'activa' ? 'green' : 'amber'}>{status || '—'}</Badge>
+          <Badge color={status === 'activa' ? 'green' : status === 'vencida' ? 'red' : 'amber'}>
+            {status === 'vencida' ? 'pago pendiente' : status || '—'}
+          </Badge>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
           <div>
@@ -210,6 +265,12 @@ export default function Billing() {
           <div>
             <div className="text-muted">Renovación</div>
             <div className="font-medium text-fg">{renewalStr}</div>
+            {renewalAmount > 0 && status !== 'cancelada' && (
+              <div className="text-[11px] text-subtle">
+                {money(renewalAmount)}
+                {savedCard ? ` · ${savedCard.brand} •••• ${savedCard.last4}` : ' · sin tarjeta'}
+              </div>
+            )}
           </div>
           <div>
             <div className="text-muted">Conversaciones disponibles</div>
@@ -277,7 +338,7 @@ export default function Billing() {
       )}
 
       {/* Método de pago guardado + recarga automática (solo cuando hay cobros live) */}
-      {paidPlansLive && <PaymentMethod packs={packs} />}
+      {paidPlansLive && <PaymentMethod packs={packs} onCardChange={onCardChange} />}
 
       {/* Paquetes de créditos */}
       <div>
@@ -342,7 +403,9 @@ export default function Billing() {
                       {new Date(p.createdAt).toLocaleDateString('es-MX')}
                     </td>
                     <td className="py-2 text-muted">{p.description}</td>
-                    <td className="py-2 text-muted">{p.type === 'plan' ? 'Plan' : 'Créditos'}</td>
+                    <td className="py-2 text-muted">
+                      {p.type === 'credits' ? 'Créditos' : p.renewal ? 'Renovación' : 'Plan'}
+                    </td>
                     <td className="py-2 tabular text-muted">
                       ${p.amountMXN?.toLocaleString('es-MX')}
                     </td>
@@ -367,8 +430,9 @@ export default function Billing() {
           packKey={checkout.packKey}
           itemName={checkout.itemName}
           amountMXN={checkout.amountMXN}
-          savedCard={savedCard}
+          note={checkout.note}
           onSuccess={onCheckoutSuccess}
+          onCardChange={onCardChange}
         />
       )}
     </div>

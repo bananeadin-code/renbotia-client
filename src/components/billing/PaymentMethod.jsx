@@ -1,33 +1,29 @@
-import { useEffect, useMemo, useState } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { useEffect, useState } from 'react';
 import { billingApi } from '../../api/endpoints.js';
+import { CardSetup } from './CardSetup.jsx';
 import { confirm } from '../../store/confirmStore.js';
 import { Card, Button, Select, Input, Alert, Spinner } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
-import { useThemeStore } from '../../store/themeStore.js';
 
 /**
  * "Método de pago y recarga automática".
  * - La tarjeta se captura con Stripe Elements (iframes de Stripe con tu diseño):
  *   los datos sensibles nunca tocan el server ni se ven; Stripe (PCI) los maneja.
- * - Con la tarjeta guardada, el cliente puede PROGRAMAR la compra automática de
- *   un paquete de créditos cuando su saldo baje del umbral (auto-reload).
+ * - La misma tarjeta paga las compras, la renovación mensual del plan y la
+ *   recarga automática de créditos (cuando el saldo baja del umbral).
+ * - Se puede CAMBIAR en cualquier momento; quitarla solo si no hay un plan de
+ *   pago por renovar (el servidor lo valida).
  */
-export function PaymentMethod({ packs = [] }) {
-  const isDark = useThemeStore((s) => s.isDark);
+export function PaymentMethod({ packs = [], onCardChange }) {
   const [loading, setLoading] = useState(true);
   const [pk, setPk] = useState('');
   const [card, setCard] = useState(null);
   const [autoRecharge, setAutoRecharge] = useState({ enabled: false, packKey: '', threshold: 0 });
   const [adding, setAdding] = useState(false);
-  const [clientSecret, setClientSecret] = useState('');
   const [error, setError] = useState('');
   const [msg, setMsg] = useState('');
   const [savingAR, setSavingAR] = useState(false);
   const [removing, setRemoving] = useState(false);
-
-  const stripePromise = useMemo(() => (pk ? loadStripe(pk) : null), [pk]);
 
   async function load() {
     try {
@@ -54,22 +50,22 @@ export function PaymentMethod({ packs = [] }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function startAdd() {
+  function startAdd() {
     setError('');
     setMsg('');
-    try {
-      const { clientSecret: cs } = await billingApi.setupIntent();
-      setClientSecret(cs);
-      setAdding(true);
-    } catch (e) {
-      setError(e.response?.data?.message || 'No se pudo iniciar el registro de la tarjeta.');
-    }
+    setAdding(true);
   }
 
-  async function onCardSaved() {
+  async function onCardSaved(result) {
     setAdding(false);
-    setClientSecret('');
-    setMsg('Tarjeta guardada correctamente.');
+    onCardChange?.(result.paymentMethod);
+    setMsg(
+      result.renewal === 'renewed'
+        ? 'Tarjeta guardada y renovación cobrada. Tu plan ya está al corriente.'
+        : result.renewal === 'failed'
+          ? 'Tarjeta guardada, pero el banco no aprobó el cobro de la renovación. Prueba con otra tarjeta.'
+          : 'Tarjeta guardada correctamente.'
+    );
     await load();
   }
 
@@ -86,8 +82,9 @@ export function PaymentMethod({ packs = [] }) {
     setRemoving(true);
     setError('');
     try {
-      const data = await billingApi.deletePaymentMethod();
+      await billingApi.deletePaymentMethod();
       setCard(null);
+      onCardChange?.(null);
       setAutoRecharge((a) => ({ ...a, enabled: false }));
       setMsg('Tarjeta eliminada.');
     } catch (e) {
@@ -145,8 +142,8 @@ export function PaymentMethod({ packs = [] }) {
         <h2 className="font-semibold text-fg">Método de pago y recarga automática</h2>
       </div>
       <p className="mb-4 text-sm text-muted">
-        Guarda una tarjeta de forma segura (la procesa Stripe; el sitio nunca ve tus datos) y
-        programa la compra automática de créditos para no quedarte sin servicio.
+        Tu tarjeta paga tus compras y la renovación mensual de tu plan. La procesa Stripe: el sitio
+        nunca ve tus datos. También puedes programar la compra automática de créditos.
       </p>
 
       {msg && (
@@ -161,7 +158,14 @@ export function PaymentMethod({ packs = [] }) {
       )}
 
       {/* Tarjeta */}
-      {card ? (
+      {adding ? (
+        <div className="rounded-lg border border-line p-4">
+          {card && (
+            <p className="mb-3 text-xs text-muted">La tarjeta nueva reemplazará a la {card.brand} •••• {card.last4}.</p>
+          )}
+          <CardSetup onSaved={onCardSaved} onCancel={() => setAdding(false)} />
+        </div>
+      ) : card ? (
         <div className="flex items-center justify-between rounded-lg border border-line bg-surface2 px-4 py-3">
           <div className="flex items-center gap-3">
             <Icon name="card" size={20} className="text-fg" />
@@ -174,25 +178,15 @@ export function PaymentMethod({ packs = [] }) {
               </div>
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={removeCard} disabled={removing}>
-            {removing ? 'Quitando…' : 'Quitar'}
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button variant="secondary" size="sm" onClick={startAdd}>
+              Cambiar
+            </Button>
+            <Button variant="ghost" size="sm" onClick={removeCard} disabled={removing}>
+              {removing ? 'Quitando…' : 'Quitar'}
+            </Button>
+          </div>
         </div>
-      ) : adding && clientSecret ? (
-        <Elements
-          stripe={stripePromise}
-          options={{
-            clientSecret,
-            appearance: { theme: isDark ? 'night' : 'stripe' },
-          }}
-        >
-          <AddCardForm
-            onSaved={onCardSaved}
-            onCancel={() => setAdding(false)}
-            onError={setError}
-            testMode={pk.startsWith('pk_test_')}
-          />
-        </Elements>
       ) : (
         <div className="rounded-lg border border-dashed border-line p-5 text-center">
           <p className="mb-3 text-sm text-muted">Aún no tienes una tarjeta guardada.</p>
@@ -276,54 +270,6 @@ export function PaymentMethod({ packs = [] }) {
         )}
       </div>
     </Card>
-  );
-}
-
-/** Formulario de tarjeta con Stripe Elements (iframes). Confirma el SetupIntent. */
-function AddCardForm({ onSaved, onCancel, onError, testMode }) {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [submitting, setSubmitting] = useState(false);
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    if (!stripe || !elements) return;
-    setSubmitting(true);
-    onError('');
-    try {
-      const { error, setupIntent } = await stripe.confirmSetup({
-        elements,
-        redirect: 'if_required', // tarjetas sin 3DS se confirman sin redirigir
-      });
-      if (error) {
-        onError(error.message || 'No se pudo guardar la tarjeta.');
-        setSubmitting(false);
-        return;
-      }
-      await billingApi.savePaymentMethod(setupIntent.payment_method);
-      onSaved();
-    } catch (err) {
-      onError(err.response?.data?.message || 'No se pudo guardar la tarjeta.');
-      setSubmitting(false);
-    }
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-3 rounded-lg border border-line p-4">
-      <PaymentElement options={{ layout: 'tabs' }} />
-      <div className="flex justify-end gap-2">
-        <Button type="button" variant="ghost" size="sm" onClick={onCancel} disabled={submitting}>
-          Cancelar
-        </Button>
-        <Button type="submit" size="sm" disabled={!stripe || submitting}>
-          {submitting ? 'Guardando…' : 'Guardar tarjeta'}
-        </Button>
-      </div>
-      <p className="text-[11px] text-subtle">
-        Pago seguro con Stripe.
-        {testMode && ' Prueba (modo test): 4242 4242 4242 4242, cualquier fecha futura y CVC.'}
-      </p>
-    </form>
   );
 }
 
