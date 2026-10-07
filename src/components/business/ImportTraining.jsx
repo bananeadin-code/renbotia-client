@@ -25,7 +25,7 @@ const SOURCES = [
 const STEPS = ['Leyendo tu información…', 'Encontrando las preguntas que más te hacen…', 'Redactando respuestas con tu estilo…'];
 const TONE_LABEL = { formal: 'Formal', cercano: 'Cercano', neutral: 'Neutral', tecnico: 'Técnico' };
 
-export function ImportTraining({ open, onClose, onApply, allow = {} }) {
+export function ImportTraining({ open, onClose, onApply, allow = {}, faqRoom = null }) {
   const [source, setSource] = useState('');
   const [chats, setChats] = useState([]); // [{ file, messages, participants }]
   const [business, setBusiness] = useState([]); // nombres que son el negocio
@@ -102,7 +102,8 @@ export function ImportTraining({ open, onClose, onApply, allow = {} }) {
       const r = await importApi.analyze(body);
       setResult(r);
       setPick({
-        faqs: r.faqs.map(() => true),
+        // Solo se preseleccionan las que caben en el plan (faqRoom = lugares libres).
+        faqs: r.faqs.map((_, i) => faqRoom == null || i < faqRoom),
         services: r.services.length > 0,
         hours: Boolean(r.hours),
         location: Boolean(r.location),
@@ -131,9 +132,19 @@ export function ImportTraining({ open, onClose, onApply, allow = {} }) {
     onClose();
   }
 
-  const Check = ({ checked, onChange, children }) => (
-    <label className="flex cursor-pointer items-start gap-2.5 rounded-lg p-2 transition hover:bg-surface2/60">
-      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-brand-600" />
+  const Check = ({ checked, onChange, disabled, children }) => (
+    <label
+      className={`flex items-start gap-2.5 rounded-lg p-2 transition ${
+        disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-surface2/60'
+      }`}
+    >
+      <input
+        type="checkbox"
+        checked={checked}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.checked)}
+        className="mt-0.5 h-4 w-4 shrink-0 accent-brand-600"
+      />
       <span className="min-w-0 text-sm">{children}</span>
     </label>
   );
@@ -153,10 +164,20 @@ export function ImportTraining({ open, onClose, onApply, allow = {} }) {
             {result.faqs.length > 0 && (
               <div>
                 <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-subtle">Preguntas frecuentes</p>
+                {faqRoom != null && faqRoom < result.faqs.length && (
+                  <p className="mb-1 rounded-lg bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-300">
+                    {faqRoom === 0
+                      ? 'Ya usaste todas las preguntas frecuentes de tu plan. Mejóralo para agregar más.'
+                      : `Tu plan guarda ${faqRoom} ${faqRoom === 1 ? 'pregunta más' : 'preguntas más'}: elige las más importantes.`}
+                  </p>
+                )}
                 {result.faqs.map((f, i) => (
                   <Check
                     key={i}
                     checked={Boolean(pick.faqs?.[i])}
+                    disabled={
+                      !pick.faqs?.[i] && faqRoom != null && (pick.faqs || []).filter(Boolean).length >= faqRoom
+                    }
                     onChange={(v) => setPick((p) => ({ ...p, faqs: p.faqs.map((x, j) => (j === i ? v : x)) }))}
                   >
                     <span className="block font-medium text-fg">{f.question}</span>

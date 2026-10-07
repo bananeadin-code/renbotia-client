@@ -355,6 +355,7 @@ export default function OnboardingWizard() {
                 open={importOpen}
                 onClose={() => setImportOpen(false)}
                 allow={{ tone: limits.tone, extraContext: false }}
+                faqRoom={Math.max(0, faqMax - faqs.filter((f) => f.question.trim() || f.answer.trim()).length)}
                 onApply={applyImport}
               />
               <div className="grid gap-4 sm:grid-cols-2">

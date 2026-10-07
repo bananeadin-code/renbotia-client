@@ -594,6 +594,11 @@ export default function BotTraining() {
         open={importOpen}
         onClose={() => setImportOpen(false)}
         allow={{ tone: limits.tone, extraContext: limits.extraContext }}
+        faqRoom={
+          limits.maxFaqs == null
+            ? null
+            : Math.max(0, limits.maxFaqs - (cfg?.faqs || []).filter((f) => f.question.trim() || f.answer.trim()).length)
+        }
         onApply={applyImport}
       />
 
