@@ -11,6 +11,7 @@ import { Logo } from '../../components/ui/Logo.jsx';
 import { ThemeToggle } from '../../components/ui/ThemeToggle.jsx';
 import { limitsFor } from '../../lib/planLimits.js';
 import { DEMO_PROFILE_KEY } from '../../lib/demoProfile.js';
+import { ImportTraining } from '../../components/business/ImportTraining.jsx';
 
 const STEPS = ['Tu negocio', 'Elige un plan', 'Entrena tu bot'];
 
@@ -140,6 +141,25 @@ export default function OnboardingWizard() {
   function updateFaq(i, field, value) {
     setFaqs((prev) => prev.map((f, idx) => (idx === i ? { ...f, [field]: value } : f)));
   }
+  // "Entrénalo con lo que ya tienes" también en el registro inicial.
+  const [importOpen, setImportOpen] = useState(false);
+  function applyImport(sel) {
+    const current = faqs.filter((f) => f.question.trim() || f.answer.trim());
+    const known = new Set(current.map((f) => f.question.trim().toLowerCase()));
+    const fresh = sel.faqs.filter((f) => !known.has(f.question.trim().toLowerCase()));
+    const merged = [...current, ...fresh].slice(0, faqMax);
+    setFaqs(merged.length ? merged : [{ question: '', answer: '' }]);
+    setBot((b) => ({
+      ...b,
+      hours: sel.hours || b.hours,
+      location: sel.location || b.location,
+      tone: sel.tone && limits.tone ? sel.tone : b.tone,
+      services: [...new Set([...(b.services || []), ...(sel.services || [])])],
+      basePricing: sel.basePricing || b.basePricing,
+    }));
+    toast.success('Listo. Revisa lo que se cargó; puedes ajustarlo después en Entrenamiento.');
+  }
+
   function addFaq() {
     if (faqs.length < faqMax) setFaqs([...faqs, { question: '', answer: '' }]);
   }
@@ -315,6 +335,26 @@ export default function OnboardingWizard() {
                 Opcional: puedes dejarlo vacío y entrenar tu bot más tarde desde{' '}
                 <strong>Entrenamiento</strong> en el panel.
               </p>
+              <button
+                type="button"
+                onClick={() => setImportOpen(true)}
+                className="flex w-full items-center gap-3 rounded-xl border border-brand-400/40 bg-brand-500/[0.06] p-3 text-left transition hover:border-brand-500"
+              >
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-500/15 text-brand-600">
+                  <Icon name="sparkles" size={18} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-semibold text-fg">Ahórrate escribir: impórtalo</span>
+                  <span className="block text-xs text-muted">Desde tus chats de WhatsApp, tu sitio o tu menú.</span>
+                </span>
+                <Icon name="chevronRight" size={16} className="text-subtle" />
+              </button>
+              <ImportTraining
+                open={importOpen}
+                onClose={() => setImportOpen(false)}
+                allow={{ tone: limits.tone, extraContext: false }}
+                onApply={applyImport}
+              />
               <div className="grid gap-4 sm:grid-cols-2">
                 <Input
                   label="Nombre del bot"

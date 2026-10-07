@@ -199,6 +199,11 @@ export const widgetApi = {
     ),
 };
 
+export const importApi = {
+  // "Entrénalo con lo que ya tienes": propuesta desde chats, sitio o texto.
+  analyze: (body) => unwrap(api.post('/import', body)),
+};
+
 export const learningApi = {
   // "Aprende de ti": lo que el bot podría aprender de la operación diaria.
   list: () => unwrap(api.get('/learning')),

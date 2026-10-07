@@ -10,6 +10,7 @@ import { limitsFor } from '../../lib/planLimits.js';
 import { extractTextFromFile } from '../../lib/extractText.js';
 import { INDUSTRY_TEMPLATES } from '../../content/industryTemplates.js';
 import { LearningCard } from '../../components/business/LearningCard.jsx';
+import { ImportTraining } from '../../components/business/ImportTraining.jsx';
 
 const TONES = [
   { value: 'formal', label: 'Formal' },
@@ -164,6 +165,7 @@ export default function BotTraining() {
   // Tarjeta de plantillas de arranque: visible por defecto; se oculta para el
   // usuario solo al pulsar "No mostrar de nuevo" (recordado en el navegador).
   const [showTemplates, setShowTemplates] = useState(true);
+  const [importOpen, setImportOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -345,6 +347,45 @@ export default function BotTraining() {
   }
   function removeQuickReply(i) {
     setCfg((prev) => ({ ...prev, quickReplies: prev.quickReplies.filter((_, idx) => idx !== i) }));
+  }
+
+  // Aplica lo que propuso "Entrénalo con lo que ya tienes" al formulario. No
+  // guarda: el dueño revisa y pulsa Guardar (con la validación de siempre).
+  function applyImport(sel) {
+    let skipped = 0;
+    setCfg((prev) => {
+      const current = prev.faqs.filter((f) => f.question.trim() || f.answer.trim());
+      const known = new Set(current.map((f) => f.question.trim().toLowerCase()));
+      const fresh = sel.faqs.filter((f) => !known.has(f.question.trim().toLowerCase()));
+      const room = limits.maxFaqs == null ? fresh.length : Math.max(0, limits.maxFaqs - current.length);
+      skipped = Math.max(0, fresh.length - room);
+      const faqs = [...current, ...fresh.slice(0, room)];
+      const services = [
+        ...new Set([
+          ...prev.servicesText.split(',').map((x) => x.trim()).filter(Boolean),
+          ...(sel.services || []),
+        ]),
+      ];
+      return {
+        ...prev,
+        faqs: faqs.length ? faqs : [{ question: '', answer: '' }],
+        servicesText: services.join(', '),
+        tone: sel.tone || prev.tone,
+        extraContext: sel.summary
+          ? [prev.extraContext.trim(), sel.summary].filter(Boolean).join('\n\n').slice(0, 6000)
+          : prev.extraContext,
+        businessInfo: {
+          ...prev.businessInfo,
+          ...(sel.hours ? { hours: sel.hours } : {}),
+          ...(sel.location ? { location: sel.location } : {}),
+          ...(sel.basePricing ? { basePricing: sel.basePricing } : {}),
+        },
+      };
+    });
+    setTimeout(() => {
+      toast.success('Listo. Revisa lo que se cargó y pulsa Guardar.');
+      if (skipped > 0) toast.info(`${skipped} preguntas no cupieron en tu plan. Mejóralo para agregar más.`);
+    }, 0);
   }
 
   async function save({ thenSimulate } = {}) {
@@ -532,6 +573,42 @@ export default function BotTraining() {
       </div>
       )}
 
+      {/* Entrénalo con lo que ya tienes: chats de WhatsApp, sitio o texto */}
+      <Card className="border-brand-400/30 bg-gradient-to-br from-brand-500/[0.06] to-transparent">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-500/15 text-brand-600">
+            <Icon name="sparkles" size={21} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <h2 className="font-semibold text-fg">Entrénalo con lo que ya tienes</h2>
+            <p className="mt-0.5 text-sm text-muted">
+              Sube tus chats de WhatsApp, tu sitio o tu menú y el bot aprende a contestar como tú. Tú eliges qué se queda.
+            </p>
+          </div>
+          <Button onClick={() => setImportOpen(true)} className="shrink-0 justify-center">
+            Importar
+          </Button>
+        </div>
+      </Card>
+      <ImportTraining
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        allow={{ tone: limits.tone, extraContext: limits.extraContext }}
+        onApply={applyImport}
+      />
+
+      {/* Aprende de ti: lo pendiente por enseñar (solo aparece si hay algo) */}
+      <LearningCard
+        onLearned={(faq) =>
+          // La FAQ ya se guardó en el servidor; se agrega al estado local para que
+          // un "Guardar" posterior no la borre.
+          setCfg((prev) => ({
+            ...prev,
+            faqs: [...prev.faqs.filter((f) => f.question.trim() || f.answer.trim()), { question: faq.question, answer: faq.answer }],
+          }))
+        }
+      />
+
       {/* Personalidad */}
       <Card>
         <h2 className="mb-4 font-semibold text-fg">Personalidad</h2>
@@ -583,18 +660,6 @@ export default function BotTraining() {
           />
         </Card>
       )}
-
-      {/* Aprende de ti: lo pendiente por enseñar (solo aparece si hay algo) */}
-      <LearningCard
-        onLearned={(faq) =>
-          // La FAQ ya se guardó en el servidor; se agrega al estado local para que
-          // un "Guardar" posterior no la borre.
-          setCfg((prev) => ({
-            ...prev,
-            faqs: [...prev.faqs.filter((f) => f.question.trim() || f.answer.trim()), { question: faq.question, answer: faq.answer }],
-          }))
-        }
-      />
 
       {/* Datos del negocio */}
       <Card>
