@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { conversationsApi, botConfigApi, learningApi } from '../../api/endpoints.js';
 import { downloadFile } from '../../api/download.js';
 import { toast } from '../../store/toastStore.js';
@@ -87,8 +87,17 @@ export default function Conversations() {
   const [retentionDays, setRetentionDays] = useState(30); // borrado automático por inactividad
   const [onlyHot, setOnlyHot] = useState(false);
   // Clientes reales vs. pruebas del Simulador (aparte, con quién y cuántos tokens).
-  const [scope, setScope] = useState('real');
+  // La pestaña vive en la URL (?vista=simulador) para sobrevivir a recargas.
+  const [params, setParams] = useSearchParams();
+  const [scope, setScope] = useState(params.get('vista') === 'simulador' ? 'simulator' : 'real');
   const [simulatorCount, setSimulatorCount] = useState(0);
+  // Pestaña vigente para los refrescos en segundo plano (los intervalos no ven el
+  // estado nuevo), caché por pestaña para cambiar al instante, y número de
+  // petición por pestaña para descartar respuestas que lleguen tarde.
+  const scopeRef = useRef(scope);
+  const cacheRef = useRef({ real: null, simulator: null });
+  const reqRef = useRef({ real: 0, simulator: 0 });
+  const [listLoading, setListLoading] = useState(false);
   const [onlyWaiting, setOnlyWaiting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
@@ -139,32 +148,65 @@ export default function Conversations() {
       .catch(() => {});
   }, []);
 
-  async function loadList(sc = scope) {
+  // Pinta en pantalla los datos guardados de una pestaña.
+  function applyData(data) {
+    setList(data.conversations);
+    setSimulatorCount(data.simulatorCount || 0);
+    setNeedAttention(data.needAttention || 0);
+    setHotLeads(data.hotLeads || 0);
+    if (data.retentionDays) setRetentionDays(data.retentionDays);
+  }
+
+  /**
+   * Carga la lista de una pestaña. Por defecto la pestaña ACTUAL (scopeRef, no el
+   * estado capturado por un intervalo viejo). Solo pinta si la respuesta es la
+   * más reciente de esa pestaña y esa pestaña sigue a la vista.
+   */
+  async function loadList(sc = scopeRef.current) {
+    const seq = ++reqRef.current[sc];
     try {
       const data = await conversationsApi.list(sc);
-      setList(data.conversations);
-      setSimulatorCount(data.simulatorCount || 0);
-      setNeedAttention(data.needAttention || 0);
-      setHotLeads(data.hotLeads || 0);
-      if (data.retentionDays) setRetentionDays(data.retentionDays);
+      if (seq !== reqRef.current[sc] || data.scope !== sc) return; // respuesta vieja
+      // Defensa extra: cada pestaña solo muestra lo suyo.
+      data.conversations = (data.conversations || []).filter((c) =>
+        sc === 'simulator' ? c.channel === 'simulator' : c.channel !== 'simulator'
+      );
+      cacheRef.current[sc] = data;
+      if (sc === scopeRef.current) applyData(data);
+      else setSimulatorCount(data.simulatorCount || 0);
     } catch {
       /* silencioso */
     } finally {
-      setLoading(false);
+      if (sc === scopeRef.current) {
+        setLoading(false);
+        setListLoading(false);
+      }
     }
   }
   useEffect(() => {
-    loadList(scope);
+    // Primera carga: la pestaña visible y, detrás, la otra (cambio instantáneo).
+    loadList(scopeRef.current).then(() => loadList(scopeRef.current === 'real' ? 'simulator' : 'real'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scope]);
+  }, []);
 
   function switchScope(next) {
-    if (next === scope) return;
+    if (next === scopeRef.current) return;
+    scopeRef.current = next;
+    setScope(next);
+    setParams(next === 'simulator' ? { vista: 'simulador' } : {}, { replace: true });
     setSelectedId(null);
     setThread(null);
     setOnlyHot(false);
     setOnlyWaiting(false);
-    setScope(next);
+    setSearch('');
+    const cached = cacheRef.current[next];
+    if (cached) {
+      applyData(cached); // al instante, sin parpadeo
+    } else {
+      setList([]);
+      setListLoading(true);
+    }
+    loadList(next); // y se actualiza en segundo plano
   }
 
   async function openConv(id) {
@@ -477,37 +519,67 @@ export default function Conversations() {
         )}
       </div>
 
-      {/* Clientes reales | Pruebas del simulador */}
-      <div role="tablist" aria-label="Tipo de conversaciones" className="mb-4 inline-flex rounded-xl border border-line bg-surface p-1">
+      {/* Clientes reales | Pruebas del simulador: control segmentado con
+          indicador deslizante (flechas para cambiar con teclado) */}
+      <div
+        role="tablist"
+        aria-label="Tipo de conversaciones"
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+            e.preventDefault();
+            switchScope(scope === 'real' ? 'simulator' : 'real');
+          }
+        }}
+        className="relative mb-4 grid w-full max-w-xs grid-cols-2 rounded-xl border border-line bg-surface p-1 shadow-card"
+      >
+        <span
+          aria-hidden="true"
+          className="absolute bottom-1 left-1 top-1 w-[calc(50%-4px)] rounded-lg bg-brand-600 shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
+          style={{ transform: scope === 'simulator' ? 'translateX(100%)' : 'translateX(0)' }}
+        />
         {[
           ['real', 'Clientes', 'inbox'],
           ['simulator', 'Simulador', 'message'],
-        ].map(([val, label, icon]) => (
-          <button
-            key={val}
-            type="button"
-            role="tab"
-            aria-selected={scope === val}
-            onClick={() => switchScope(val)}
-            className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-              scope === val ? 'bg-brand-600 text-white' : 'text-muted hover:text-fg'
-            }`}
-          >
-            <Icon name={icon} size={15} /> {label}
-            {val === 'simulator' && simulatorCount > 0 && (
-              <span
-                className={`rounded-full px-1.5 text-[11px] tabular ${
-                  scope === val ? 'bg-white/20 text-white' : 'bg-surface2 text-muted'
-                }`}
-              >
-                {simulatorCount}
-              </span>
-            )}
-          </button>
-        ))}
+        ].map(([val, label, icon]) => {
+          const on = scope === val;
+          return (
+            <button
+              key={val}
+              type="button"
+              role="tab"
+              aria-selected={on}
+              tabIndex={on ? 0 : -1}
+              onClick={() => switchScope(val)}
+              className={`relative z-[1] inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 ${
+                on ? 'text-white' : 'text-muted hover:text-fg'
+              }`}
+            >
+              <Icon name={icon} size={15} /> {label}
+              {val === 'simulator' && simulatorCount > 0 && (
+                <span
+                  className={`rounded-full px-1.5 text-[11px] tabular transition-colors ${
+                    on ? 'bg-white/20 text-white' : 'bg-surface2 text-muted'
+                  }`}
+                >
+                  {simulatorCount}
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
-      {list.length === 0 ? (
+      {listLoading ? (
+        // Primera vez en esta pestaña: esqueleto en lugar de un parpadeo vacío.
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[330px_minmax(0,1fr)]" aria-busy="true">
+          <div className="space-y-2">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="h-[92px] animate-pulse rounded-xl border border-line bg-surface" />
+            ))}
+          </div>
+          <div className="hidden h-[70vh] animate-pulse rounded-2xl border border-line bg-surface lg:block" />
+        </div>
+      ) : list.length === 0 ? (
         <Card className="py-12 text-center">
           <Icon name="message" size={30} className="mx-auto mb-2 text-subtle" />
           <p className="text-sm text-muted">
