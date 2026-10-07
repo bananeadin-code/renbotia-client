@@ -86,6 +86,9 @@ export default function Dashboard() {
       {/* Primeros pasos (solo cuentas nuevas / incompletas) */}
       <OnboardingChecklist />
 
+      {/* Regalo único: invita a 3 negocios y gana 1 mes de Pro (destacado arriba) */}
+      <ReferralCard />
+
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
@@ -127,9 +130,6 @@ export default function Dashboard() {
 
       {/* Lo que generó tu bot: datos reales + estimación en pesos (retención) */}
       <ImpactCard impact={impact} onChange={setImpact} />
-
-      {/* Invita y gana: 1 mes de Pro por cada 3 negocios */}
-      <ReferralCard />
 
       {/* Barra de consumo (en conversaciones, tono tranquilo) */}
       <Card>

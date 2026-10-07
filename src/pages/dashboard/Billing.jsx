@@ -8,6 +8,7 @@ import { toast } from '../../store/toastStore.js';
 import { Card, Button, Badge, Alert, Spinner } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { fmtConversations } from '../../lib/usage.js';
+import { ReferralTeaser } from '../../components/dashboard/ReferralCard.jsx';
 
 /**
  * Facturación: plan actual + gestión (cambiar/cancelar/reactivar), balance,
@@ -153,6 +154,9 @@ export default function Billing() {
         <h1 className="text-2xl font-bold text-fg">Facturación</h1>
         <p className="text-sm text-muted">Gestiona tu plan y tus créditos.</p>
       </div>
+
+      {/* Regalo de referidos (solo si aún no se reclama) */}
+      <ReferralTeaser />
 
       {msg && <Alert variant="success">{msg}</Alert>}
       {error && <Alert variant="error">{error}</Alert>}
