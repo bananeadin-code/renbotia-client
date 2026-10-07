@@ -608,7 +608,6 @@ export default function BotTraining() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Input label="Horario de atención" value={cfg.businessInfo.hours} onChange={(e) => setInfo('hours', e.target.value)} placeholder="Lun-Vie 9:00-18:00" />
           <Input label="Ubicación" value={cfg.businessInfo.location} onChange={(e) => setInfo('location', e.target.value)} placeholder="Centro, Durango" />
           <Input
             label="Servicios (separados por coma)"
@@ -618,6 +617,171 @@ export default function BotTraining() {
           />
           <Input label="Precios base" value={cfg.businessInfo.basePricing} onChange={(e) => setInfo('basePricing', e.target.value)} placeholder="Consulta desde $500 MXN" />
         </div>
+      </Card>
+
+      {/* Horario de atención (todos los planes) */}
+      <Card>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600">
+              <Icon name="clock" size={18} />
+            </span>
+            <div>
+              <h2 className="font-semibold text-fg">Horario de atención</h2>
+              <p className="mt-0.5 text-xs text-muted">
+                Dile al bot cuándo está abierto tu negocio: puede contestar siempre (y avisar cuando estés cerrado) o
+                solo fuera de tu horario, mientras tú atiendes en horario.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={cfg.schedule.enabled}
+            aria-label="Activar horario de atención"
+            onClick={() => set('schedule', { ...cfg.schedule, enabled: !cfg.schedule.enabled })}
+            className={`relative mt-1 h-6 w-11 shrink-0 rounded-full transition ${
+              cfg.schedule.enabled ? 'bg-brand-600' : 'bg-surface2 ring-1 ring-inset ring-line'
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
+                cfg.schedule.enabled ? 'left-[22px]' : 'left-0.5'
+              }`}
+            />
+          </button>
+        </div>
+
+        {/* Negocios que escribieron su horario a mano antes de este componente. */}
+        {!cfg.schedule.enabled && cfg.businessInfo.hours?.trim() && (
+          <p className="mt-3 flex items-start gap-1.5 rounded-lg bg-surface2/60 px-3 py-2 text-xs text-muted">
+            <Icon name="clock" size={13} className="mt-0.5 shrink-0" />
+            <span>
+              Hoy el bot usa el horario que escribiste: <strong className="text-fg">{cfg.businessInfo.hours}</strong>.
+              Actívalo aquí para que lo sepa con exactitud y sepa cuándo estás cerrado.
+            </span>
+          </p>
+        )}
+
+        {cfg.schedule.enabled && (
+          <div className="mt-4 space-y-5 border-t border-line pt-4 animate-fade-up">
+            <div>
+              <p className="mb-1.5 text-sm font-medium text-fg">¿Cuándo contesta el bot?</p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {[
+                  ['always', 'Siempre', 'Contesta a toda hora. Cuando estés cerrado, lo sabe y avisa que atenderán en horario.'],
+                  ['closed_only', 'Solo fuera de horario', 'En horario contestas tú desde Conversaciones; el bot cubre noches y días libres.'],
+                ].map(([val, title, desc]) => (
+                  <button
+                    key={val}
+                    type="button"
+                    onClick={() => set('schedule', { ...cfg.schedule, botMode: val })}
+                    className={`rounded-xl border p-3 text-left transition ${
+                      cfg.schedule.botMode === val
+                        ? 'border-brand-500 bg-brand-500/5 ring-1 ring-brand-500'
+                        : 'border-line hover:border-brand-300'
+                    }`}
+                  >
+                    <span className="block text-sm font-medium text-fg">{title}</span>
+                    <span className="mt-0.5 block text-xs text-muted">{desc}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-medium text-fg">Días y horas</p>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      set('schedule', {
+                        ...cfg.schedule,
+                        days: cfg.schedule.days.map((d) => ({ ...d, enabled: true, open: '00:00', close: '23:59' })),
+                      })
+                    }
+                    className="rounded-full border border-line px-2 py-0.5 text-[11px] font-medium text-muted transition hover:border-brand-300 hover:text-fg"
+                  >
+                    Abierto 24/7
+                  </button>
+                </div>
+                <select
+                  value={cfg.schedule.timezone}
+                  onChange={(e) => set('schedule', { ...cfg.schedule, timezone: e.target.value })}
+                  aria-label="Zona horaria"
+                  className="rounded-lg border border-line bg-canvas px-2.5 py-1.5 text-xs text-fg outline-none focus:border-brand-500"
+                >
+                  {TIMEZONES.map(([tz, label]) => (
+                    <option key={tz} value={tz}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="divide-y divide-line rounded-xl border border-line">
+                {cfg.schedule.days.map((d, i) => {
+                  const setDay = (patch) =>
+                    set('schedule', {
+                      ...cfg.schedule,
+                      days: cfg.schedule.days.map((x, j) => (j === i ? { ...x, ...patch } : x)),
+                    });
+                  return (
+                    <div key={d.day} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2.5">
+                      <label className="flex w-28 shrink-0 cursor-pointer items-center gap-2 text-sm text-fg">
+                        <input
+                          type="checkbox"
+                          checked={d.enabled}
+                          onChange={(e) => setDay({ enabled: e.target.checked })}
+                          className="h-4 w-4 rounded border-line accent-brand-600"
+                        />
+                        {DAY_LABELS[d.day]}
+                      </label>
+                      {d.enabled ? (
+                        <div className="flex items-center gap-2 text-sm">
+                          <input
+                            type="time"
+                            value={d.open}
+                            onChange={(e) => setDay({ open: e.target.value })}
+                            aria-label={`${DAY_LABELS[d.day]}: abre`}
+                            className="rounded-lg border border-line bg-canvas px-2 py-1 text-fg outline-none focus:border-brand-500"
+                          />
+                          <span className="text-subtle">a</span>
+                          <input
+                            type="time"
+                            value={d.close}
+                            onChange={(e) => setDay({ close: e.target.value })}
+                            aria-label={`${DAY_LABELS[d.day]}: cierra`}
+                            className="rounded-lg border border-line bg-canvas px-2 py-1 text-fg outline-none focus:border-brand-500"
+                          />
+                        </div>
+                      ) : (
+                        <span className="text-sm text-subtle">Cerrado</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="mt-1.5 text-[11px] text-subtle">
+                Si cierras después de medianoche (por ejemplo 20:00 a 02:00), el horario se cuenta hasta la madrugada.
+              </p>
+            </div>
+
+            {cfg.schedule.botMode === 'always' && (
+              <div>
+                <Textarea
+                  label="Aviso cuando estés cerrado (opcional)"
+                  rows={2}
+                  maxLength={300}
+                  value={cfg.schedule.closedMessage}
+                  onChange={(e) => set('schedule', { ...cfg.schedule, closedMessage: e.target.value })}
+                  placeholder="Ej. Abrimos mañana a las 9:00. Si es urgente, déjanos tu número y te llamamos."
+                />
+                <p className="mt-1 text-[11px] text-subtle">El bot lo comunica con sus palabras cuando aplique.</p>
+              </div>
+            )}
+          </div>
+        )}
       </Card>
 
       {/* Base de conocimiento */}
@@ -815,146 +979,6 @@ export default function BotTraining() {
           </p>
         </Card>
       )}
-
-      {/* Horario de atención (todos los planes) */}
-      <Card>
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600">
-              <Icon name="clock" size={18} />
-            </span>
-            <div>
-              <h2 className="font-semibold text-fg">Horario de atención</h2>
-              <p className="mt-0.5 text-xs text-muted">
-                Dile al bot cuándo está abierto tu negocio: puede contestar siempre (y avisar cuando estés cerrado) o
-                solo fuera de tu horario, mientras tú atiendes en horario.
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={cfg.schedule.enabled}
-            aria-label="Activar horario de atención"
-            onClick={() => set('schedule', { ...cfg.schedule, enabled: !cfg.schedule.enabled })}
-            className={`relative mt-1 h-6 w-11 shrink-0 rounded-full transition ${
-              cfg.schedule.enabled ? 'bg-brand-600' : 'bg-surface2 ring-1 ring-inset ring-line'
-            }`}
-          >
-            <span
-              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
-                cfg.schedule.enabled ? 'left-[22px]' : 'left-0.5'
-              }`}
-            />
-          </button>
-        </div>
-
-        {cfg.schedule.enabled && (
-          <div className="mt-4 space-y-5 border-t border-line pt-4 animate-fade-up">
-            <div>
-              <p className="mb-1.5 text-sm font-medium text-fg">¿Cuándo contesta el bot?</p>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {[
-                  ['always', 'Siempre', 'Contesta a toda hora. Cuando estés cerrado, lo sabe y avisa que atenderán en horario.'],
-                  ['closed_only', 'Solo fuera de horario', 'En horario contestas tú desde Conversaciones; el bot cubre noches y días libres.'],
-                ].map(([val, title, desc]) => (
-                  <button
-                    key={val}
-                    type="button"
-                    onClick={() => set('schedule', { ...cfg.schedule, botMode: val })}
-                    className={`rounded-xl border p-3 text-left transition ${
-                      cfg.schedule.botMode === val
-                        ? 'border-brand-500 bg-brand-500/5 ring-1 ring-brand-500'
-                        : 'border-line hover:border-brand-300'
-                    }`}
-                  >
-                    <span className="block text-sm font-medium text-fg">{title}</span>
-                    <span className="mt-0.5 block text-xs text-muted">{desc}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-medium text-fg">Días y horas</p>
-                <select
-                  value={cfg.schedule.timezone}
-                  onChange={(e) => set('schedule', { ...cfg.schedule, timezone: e.target.value })}
-                  aria-label="Zona horaria"
-                  className="rounded-lg border border-line bg-canvas px-2.5 py-1.5 text-xs text-fg outline-none focus:border-brand-500"
-                >
-                  {TIMEZONES.map(([tz, label]) => (
-                    <option key={tz} value={tz}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="divide-y divide-line rounded-xl border border-line">
-                {cfg.schedule.days.map((d, i) => {
-                  const setDay = (patch) =>
-                    set('schedule', {
-                      ...cfg.schedule,
-                      days: cfg.schedule.days.map((x, j) => (j === i ? { ...x, ...patch } : x)),
-                    });
-                  return (
-                    <div key={d.day} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2.5">
-                      <label className="flex w-28 shrink-0 cursor-pointer items-center gap-2 text-sm text-fg">
-                        <input
-                          type="checkbox"
-                          checked={d.enabled}
-                          onChange={(e) => setDay({ enabled: e.target.checked })}
-                          className="h-4 w-4 rounded border-line accent-brand-600"
-                        />
-                        {DAY_LABELS[d.day]}
-                      </label>
-                      {d.enabled ? (
-                        <div className="flex items-center gap-2 text-sm">
-                          <input
-                            type="time"
-                            value={d.open}
-                            onChange={(e) => setDay({ open: e.target.value })}
-                            aria-label={`${DAY_LABELS[d.day]}: abre`}
-                            className="rounded-lg border border-line bg-canvas px-2 py-1 text-fg outline-none focus:border-brand-500"
-                          />
-                          <span className="text-subtle">a</span>
-                          <input
-                            type="time"
-                            value={d.close}
-                            onChange={(e) => setDay({ close: e.target.value })}
-                            aria-label={`${DAY_LABELS[d.day]}: cierra`}
-                            className="rounded-lg border border-line bg-canvas px-2 py-1 text-fg outline-none focus:border-brand-500"
-                          />
-                        </div>
-                      ) : (
-                        <span className="text-sm text-subtle">Cerrado</span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-              <p className="mt-1.5 text-[11px] text-subtle">
-                Si cierras después de medianoche (por ejemplo 20:00 a 02:00), el horario se cuenta hasta la madrugada.
-              </p>
-            </div>
-
-            {cfg.schedule.botMode === 'always' && (
-              <div>
-                <Textarea
-                  label="Aviso cuando estés cerrado (opcional)"
-                  rows={2}
-                  maxLength={300}
-                  value={cfg.schedule.closedMessage}
-                  onChange={(e) => set('schedule', { ...cfg.schedule, closedMessage: e.target.value })}
-                  placeholder="Ej. Abrimos mañana a las 9:00. Si es urgente, déjanos tu número y te llamamos."
-                />
-                <p className="mt-1 text-[11px] text-subtle">El bot lo comunica con sus palabras cuando aplique.</p>
-              </div>
-            )}
-          </div>
-        )}
-      </Card>
 
       {/* Seguimiento automático (Pro/Elite) */}
       <Card>
