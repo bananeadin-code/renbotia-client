@@ -75,7 +75,10 @@ export const chatApi = {
 
 export const simulatorApi = {
   // Devuelve la respuesta completa para poder distinguir el 402 (límite).
-  send: (message, chatId) => api.post('/simulator/message', { message, chatId }),
+  // file (opcional): { kind:'image'|'pdf', mediaType, data(base64), name } para probar
+  // cómo responde el bot a una foto o un PDF.
+  send: (message, chatId, file) =>
+    api.post('/simulator/message', { message, chatId, ...(file ? { file } : {}) }),
 };
 
 export const demoApi = {

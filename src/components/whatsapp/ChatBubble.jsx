@@ -1,9 +1,11 @@
+import { Icon } from '../ui/Icon.jsx';
+
 /**
  * Burbuja de mensaje estilo WhatsApp. `mine` = mensaje del usuario (verde,
  * a la derecha); si no, respuesta del bot (blanco, a la izquierda).
  * `images` = imágenes reales que el bot adjuntó ([{label, url}]).
  */
-export function ChatBubble({ content, time, mine, images }) {
+export function ChatBubble({ content, time, mine, images, files }) {
   const hasImages = Array.isArray(images) && images.length > 0;
   return (
     <div className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
@@ -32,6 +34,15 @@ export function ChatBubble({ content, time, mine, images }) {
             ))}
           </div>
         )}
+        {files?.map((f, i) => (
+          <span
+            key={i}
+            className="mb-1.5 flex items-center gap-1.5 rounded-md bg-black/5 px-2 py-1.5 text-xs font-medium text-slate-700 dark:bg-white/10 dark:text-whatsapp-darkText"
+          >
+            <Icon name="file" size={14} className="shrink-0 text-red-500" />
+            <span className="min-w-0 truncate">{f.name || 'documento.pdf'}</span>
+          </span>
+        ))}
         {content && (
           <p className="whitespace-pre-wrap break-words text-slate-800 dark:text-whatsapp-darkText">
             {content}

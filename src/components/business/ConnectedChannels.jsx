@@ -1,23 +1,25 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { connectionsApi } from '../../api/endpoints.js';
+import { connectionsApi, widgetApi } from '../../api/endpoints.js';
 import { Card, Badge, Spinner } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
 
 /**
  * Panel informativo de canales conectados (solo datos). La conexión real se
  * gestiona en Conexiones; aquí se muestra el número de WhatsApp asociado al bot
- * y el de Facebook Messenger e Instagram.
+ * y el de Facebook Messenger e Instagram, más el chat del sitio web.
  */
 export function ConnectedChannels() {
   const [data, setData] = useState(null);
+  const [web, setWeb] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    connectionsApi
-      .get()
-      .then(setData)
-      .catch(() => setData(null))
+    Promise.all([connectionsApi.get().catch(() => null), widgetApi.get().catch(() => null)])
+      .then(([conn, widget]) => {
+        setData(conn);
+        setWeb(widget);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -145,6 +147,39 @@ export function ConnectedChannels() {
               </span>
             </div>
           )}
+
+          {/* Chat del sitio web */}
+          <div
+            className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 ${
+              web?.allowed ? 'border border-line bg-surface2/40' : 'border border-dashed border-line opacity-70'
+            }`}
+          >
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sky-500/10 text-sky-600">
+                <Icon name="globe" size={18} />
+              </span>
+              <div className="min-w-0">
+                <div className="text-sm font-medium text-fg">Chat del sitio web</div>
+                <div className="truncate text-xs text-subtle">
+                  {!web?.allowed ? 'Disponible en Pro y Elite' : web.enabled ? 'Activo en tu sitio' : 'Sin activar'}
+                </div>
+              </div>
+            </div>
+            {web?.allowed && web.enabled ? (
+              <Badge color="green">Activo</Badge>
+            ) : web?.allowed ? (
+              <Link
+                to="/dashboard/conexiones?canal=web"
+                className="shrink-0 text-xs font-semibold text-brand-600 hover:underline"
+              >
+                Activar
+              </Link>
+            ) : (
+              <Link to="/dashboard/facturacion" className="shrink-0 text-xs font-semibold text-brand-600 hover:underline">
+                Ver planes
+              </Link>
+            )}
+          </div>
         </div>
       )}
     </Card>

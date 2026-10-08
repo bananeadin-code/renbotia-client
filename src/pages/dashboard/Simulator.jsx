@@ -7,12 +7,14 @@ import { ChatBubble } from '../../components/whatsapp/ChatBubble.jsx';
 import { TypingIndicator } from '../../components/whatsapp/TypingIndicator.jsx';
 import { Button, Alert } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
+import { compressImageForUpload, fileToBase64 } from '../../lib/image.js';
 
 const hhmm = (d = new Date()) =>
   d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
 
 export default function Simulator() {
-  const { balance, setBalance, business } = useBusinessStore();
+  const { balance, setBalance, business, subscription } = useBusinessStore();
+  const readsFiles = subscription?.plan?.key === 'elite';
   const [botName, setBotName] = useState('Asistente');
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -22,6 +24,7 @@ export default function Simulator() {
   const [error, setError] = useState('');
   const [captured, setCaptured] = useState([]);
   const scrollRef = useRef(null);
+  const fileRef = useRef(null);
 
   useEffect(() => {
     botConfigApi.get().then((data) => setBotName(data.botConfig.botName || 'Asistente')).catch(() => {});
@@ -31,18 +34,48 @@ export default function Simulator() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, typing]);
 
-  async function send(e) {
+  // Probar cómo responde el bot a una foto o un PDF (como si lo mandara un cliente).
+  async function onPickFile(e) {
+    const f = e.target.files?.[0];
+    e.target.value = '';
+    if (!f || typing) return;
+    try {
+      if (f.type.startsWith('image/')) {
+        const img = await compressImageForUpload(f);
+        await send(null, { kind: 'image', mediaType: img.mediaType, data: img.data, preview: img.preview });
+      } else if (f.type === 'application/pdf' || /\.pdf$/i.test(f.name)) {
+        if (f.size > 5 * 1024 * 1024) return setError('El PDF pesa demasiado (máximo 5 MB).');
+        await send(null, { kind: 'pdf', mediaType: 'application/pdf', data: await fileToBase64(f), name: f.name });
+      } else {
+        setError('Puedes adjuntar una foto o un PDF.');
+      }
+    } catch (err) {
+      setError(err.message || 'No se pudo leer el archivo.');
+    }
+  }
+
+  async function send(e, file) {
     e?.preventDefault();
     const text = input.trim();
-    if (!text || typing) return;
+    if ((!text && !file) || typing) return;
 
     setError('');
     setInput('');
-    setMessages((m) => [...m, { role: 'user', content: text, time: hhmm() }]);
+    setMessages((m) => [
+      ...m,
+      {
+        role: 'user',
+        content: text,
+        images: file?.preview ? [{ url: file.preview }] : undefined,
+        files: file?.kind === 'pdf' ? [{ name: file.name }] : undefined,
+        time: hhmm(),
+      },
+    ]);
     setTyping(true);
 
     try {
-      const res = await simulatorApi.send(text, chatId || undefined);
+      const payload = file ? { kind: file.kind, mediaType: file.mediaType, data: file.data, name: file.name || '' } : undefined;
+      const res = await simulatorApi.send(text, chatId || undefined, payload);
       const data = res.data.data;
       setChatId(data.chatId);
       setBalance(data.balance);
@@ -144,6 +177,7 @@ export default function Simulator() {
               time={m.time}
               mine={m.role === 'user'}
               images={m.images}
+              files={m.files}
             />
           ))}
 
@@ -165,6 +199,25 @@ export default function Simulator() {
         {/* Input */}
         <form onSubmit={send} className="flex items-center gap-2 border-t border-line bg-surface p-3">
           <input
+            ref={fileRef}
+            type="file"
+            accept="image/*,application/pdf"
+            className="hidden"
+            onChange={onPickFile}
+            aria-hidden="true"
+            tabIndex={-1}
+          />
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            disabled={typing || limitReached}
+            aria-label="Adjuntar foto o PDF"
+            title={readsFiles ? 'Adjuntar foto o PDF' : 'Adjuntar foto o PDF (el bot los lee en Elite)'}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted transition hover:bg-surface2 hover:text-fg disabled:opacity-50"
+          >
+            <Icon name="paperclip" size={18} />
+          </button>
+          <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={limitReached}
@@ -184,6 +237,9 @@ export default function Simulator() {
 
       <p className="text-center text-xs text-subtle">
         Cada mensaje consume tokens reales de la API de Claude, descontados de tu plan.
+        {readsFiles
+          ? ' Puedes adjuntar fotos o PDF como lo haría un cliente.'
+          : ' Puedes adjuntar fotos o PDF para ver cómo responde: en tu plan el bot pide que se lo escriban; en Elite los lee.'}
       </p>
     </div>
   );
