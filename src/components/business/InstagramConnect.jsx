@@ -251,6 +251,14 @@ export function InstagramConnect({ data, isOwner, sdkReady, onChanged }) {
                     activa <strong className="text-fg">Permitir acceso a los mensajes</strong>.
                   </span>
                 </li>
+                <li className="flex items-start gap-1.5">
+                  <Icon name="check" size={13} className="mt-0.5 shrink-0 text-brand-600" />
+                  <span>
+                    En la ventana de Facebook, elige la <strong className="text-fg">Página ligada</strong> y tu cuenta de
+                    Instagram, y deja <strong className="text-fg">todos los permisos marcados</strong>. No necesitas
+                    conectar Messenger antes.
+                  </span>
+                </li>
               </ul>
               <p className="mt-3 flex items-start gap-1.5 text-xs text-subtle">
                 <Icon name="shield" size={14} className="mt-0.5 shrink-0" />
