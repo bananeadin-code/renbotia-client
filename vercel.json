@@ -1,8 +1,19 @@
 {
+  "redirects": [
+    {
+      "source": "/api/:path((?!media/|widget/public/).*)",
+      "destination": "https://api.renbotia.com/api/:path",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "https://renbotia-server.onrender.com/api/:path*"
+      "source": "/api/media/:path*",
+      "destination": "https://renbotia-server.onrender.com/api/media/:path*"
+    },
+    {
+      "source": "/api/widget/public/:path*",
+      "destination": "https://renbotia-server.onrender.com/api/widget/public/:path*"
     },
     {
       "source": "/(.*)",
