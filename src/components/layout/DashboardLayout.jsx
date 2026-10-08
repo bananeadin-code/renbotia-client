@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { PastDueBanner } from '../dashboard/PastDueBanner.jsx';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore.js';
 import { useBusinessStore } from '../../store/businessStore.js';
@@ -197,6 +198,7 @@ export function DashboardLayout() {
             en pantallas anchas o al alejar el zoom). */}
         <main className="min-h-screen min-w-0 flex-1 p-4 md:p-8">
           <div className="mx-auto max-w-6xl">
+            <PastDueBanner />
             <Outlet />
           </div>
         </main>
