@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { widgetApi } from '../../api/endpoints.js';
+import { compressImageForUpload, fileToBase64 } from '../../lib/image.js';
 import { Icon } from '../../components/ui/Icon.jsx';
 
 /**
@@ -170,20 +171,53 @@ export default function WidgetChat() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, sending]);
 
-  async function send(e, preset) {
+  // Adjuntar foto o PDF (solo si el negocio lo permite: plan con lectura de archivos).
+  const fileRef = useRef(null);
+  async function onPickFile(e) {
+    const f = e.target.files?.[0];
+    e.target.value = '';
+    if (!f || sending) return;
+    try {
+      if (f.type.startsWith('image/')) {
+        const img = await compressImageForUpload(f);
+        await send(null, null, { kind: 'image', mediaType: img.mediaType, data: img.data, preview: img.preview });
+      } else if (f.type === 'application/pdf' || /\.pdf$/i.test(f.name)) {
+        if (f.size > 5 * 1024 * 1024) return setNotice('El PDF pesa demasiado (máximo 5 MB).');
+        const data = await fileToBase64(f);
+        await send(null, null, { kind: 'pdf', mediaType: 'application/pdf', data, name: f.name });
+      } else {
+        setNotice('Puedes adjuntar una foto o un PDF.');
+      }
+    } catch (err) {
+      setNotice(err.message || 'No se pudo leer el archivo.');
+    }
+  }
+
+  async function send(e, preset, file) {
     e?.preventDefault();
     const msg = (preset ?? text).trim();
-    if (!msg || sending) return;
+    if ((!msg && !file) || sending) return;
     setText('');
     setNotice('');
     setSending(true);
     busy.current = true;
     const base = serverCount.current;
-    setMessages((prev) => [...prev, { role: 'user', content: msg, at: new Date().toISOString(), pending: true }]);
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: 'user',
+        content: msg,
+        images: file?.preview ? [{ url: file.preview, label: 'Tu foto' }] : undefined,
+        files: file?.kind === 'pdf' ? [{ name: file.name }] : undefined,
+        at: new Date().toISOString(),
+        pending: true,
+      },
+    ]);
     try {
       const res = await widgetApi.send(key, {
         sessionId: sessionRef.current,
         message: msg,
+        ...(file ? { file: { kind: file.kind, mediaType: file.mediaType, data: file.data, name: file.name || '' } } : {}),
         after: base,
         host: hostRef.current,
         ...(config?.requireContact && !hasContact && contact ? { contact } : {}),
@@ -317,6 +351,12 @@ export default function WidgetChat() {
                 {m.images?.map((img, k) => (
                   <img key={k} src={img.url} alt={img.label || 'imagen'} className="mb-1 max-h-56 w-full rounded-md object-cover" />
                 ))}
+                {m.files?.map((f, k) => (
+                  <span key={k} className="mb-1 flex items-center gap-1.5 rounded-md bg-black/10 px-2 py-1.5 text-xs font-medium">
+                    <Icon name="file" size={14} className="shrink-0" />
+                    <span className="min-w-0 truncate">{f.name || 'documento.pdf'}</span>
+                  </span>
+                ))}
                 {richText(m.content)}
               </Bubble>
             </div>
@@ -403,6 +443,29 @@ export default function WidgetChat() {
         onSubmit={send}
         className={`flex shrink-0 items-center gap-2 bg-surface p-2.5 ${showSuggestions ? '' : 'border-t border-line'}`}
       >
+        {config?.allowFiles && (
+          <>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*,application/pdf"
+              className="hidden"
+              onChange={onPickFile}
+              aria-hidden="true"
+              tabIndex={-1}
+            />
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              disabled={sending}
+              aria-label="Adjuntar foto o PDF"
+              title="Adjuntar foto o PDF"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-muted transition hover:bg-surface2 hover:text-fg disabled:opacity-40"
+            >
+              <Icon name="paperclip" size={18} />
+            </button>
+          </>
+        )}
         <input
           ref={inputRef}
           value={text}

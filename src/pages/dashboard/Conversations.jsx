@@ -127,6 +127,8 @@ export default function Conversations() {
   const [templates, setTemplates] = useState([]);
   const [templateReason, setTemplateReason] = useState(null);
   const [templatesLoaded, setTemplatesLoaded] = useState(false);
+  // Valores de las variables de la plantilla elegida ({nombre} = el cliente).
+  const [tplParams, setTplParams] = useState([]);
   const [tplName, setTplName] = useState('');
   const [sendingTpl, setSendingTpl] = useState(false);
   // Búsqueda + filtro por fecha (cliente) y renombrar conversación.
@@ -340,13 +342,35 @@ export default function Conversations() {
   async function loadTemplates() {
     try {
       const data = await conversationsApi.templates();
-      setTemplates(data.templates || []);
+      // Solo las que se pueden enviar desde aquí (sin encabezado multimedia ni
+      // botones con datos variables).
+      const usable = (data.templates || []).filter((t) => t.usable !== false);
+      setTemplates(usable);
       setTemplateReason(data.reason || null);
-      if (data.templates?.length) setTplName(data.templates[0].name);
+      if (usable.length) pickTemplate(usable[0]);
     } catch {
       setTemplateReason('fetch_failed');
     } finally {
       setTemplatesLoaded(true);
+    }
+  }
+
+  function pickTemplate(t) {
+    setTplName(t?.name || '');
+    setTplParams((t?.vars || []).map((_, i) => (i === 0 ? '{nombre}' : '')));
+  }
+
+  async function downloadFile(file) {
+    try {
+      const blob = await conversationsApi.downloadFile(selectedId, file.id);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.name || 'documento.pdf';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    } catch {
+      toast.error('No se pudo descargar el archivo (se borra junto con la conversación).');
     }
   }
 
@@ -358,6 +382,7 @@ export default function Conversations() {
       const data = await conversationsApi.sendTemplate(selectedId, {
         templateName: tplName,
         languageCode: tpl?.language || 'es_MX',
+        params: tplParams,
       });
       setThread(data.conversation);
       toast.success('Plantilla enviada. Cuando el cliente responda, se reabrirá la ventana de 24 h.');
@@ -409,6 +434,7 @@ export default function Conversations() {
       // Aprende de ti: ofrecer que el bot aprenda esta respuesta.
       setLearnOffer(data.suggestion ? { ...data.suggestion, chatId: selectedId } : null);
       if (data.sendWarning) toast.error(data.sendWarning); // p.ej. falta pago en Meta
+      if (data.emailed) toast.info('El visitante ya no estaba en el sitio: le avisamos por correo.');
       loadList();
     } catch (err) {
       if (err.response?.data?.details?.code === 'WINDOW_CLOSED') {
@@ -1001,7 +1027,15 @@ export default function Conversations() {
                         <div className="max-w-[80%]">
                           {mine && (
                             <div className={`mb-0.5 text-right text-[10px] font-medium ${agent ? 'text-brand-600' : 'text-subtle'}`}>
-                              {agent ? 'Tú (persona)' : m.followUp ? 'Bot · seguimiento automático' : 'Bot'}
+                              {agent
+                                ? m.template
+                                  ? 'Tú · plantilla'
+                                  : 'Tú (persona)'
+                                : m.template
+                                  ? 'Bot · seguimiento con plantilla'
+                                  : m.followUp
+                                    ? 'Bot · seguimiento automático'
+                                    : 'Bot'}
                             </div>
                           )}
                           <div
@@ -1026,7 +1060,25 @@ export default function Conversations() {
                                 ))}
                               </div>
                             )}
-                            {m.content && m.content !== '(imagen del cliente)' && (
+                            {m.files?.length > 0 && (
+                              <div className="mb-1 space-y-1">
+                                {m.files.map((f) => (
+                                  <button
+                                    key={f.id}
+                                    type="button"
+                                    onClick={() => downloadFile(f)}
+                                    className="flex w-full items-center gap-2 rounded-md border border-black/10 bg-white/70 px-2.5 py-2 text-left text-xs text-slate-700 transition hover:bg-white dark:border-white/10 dark:bg-black/20 dark:text-whatsapp-darkText"
+                                  >
+                                    <Icon name="file" size={16} className="shrink-0 text-red-500" />
+                                    <span className="min-w-0 flex-1 truncate font-medium">{f.name}</span>
+                                    <span className="shrink-0 text-[10px] text-slate-400">
+                                      {f.size ? `${Math.max(1, Math.round(f.size / 1024))} KB` : 'PDF'}
+                                    </span>
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                            {m.content && m.content !== '(imagen del cliente)' && !/^\(documento del cliente: .*\)$/.test(m.content) && (
                               <p className={`whitespace-pre-wrap break-words ${mine && agent ? 'text-white' : 'text-slate-800 dark:text-whatsapp-darkText'}`}>
                                 {m.content}
                               </p>
@@ -1101,10 +1153,11 @@ export default function Conversations() {
                     {!templatesLoaded ? (
                       <p className="text-xs text-subtle">Cargando plantillas…</p>
                     ) : templates.length ? (
+                      <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <select
                           value={tplName}
-                          onChange={(e) => setTplName(e.target.value)}
+                          onChange={(e) => pickTemplate(templates.find((t) => t.name === e.target.value))}
                           className="min-w-0 flex-1 rounded-lg border border-line bg-canvas px-3 py-2 text-sm text-fg outline-none focus:border-brand-500"
                         >
                           {templates.map((t) => (
@@ -1116,6 +1169,13 @@ export default function Conversations() {
                         <Button size="sm" className="shrink-0" disabled={sendingTpl || !tplName} onClick={sendTemplateMsg}>
                           {sendingTpl ? 'Enviando…' : 'Enviar plantilla'}
                         </Button>
+                      </div>
+                      <TemplateVars
+                        template={templates.find((t) => t.name === tplName)}
+                        values={tplParams}
+                        onChange={setTplParams}
+                        customerName={thread.customerName}
+                      />
                       </div>
                     ) : (
                       <Alert variant="info">
@@ -1210,6 +1270,42 @@ export default function Conversations() {
             )}
           </div>
         </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Variables de una plantilla de WhatsApp ({{1}}, {{nombre}}…): un campo por
+ * variable y la vista previa del mensaje tal como lo recibirá el cliente.
+ * {nombre} se reemplaza por el nombre del cliente al enviar.
+ */
+function TemplateVars({ template, values, onChange, customerName }) {
+  if (!template) return null;
+  const vars = template.vars || [];
+  const first = String(customerName || '').trim().split(/\s+/)[0] || 'cliente';
+  const fill = (v) => String(v || '').replace(/\{nombre\}/gi, first) || '…';
+  let preview = template.bodyText || '';
+  vars.forEach((v, i) => {
+    preview = preview.split(new RegExp(`\\{\\{\\s*${v}\\s*\\}\\}`)).join(fill(values[i]));
+  });
+  return (
+    <div className="space-y-2">
+      {vars.map((v, i) => (
+        <input
+          key={v}
+          value={values[i] || ''}
+          onChange={(e) => onChange(vars.map((_, k) => (k === i ? e.target.value : values[k] || '')))}
+          maxLength={300}
+          placeholder={`Valor de {{${v}}} (usa {nombre} para el nombre del cliente)`}
+          className="w-full rounded-lg border border-line bg-canvas px-3 py-2 text-sm text-fg outline-none focus:border-brand-500"
+        />
+      ))}
+      {preview && (
+        <p className="whitespace-pre-wrap rounded-lg bg-surface2 px-3 py-2 text-xs text-muted">
+          <span className="mb-0.5 block text-[10px] font-semibold uppercase tracking-wide text-subtle">Vista previa</span>
+          {preview}
+        </p>
       )}
     </div>
   );

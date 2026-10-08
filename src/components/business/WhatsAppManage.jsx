@@ -12,20 +12,32 @@ import { Icon } from '../ui/Icon.jsx';
  * Ver: cualquier miembro. Editar/crear: solo el dueño (isOwner).
  */
 
+// {{1}} = nombre del cliente (lo llena el sistema al enviar). Las respuestas
+// rápidas dejan que el cliente conteste con un toque y reabren la conversación.
 const TEMPLATE_PRESETS = [
+  {
+    label: 'Seguimiento de venta',
+    name: 'seguimiento_venta',
+    category: 'MARKETING',
+    bodyText:
+      'Hola {{1}}, ¿pudiste revisar la información que te compartimos? Si te quedó alguna duda o quieres avanzar, responde a este mensaje y con gusto te ayudamos.',
+    buttons: 'Sí, me interesa | Tengo una duda',
+  },
   {
     label: 'Reactivación',
     name: 'reactivacion',
     category: 'MARKETING',
     bodyText:
-      'Hola, seguimos disponibles para ayudarte. ¿Te gustaría retomar tu consulta? Con gusto te atendemos por aquí.',
+      'Hola {{1}}, seguimos disponibles para ayudarte. ¿Te gustaría retomar tu consulta? Con gusto te atendemos por aquí.',
+    buttons: 'Sí, retomemos',
   },
   {
-    label: 'Seguimiento',
+    label: 'Seguimiento de solicitud',
     name: 'seguimiento',
     category: 'UTILITY',
     bodyText:
-      'Hola, damos seguimiento a tu solicitud. Si necesitas algo más, respóndenos por este medio y te ayudamos.',
+      'Hola {{1}}, damos seguimiento a tu solicitud. Si necesitas algo más, respóndenos por este medio y te ayudamos.',
+    buttons: '',
   },
 ];
 
@@ -104,7 +116,7 @@ export function WhatsAppManage({ isOwner }) {
   const [templates, setTemplates] = useState([]);
   const [tplReason, setTplReason] = useState(null);
   const [showCreate, setShowCreate] = useState(false);
-  const [tpl, setTpl] = useState({ name: '', category: 'UTILITY', bodyText: '' });
+  const [tpl, setTpl] = useState({ name: '', category: 'UTILITY', bodyText: '', buttons: '' });
   const [creatingTpl, setCreatingTpl] = useState(false);
 
   async function load() {
@@ -154,10 +166,16 @@ export function WhatsAppManage({ isOwner }) {
     e.preventDefault();
     setCreatingTpl(true);
     try {
-      await connectionsApi.createTemplate({ ...tpl, language: 'es_MX' });
+      await connectionsApi.createTemplate({
+        name: tpl.name,
+        category: tpl.category,
+        bodyText: tpl.bodyText,
+        language: 'es_MX',
+        buttons: (tpl.buttons || '').split('|').map((b) => b.trim()).filter(Boolean).slice(0, 3),
+      });
       toast.success('Plantilla enviada a revisión de Meta. Aparecerá aprobada en unos minutos u horas.');
       setShowCreate(false);
-      setTpl({ name: '', category: 'UTILITY', bodyText: '' });
+      setTpl({ name: '', category: 'UTILITY', bodyText: '', buttons: '' });
       const t = await connectionsApi.listTemplates();
       setTemplates(t.templates || []);
     } catch (err) {
@@ -351,7 +369,7 @@ export function WhatsAppManage({ isOwner }) {
                 <button
                   type="button"
                   key={p.name}
-                  onClick={() => setTpl({ name: p.name, category: p.category, bodyText: p.bodyText })}
+                  onClick={() => setTpl({ name: p.name, category: p.category, bodyText: p.bodyText, buttons: p.buttons })}
                   className="rounded-full border border-line px-3 py-1 text-xs font-medium text-muted hover:border-brand-300 hover:text-fg"
                 >
                   {p.label}
@@ -375,11 +393,21 @@ export function WhatsAppManage({ isOwner }) {
                 maxLength={1024}
                 value={tpl.bodyText}
                 onChange={(e) => setTpl({ ...tpl, bodyText: e.target.value })}
-                placeholder="Texto de la plantilla (sin variables)."
+                placeholder="Hola {{1}}, ... ({{1}} = nombre del cliente)"
                 required
                 className="w-full rounded-lg border border-line bg-canvas px-3 py-2 text-sm text-fg outline-none focus:border-brand-500"
               />
+              <p className="mt-1 text-[11px] text-subtle">
+                Escribe {'{{1}}'} donde quieras el nombre del cliente. Meta pide un ejemplo por variable; lo
+                agregamos por ti.
+              </p>
             </div>
+            <Input
+              label="Respuestas rápidas (opcional, separadas por |, máx. 3)"
+              value={tpl.buttons}
+              onChange={(e) => setTpl({ ...tpl, buttons: e.target.value })}
+              placeholder="Sí, me interesa | Tengo una duda"
+            />
             <div className="flex justify-end gap-2">
               <Button type="button" variant="ghost" size="sm" onClick={() => setShowCreate(false)}>
                 Cancelar

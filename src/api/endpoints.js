@@ -140,6 +140,9 @@ export const conversationsApi = {
   // Plantillas de WhatsApp (para reactivar fuera de la ventana de 24h).
   templates: () => unwrap(api.get('/conversations/templates')),
   sendTemplate: (id, body) => unwrap(api.post(`/conversations/${id}/template`, body)),
+  // PDF que envió el cliente (descarga autenticada como Blob).
+  downloadFile: (id, fileId) =>
+    api.get(`/conversations/${id}/files/${fileId}`, { responseType: 'blob' }).then((r) => r.data),
 };
 
 export const managementApi = {

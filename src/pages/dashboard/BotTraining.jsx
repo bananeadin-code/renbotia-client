@@ -12,6 +12,7 @@ import { INDUSTRY_TEMPLATES } from '../../content/industryTemplates.js';
 import { LearningCard } from '../../components/business/LearningCard.jsx';
 import { ImportTraining } from '../../components/business/ImportTraining.jsx';
 import { NoticesCard } from '../../components/business/NoticesCard.jsx';
+import { TemplateFollowUp } from '../../components/business/TemplateFollowUp.jsx';
 
 const TONES = [
   { value: 'formal', label: 'Formal' },
@@ -217,6 +218,14 @@ export default function BotTraining() {
             delayHours: c.followUp?.delayHours || 4,
             mode: c.followUp?.mode || 'ai',
             message: c.followUp?.message || '',
+            template: {
+              enabled: Boolean(c.followUp?.template?.enabled),
+              name: c.followUp?.template?.name || '',
+              language: c.followUp?.template?.language || 'es_MX',
+              delayHours: c.followUp?.template?.delayHours || 48,
+              params: c.followUp?.template?.params || [],
+              nameFallback: c.followUp?.template?.nameFallback ?? 'cliente',
+            },
           },
           // servicesText: string crudo que edita el usuario; se parsea a array al
           // guardar (antes se parseaba en cada tecla y borraba comas/espacios).
@@ -419,6 +428,13 @@ export default function BotTraining() {
       }
     }
 
+    // Seguimiento con plantilla: necesita la plantilla elegida.
+    if (cfg.followUp?.template?.enabled && !cfg.followUp.template.name) {
+      setError('Elige la plantilla aprobada para el seguimiento después de 24 h, o desactívalo.');
+      setFeedbackTick((t) => t + 1);
+      return;
+    }
+
     // Seguimiento con texto fijo: necesita el mensaje.
     if (cfg.followUp?.enabled && cfg.followUp.mode === 'custom' && cfg.followUp.message.trim().length < 5) {
       setError('Escribe el mensaje de seguimiento o elige que el bot lo redacte.');
@@ -441,7 +457,15 @@ export default function BotTraining() {
         images: cfg.images.filter((img) => img.label.trim() && img.url.trim()),
         documents: (cfg.documents || []).filter((d) => d.text?.trim()),
         quickReplies: (cfg.quickReplies || []).map((s) => s.trim()).filter(Boolean),
-        followUp: { ...cfg.followUp, message: cfg.followUp.message.trim() },
+        followUp: {
+          ...cfg.followUp,
+          message: cfg.followUp.message.trim(),
+          template: {
+            ...cfg.followUp.template,
+            params: (cfg.followUp.template.params || []).map((p) => p.trim()),
+            nameFallback: (cfg.followUp.template.nameFallback || 'cliente').trim() || 'cliente',
+          },
+        },
         schedule: { ...cfg.schedule, closedMessage: cfg.schedule.closedMessage.trim() },
         businessInfo: { ...cfg.businessInfo, services },
       };
@@ -1077,8 +1101,8 @@ export default function BotTraining() {
             <div>
               <h2 className="font-semibold text-fg">Seguimiento automático</h2>
               <p className="mt-0.5 text-xs text-muted">
-                Si un cliente deja de responder, el bot le escribe una vez para retomar la conversación. Solo
-                en WhatsApp y Messenger, dentro de las 24 h que Meta permite (sin costo extra de Meta).
+                Si un cliente deja de responder, el bot le escribe una vez para retomar la conversación. En
+                WhatsApp, Messenger e Instagram, dentro de las 24 h que Meta permite (sin costo extra de Meta).
               </p>
             </div>
           </div>
@@ -1170,6 +1194,14 @@ export default function BotTraining() {
               </p>
             </div>
           )
+        )}
+        {limits.followUp && (
+          <div className="mt-4">
+            <TemplateFollowUp
+              value={cfg.followUp.template}
+              onChange={(template) => set('followUp', { ...cfg.followUp, template })}
+            />
+          </div>
         )}
       </Card>
 
