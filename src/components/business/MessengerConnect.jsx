@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { connectionsApi } from '../../api/endpoints.js';
 import { toast } from '../../store/toastStore.js';
 import { confirm } from '../../store/confirmStore.js';
-import { Card, Button, Alert } from '../ui/index.jsx';
+import { Card, Button, Alert, Notice } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
 
 /**
@@ -218,13 +218,10 @@ export function MessengerConnect({ data, isOwner, sdkReady, onChanged }) {
                   </button>
                 )}
               </div>
-              <p className="mt-3 flex items-start gap-1.5 text-xs text-subtle">
-                <Icon name="shield" size={14} className="mt-0.5 shrink-0" />
-                <span>
-                  Se abrirá una ventana segura de Facebook. Inicia sesión con la cuenta que administra tu Página
+              <Notice variant="security" className="mt-3">
+Se abrirá una ventana segura de Facebook. Inicia sesión con la cuenta que administra tu Página
                   y selecciónala cuando te lo pida.
-                </span>
-              </p>
+</Notice>
             </>
           )}
         </div>

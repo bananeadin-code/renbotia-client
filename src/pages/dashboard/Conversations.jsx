@@ -4,7 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { conversationsApi, botConfigApi, learningApi } from '../../api/endpoints.js';
 import { downloadFile } from '../../api/download.js';
 import { toast } from '../../store/toastStore.js';
-import { Card, Button, Badge, Spinner, Alert } from '../../components/ui/index.jsx';
+import { Card, Button, Badge, Spinner, Alert, Notice } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 
 const timeOf = (iso) =>
@@ -1240,10 +1240,8 @@ export default function Conversations() {
                           : 'No tienes plantillas aprobadas todavía. Créalas en el Administrador de WhatsApp de Meta y espera su aprobación.'}
                       </Alert>
                     )}
-                    <p className="flex items-start gap-1.5 text-[11px] text-subtle">
-                      <Icon name="shield" size={12} className="mt-0.5 shrink-0" />
-                      <span>
-                        Enviar plantillas requiere un método de pago en tu cuenta de Meta.{' '}
+                    <Notice variant="security">
+Enviar plantillas requiere un método de pago en tu cuenta de Meta.{' '}
                         <a
                           href={META_BILLING_URL}
                           target="_blank"
@@ -1253,8 +1251,7 @@ export default function Conversations() {
                           Configurar en Meta
                         </a>
                         .
-                      </span>
-                    </p>
+</Notice>
                   </div>
                 ) : isManual ? (
                   <div className="border-t border-line bg-surface">

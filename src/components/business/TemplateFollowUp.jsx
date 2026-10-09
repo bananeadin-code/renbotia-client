@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { conversationsApi } from '../../api/endpoints.js';
-import { Alert, Spinner } from '../ui/index.jsx';
+import { Alert, Spinner, Notice } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
 
 const DELAYS = [
@@ -199,14 +199,11 @@ export function TemplateFollowUp({ value, onChange }) {
           </div>
         ))}
 
-      <p className="flex items-start gap-1.5 text-[11px] text-subtle">
-        <Icon name="shield" size={12} className="mt-0.5 shrink-0" />
-        <span>
-          Meta cobra cada plantilla a tu cuenta de Meta (no gasta tu saldo de RenBotIA). Máximo 30 al día, en tu
+      <Notice variant="security">
+Meta cobra cada plantilla a tu cuenta de Meta (no gasta tu saldo de RenBotIA). Máximo 30 al día, en tu
           horario de atención, nunca si tomaste el control o la conversación pide atención. Si el cliente
           responde, el bot retoma la conversación.
-        </span>
-      </p>
+</Notice>
     </div>
   );
 }

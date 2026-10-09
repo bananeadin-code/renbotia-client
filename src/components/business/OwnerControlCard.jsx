@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ownerControlApi } from '../../api/endpoints.js';
 import { toast } from '../../store/toastStore.js';
 import { confirm } from '../../store/confirmStore.js';
-import { Card, Button } from '../ui/index.jsx';
+import { Card, Button, Notice } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
 
 /**
@@ -168,13 +168,10 @@ export function OwnerControlCard() {
         ))
       )}
 
-      <p className="mt-4 flex items-start gap-1.5 text-[11px] text-subtle">
-        <Icon name="shield" size={12} className="mt-0.5 shrink-0" />
-        <span>
-          Solo el dueño puede vincular números (máximo {state.maxNumbers}). Los cambios piden que respondas “sí”, quedan en la
+      <Notice variant="security" className="mt-4">
+Solo el dueño puede vincular números (máximo {state.maxNumbers}). Los cambios piden que respondas “sí”, quedan en la
           bitácora y la vinculación vence tras 30 días sin uso. Para probar tu bot como cliente escribe “modo cliente”.
-        </span>
-      </p>
+</Notice>
     </Card>
   );
 }

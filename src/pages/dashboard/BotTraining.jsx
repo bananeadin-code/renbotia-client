@@ -4,7 +4,7 @@ import { botConfigApi, businessApi } from '../../api/endpoints.js';
 import { useBusinessStore } from '../../store/businessStore.js';
 import { toast } from '../../store/toastStore.js';
 import { confirm } from '../../store/confirmStore.js';
-import { Card, Button, Input, Textarea, Select, Alert, Spinner, Badge } from '../../components/ui/index.jsx';
+import { Card, Button, Input, Textarea, Select, Alert, Spinner, Badge, Notice } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { limitsFor } from '../../lib/planLimits.js';
 import { extractTextFromFile } from '../../lib/extractText.js';
@@ -521,11 +521,11 @@ export default function BotTraining() {
         <Badge color="green">Plan {planName}</Badge>
       </div>
 
-      <p className="rounded-lg border border-line bg-surface2/40 px-3 py-2 text-xs text-subtle">
+      <Notice variant="tip">
         Entre más información le des al bot y más imágenes envíe, cada conversación usa un poco más
         de tu plan del mes. No tienes que contar nada: dale lo esencial y claro, así responde mejor
         y te rinde para más conversaciones.
-      </p>
+      </Notice>
 
       {/* Plantillas de arranque por giro (descartable; útil al crear la cuenta) */}
       {showTemplates && (
@@ -1081,13 +1081,10 @@ export default function BotTraining() {
               ))
             )}
           </div>
-          <p className="mt-3 flex items-start gap-1.5 text-[11px] text-subtle">
-            <Icon name="shield" size={12} className="mt-0.5 shrink-0" />
-            <span>
-              Sube solo contenido lícito y relacionado con tu negocio; eres responsable de lo que
+          <Notice variant="security" className="mt-3">
+Sube solo contenido lícito y relacionado con tu negocio; eres responsable de lo que
               cargas. El bot ignora lo que no corresponda al negocio.
-            </span>
-          </p>
+</Notice>
         </Card>
       )}
 
@@ -1184,14 +1181,11 @@ export default function BotTraining() {
                 )}
               </div>
 
-              <p className="flex items-start gap-1.5 text-[11px] text-subtle">
-                <Icon name="shield" size={12} className="mt-0.5 shrink-0" />
-                <span>
-                  Solo un seguimiento por conversación mientras el cliente no conteste. No se envía si tomaste
+              <Notice variant="security">
+Solo un seguimiento por conversación mientras el cliente no conteste. No se envía si tomaste
                   el control (modo manual) o si la conversación pide atención.
                   {cfg.followUp.mode === 'ai' ? ' Redactarlo consume muy poco de tu saldo de conversaciones.' : ''}
-                </span>
-              </p>
+</Notice>
             </div>
           )
         )}

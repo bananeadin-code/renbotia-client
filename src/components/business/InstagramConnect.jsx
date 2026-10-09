@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { connectionsApi } from '../../api/endpoints.js';
 import { toast } from '../../store/toastStore.js';
 import { confirm } from '../../store/confirmStore.js';
-import { Card, Button, Alert } from '../ui/index.jsx';
+import { Card, Button, Alert, Notice } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
 
 /**
@@ -231,7 +231,7 @@ export function InstagramConnect({ data, isOwner, sdkReady, onChanged }) {
                   </button>
                 )}
               </div>
-              <ul className="mt-4 space-y-1.5 rounded-xl border border-line bg-surface2/40 p-3 text-xs text-muted">
+              <ul className="mt-4 space-y-2 rounded-md border-l-[3px] border-l-brand-500 bg-surface2 px-4 py-3 text-sm leading-relaxed text-fg">
                 <li className="flex items-start gap-1.5">
                   <Icon name="check" size={13} className="mt-0.5 shrink-0 text-brand-600" />
                   <span>
@@ -260,13 +260,10 @@ export function InstagramConnect({ data, isOwner, sdkReady, onChanged }) {
                   </span>
                 </li>
               </ul>
-              <p className="mt-3 flex items-start gap-1.5 text-xs text-subtle">
-                <Icon name="shield" size={14} className="mt-0.5 shrink-0" />
-                <span>
-                  Se abrirá una ventana segura de Facebook. Inicia sesión con la cuenta que administra la Página
+              <Notice variant="security" className="mt-3">
+Se abrirá una ventana segura de Facebook. Inicia sesión con la cuenta que administra la Página
                   ligada a tu Instagram y selecciona tu cuenta cuando te lo pida.
-                </span>
-              </p>
+</Notice>
             </>
           )}
         </div>

@@ -8,7 +8,7 @@ import { toast } from '../../store/toastStore.js';
 import { ConnectedChannels } from '../../components/business/ConnectedChannels.jsx';
 import { ActivityLog } from '../../components/business/ActivityLog.jsx';
 import { ActiveSessions } from '../../components/account/ActiveSessions.jsx';
-import { Card, Button, Input, Select, Alert } from '../../components/ui/index.jsx';
+import { Card, Button, Input, Select, Alert, Notice } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { fileToAvatarDataUri } from '../../lib/image.js';
 import { v } from '../../lib/useForm.js';
@@ -322,10 +322,9 @@ export default function Profile() {
         <h2 className="mb-4 font-semibold text-fg">Datos del negocio</h2>
 
         {!canProfile && (
-          <p className="mb-4 flex items-start gap-1.5 rounded-lg bg-surface2/60 px-3 py-2 text-xs text-muted">
-            <Icon name="shield" size={13} className="mt-0.5 shrink-0" />
+          <Notice variant="warning" className="mb-4">
             Solo lectura: el dueño no te ha dado permiso para cambiar los datos del negocio.
-          </p>
+          </Notice>
         )}
         <fieldset disabled={!canProfile} className="min-w-0 disabled:opacity-70">
         {/* Foto / avatar del negocio (reemplaza la inicial en el panel) */}

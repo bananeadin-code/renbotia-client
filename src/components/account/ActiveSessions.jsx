@@ -4,7 +4,7 @@ import { authApi } from '../../api/endpoints.js';
 import { useAuthStore } from '../../store/authStore.js';
 import { confirm } from '../../store/confirmStore.js';
 import { toast } from '../../store/toastStore.js';
-import { Card, Button, Spinner } from '../ui/index.jsx';
+import { Card, Button, Spinner, Notice } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
 
 const ago = (d) => {
@@ -151,13 +151,10 @@ export function ActiveSessions() {
         </ul>
       )}
 
-      <p className="mt-3 flex items-start gap-1.5 text-[11px] text-subtle">
-        <Icon name="shield" size={12} className="mt-0.5 shrink-0" />
-        <span>
-          Las sesiones se cierran solas tras 7 días sin uso y como máximo a los 30 días. Te avisamos por correo cuando
+      <Notice variant="security" className="mt-3">
+Las sesiones se cierran solas tras 7 días sin uso y como máximo a los 30 días. Te avisamos por correo cuando
           alguien entra desde un dispositivo nuevo.
-        </span>
-      </p>
+</Notice>
     </Card>
   );
 }

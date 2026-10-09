@@ -123,18 +123,41 @@ export function Spinner({ className = '', size = 20 }) {
   );
 }
 
-export function Alert({ children, variant = 'info' }) {
-  const variants = {
-    info: { cls: 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20', icon: 'message' },
-    success: { cls: 'bg-brand-500/10 text-brand-700 dark:text-brand-300 border-brand-500/20', icon: 'checkCircle' },
-    error: { cls: 'bg-red-500/10 text-red-700 dark:text-red-300 border-red-500/25', icon: 'alert' },
-    warning: { cls: 'bg-amber-500/10 text-amber-800 dark:text-amber-300 border-amber-500/25', icon: 'alert' },
-  };
-  const v = variants[variant] || variants.info;
+// Avisos, advertencias y sugerencias: fondo SÓLIDO (sin transparencias ni
+// cristal), barra de color a la izquierda según el tipo y texto principal
+// legible. Sin borde completo, sombra ni hover: es una nota, no un botón.
+const NOTE_VARIANTS = {
+  info: { bar: 'border-l-blue-500', icon: 'message', iconCls: 'text-blue-500' },
+  tip: { bar: 'border-l-brand-500', icon: 'sparkles', iconCls: 'text-brand-500' },
+  success: { bar: 'border-l-brand-500', icon: 'checkCircle', iconCls: 'text-brand-500' },
+  warning: { bar: 'border-l-amber-500', icon: 'alert', iconCls: 'text-amber-500' },
+  error: { bar: 'border-l-red-500', icon: 'alert', iconCls: 'text-red-500' },
+  security: { bar: 'border-l-brand-500', icon: 'shield', iconCls: 'text-brand-500' },
+};
+
+/** Nota destacada (aviso, advertencia o sugerencia). */
+export function Notice({ children, variant = 'info', className = '' }) {
+  const v = NOTE_VARIANTS[variant] || NOTE_VARIANTS.info;
   return (
-    <div className={clsx('flex items-start gap-2.5 rounded-lg border px-4 py-3 text-sm', v.cls)}>
-      <Icon name={v.icon} size={18} className="mt-px shrink-0" />
-      <div>{children}</div>
+    <div
+      role="note"
+      className={clsx(
+        'flex items-start gap-3 rounded-md border-l-[3px] bg-surface2 px-4 py-3 text-sm leading-relaxed text-fg',
+        v.bar,
+        className
+      )}
+    >
+      <Icon name={v.icon} size={18} className={clsx('mt-0.5 shrink-0', v.iconCls)} />
+      <div className="min-w-0">{children}</div>
+    </div>
+  );
+}
+
+/** Mensaje de estado (error, éxito, advertencia, información): mismo estilo que Notice. */
+export function Alert({ children, variant = 'info' }) {
+  return (
+    <div role={variant === 'error' ? 'alert' : 'status'}>
+      <Notice variant={variant}>{children}</Notice>
     </div>
   );
 }

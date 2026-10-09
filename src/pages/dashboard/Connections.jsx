@@ -4,7 +4,7 @@ import { connectionsApi, widgetApi } from '../../api/endpoints.js';
 import { useCan } from '../../router/RequirePermission.jsx';
 import { toast } from '../../store/toastStore.js';
 import { confirm } from '../../store/confirmStore.js';
-import { Card, Button, Alert, Spinner } from '../../components/ui/index.jsx';
+import { Card, Button, Alert, Spinner, Notice } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { WhatsAppManage } from '../../components/business/WhatsAppManage.jsx';
 import { ConnectionChecklist, ConnectionHelp } from '../../components/business/ConnectionAssistant.jsx';
@@ -394,13 +394,10 @@ export function Connections() {
                     </button>
                   )}
                 </div>
-                <p className="mt-3 flex items-start gap-1.5 text-xs text-subtle">
-                  <Icon name="shield" size={14} className="mt-0.5 shrink-0" />
-                  <span>
-                    Se abrirá una ventana segura de Meta para iniciar sesión y verificar tu número.
+                <Notice variant="security" className="mt-3">
+Se abrirá una ventana segura de Meta para iniciar sesión y verificar tu número.
                     Puedes cerrarla en cualquier momento.
-                  </span>
-                </p>
+</Notice>
               </div>
             )}
           </div>

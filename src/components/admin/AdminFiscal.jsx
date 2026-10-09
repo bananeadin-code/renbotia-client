@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { adminApi } from '../../api/endpoints.js';
 import { toast } from '../../store/toastStore.js';
-import { Card, Alert, Spinner, Button } from '../../components/ui/index.jsx';
+import { Card, Alert, Spinner, Button, Notice } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 
 /**
@@ -170,13 +170,10 @@ export function AdminFiscal() {
         </div>
       </Card>
 
-      <p className="flex items-start gap-1.5 text-xs text-subtle">
-        <Icon name="shield" size={13} className="mt-0.5 shrink-0" />
-        <span>
-          Las cifras de impuestos son una estimación para tu control. La declaración se presenta en
+      <Notice variant="security">
+Las cifras de impuestos son una estimación para tu control. La declaración se presenta en
           línea en el portal del SAT; te recomendamos apoyarte en un contador para el cálculo y envío.
-        </span>
-      </p>
+</Notice>
     </div>
   );
 }
