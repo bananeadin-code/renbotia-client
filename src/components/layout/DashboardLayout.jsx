@@ -19,7 +19,7 @@ const NAV = [
   // Gestión se inserta aquí solo para Elite (ver más abajo).
   { to: '/dashboard/facturacion', label: 'Facturación', icon: 'card' },
   { to: '/dashboard/equipo', label: 'Equipo', icon: 'users' },
-  { to: '/dashboard/perfil', label: 'Perfil', icon: 'user' },
+  { to: '/dashboard/actividad', label: 'Actividad', icon: 'clipboard' },
 ];
 
 /**
@@ -37,6 +37,7 @@ const PAGE_TITLES = {
   '/dashboard/facturacion': 'Facturación',
   '/dashboard/equipo': 'Equipo',
   '/dashboard/perfil': 'Perfil',
+  '/dashboard/actividad': 'Actividad',
   '/dashboard/admin': 'Admin',
   '/dashboard/asistente-sitio': 'Asistente del sitio',
 };
@@ -141,18 +142,38 @@ export function DashboardLayout() {
             </button>
           </div>
 
-          <div className="mb-4 flex items-center gap-3 rounded-lg border border-line bg-surface2 px-3 py-2.5">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-500/15 text-sm font-bold text-brand-700 dark:text-brand-300">
-              {business?.photo ? (
-                <img src={business.photo} alt="" className="h-full w-full object-cover" />
-              ) : (
-                business?.name?.charAt(0).toUpperCase() || 'N'
-              )}
+          {/* Tarjeta de la cuenta: negocio + correo, con acceso a Perfil (que ya no
+              está en la lista de la barra). */}
+          <div className="mb-4 overflow-hidden rounded-lg border border-line bg-surface2">
+            <div className="flex items-center gap-3 px-3 py-2.5">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-500/15 text-sm font-bold text-brand-700 dark:text-brand-300">
+                {business?.photo ? (
+                  <img src={business.photo} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  business?.name?.charAt(0).toUpperCase() || 'N'
+                )}
+              </div>
+              <div className="min-w-0">
+                <div className="truncate text-sm font-semibold text-fg">{business?.name}</div>
+                <div className="truncate text-xs text-subtle">{user?.name || user?.email}</div>
+                {user?.name && <div className="truncate text-[11px] text-subtle">{user?.email}</div>}
+              </div>
             </div>
-            <div className="min-w-0">
-              <div className="truncate text-sm font-semibold text-fg">{business?.name}</div>
-              <div className="truncate text-xs text-subtle">{user?.email}</div>
-            </div>
+            <NavLink
+              to="/dashboard/perfil"
+              onClick={() => setMenuOpen(false)}
+              className={({ isActive }) =>
+                `flex items-center gap-2 border-t border-line px-3 py-2 text-xs font-semibold transition ${
+                  isActive
+                    ? 'bg-brand-500/10 text-brand-700 dark:text-brand-300'
+                    : 'text-muted hover:bg-surface hover:text-fg'
+                }`
+              }
+            >
+              <Icon name="user" size={14} />
+              <span className="flex-1">Ver perfil</span>
+              <Icon name="chevronRight" size={14} />
+            </NavLink>
           </div>
 
           {/* Switcher de proyecto (solo si el usuario tiene más de uno). */}

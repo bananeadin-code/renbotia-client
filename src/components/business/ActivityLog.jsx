@@ -14,6 +14,14 @@ const ACTION_ICON = {
   'plan.cancel': 'card',
   'plan.resume': 'card',
   'credits.purchase': 'card',
+  'plan.renew': 'card',
+  'plan.downgrade_unpaid': 'alert',
+  'contact.block': 'ban',
+  'contact.unblock': 'ban',
+  'messenger.connect': 'messenger',
+  'instagram.connect': 'instagram',
+  'whatsapp.template': 'message',
+  'botconfig.notice': 'clipboard',
 };
 
 const fmt = (iso) =>
@@ -34,13 +42,10 @@ export function ActivityLog() {
 
   return (
     <Card>
-      <div className="mb-1 flex items-center gap-2">
+      <div className="mb-4 flex items-center gap-2">
         <Icon name="clipboard" size={18} className="text-brand-600" />
         <h2 className="font-semibold text-fg">Actividad reciente</h2>
       </div>
-      <p className="mb-4 text-sm text-muted">
-        Registro de cambios en tu negocio y tu bot (quién hizo qué y cuándo).
-      </p>
 
       {loading ? (
         <div className="flex justify-center py-6">

@@ -6,7 +6,6 @@ import { useBusinessStore } from '../../store/businessStore.js';
 import { businessApi } from '../../api/endpoints.js';
 import { toast } from '../../store/toastStore.js';
 import { ConnectedChannels } from '../../components/business/ConnectedChannels.jsx';
-import { ActivityLog } from '../../components/business/ActivityLog.jsx';
 import { ActiveSessions } from '../../components/account/ActiveSessions.jsx';
 import { Card, Button, Input, Select, Alert, Notice } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
@@ -413,9 +412,6 @@ export default function Profile() {
 
       {/* Canales conectados (informativo) */}
       <ConnectedChannels />
-
-      {/* Bitácora de auditoría */}
-      <ActivityLog />
 
       {/* Seguridad: verificación en dos pasos */}
       <Card>

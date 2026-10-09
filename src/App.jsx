@@ -50,6 +50,7 @@ const Connections = named(() => import('./pages/dashboard/Connections.jsx'), 'Co
 const Management = lazy(() => import('./pages/dashboard/Management.jsx'));
 const Billing = lazy(() => import('./pages/dashboard/Billing.jsx'));
 const Profile = lazy(() => import('./pages/dashboard/Profile.jsx'));
+const Activity = lazy(() => import('./pages/dashboard/Activity.jsx'));
 const Team = lazy(() => import('./pages/dashboard/Team.jsx'));
 const AdminPanel = lazy(() => import('./pages/admin/AdminPanel.jsx'));
 const SiteAssistant = lazy(() => import('./pages/dashboard/SiteAssistant.jsx'));
@@ -130,6 +131,7 @@ export default function App() {
         <Route path="facturacion" element={<Billing />} />
         <Route path="equipo" element={<Team />} />
         <Route path="perfil" element={<Profile />} />
+        <Route path="actividad" element={<Activity />} />
         <Route
           path="admin"
           element={
