@@ -7,6 +7,7 @@ import { businessApi } from '../../api/endpoints.js';
 import { toast } from '../../store/toastStore.js';
 import { ConnectedChannels } from '../../components/business/ConnectedChannels.jsx';
 import { ActivityLog } from '../../components/business/ActivityLog.jsx';
+import { ActiveSessions } from '../../components/account/ActiveSessions.jsx';
 import { Card, Button, Input, Select, Alert } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { fileToAvatarDataUri } from '../../lib/image.js';
@@ -445,6 +446,9 @@ export default function Profile() {
           </button>
         </div>
       </Card>
+
+      {/* Sesiones activas (dispositivos con la cuenta abierta) */}
+      <ActiveSessions />
 
       {/* Contraseña */}
       <Card>

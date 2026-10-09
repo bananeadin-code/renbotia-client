@@ -89,9 +89,9 @@ export function Select({ label, children, className = '', ...props }) {
   );
 }
 
-export function Card({ children, className = '' }) {
+export function Card({ children, className = '', ...rest }) {
   return (
-    <div className={clsx('glass rounded-2xl p-5', className)}>
+    <div {...rest} className={clsx('glass rounded-2xl p-5', className)}>
       {children}
     </div>
   );

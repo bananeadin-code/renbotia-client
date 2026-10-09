@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { confirm } from '../../store/confirmStore.js';
 import { Link, useSearchParams } from 'react-router-dom';
 import { conversationsApi, botConfigApi, learningApi } from '../../api/endpoints.js';
 import { downloadFile } from '../../api/download.js';
@@ -141,6 +142,9 @@ export default function Conversations() {
   const [quickReplies, setQuickReplies] = useState([]);
   const [summary, setSummary] = useState(null); // { summary, suggestion } | null
   const [summarizing, setSummarizing] = useState(false);
+  // Cliente bloqueado: el bot ignora sus mensajes (sin gastar créditos).
+  const [blocked, setBlocked] = useState(false);
+  const [blocking, setBlocking] = useState(false);
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -223,6 +227,7 @@ export default function Conversations() {
       const data = await conversationsApi.get(id);
       setThread(data.conversation);
       setWaWindow(data.whatsappWindow || null);
+      setBlocked(Boolean(data.blocked));
       // Fuera de la ventana de 24h: cargamos las plantillas aprobadas para ofrecerlas.
       if (data.conversation?.channel === 'whatsapp' && data.whatsappWindow && !data.whatsappWindow.open) {
         loadTemplates();
@@ -358,6 +363,31 @@ export default function Conversations() {
   function pickTemplate(t) {
     setTplName(t?.name || '');
     setTplParams((t?.vars || []).map((_, i) => (i === 0 ? '{nombre}' : '')));
+  }
+
+  async function toggleBlock() {
+    const next = !blocked;
+    if (next) {
+      const ok = await confirm({
+        title: 'Bloquear contacto',
+        message:
+          'El bot dejará de leer y responder los mensajes de esta persona en este canal, y no se gastarán créditos. Puedes desbloquearla cuando quieras.',
+        tone: 'danger',
+        confirmLabel: 'Bloquear',
+      });
+      if (!ok) return;
+    }
+    setBlocking(true);
+    try {
+      await conversationsApi.setBlocked(selectedId, next);
+      setBlocked(next);
+      toast.success(next ? 'Contacto bloqueado.' : 'Contacto desbloqueado.');
+      if (next) loadList();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'No se pudo actualizar el bloqueo.');
+    } finally {
+      setBlocking(false);
+    }
   }
 
   async function downloadFile(file) {
@@ -905,7 +935,33 @@ export default function Conversations() {
                   >
                     <Icon name="bot" size={14} /> {summarizing ? 'Resumiendo…' : 'Resumen IA'}
                   </button>
+                  <button
+                    type="button"
+                    onClick={toggleBlock}
+                    disabled={blocking}
+                    title={blocked ? 'Desbloquear contacto' : 'Bloquear contacto (spam o abuso)'}
+                    aria-label={blocked ? 'Desbloquear contacto' : 'Bloquear contacto'}
+                    className={`inline-flex shrink-0 items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-medium transition disabled:opacity-50 ${
+                      blocked
+                        ? 'border-red-500/40 bg-red-500/10 text-red-600 dark:text-red-400'
+                        : 'border-line text-muted hover:border-red-400 hover:text-red-600'
+                    }`}
+                  >
+                    <Icon name="ban" size={14} /> {blocked ? 'Bloqueado' : 'Bloquear'}
+                  </button>
                 </div>
+                )}
+
+                {blocked && (
+                  <div className="flex items-center gap-2 border-b border-red-500/20 bg-red-500/10 px-4 py-2 text-xs text-red-700 dark:text-red-300">
+                    <Icon name="ban" size={13} className="shrink-0" />
+                    <span className="min-w-0 flex-1">
+                      Contacto bloqueado: el bot ignora sus mensajes en este canal y no gasta créditos.
+                    </span>
+                    <button type="button" onClick={toggleBlock} disabled={blocking} className="shrink-0 font-semibold underline underline-offset-2">
+                      Desbloquear
+                    </button>
+                  </div>
                 )}
 
                 {/* Panel de resumen con IA */}

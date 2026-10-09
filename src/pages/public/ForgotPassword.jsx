@@ -14,7 +14,6 @@ import { ThemeToggle } from '../../components/ui/ThemeToggle.jsx';
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
-  const [devLink, setDevLink] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -23,8 +22,7 @@ export default function ForgotPassword() {
     setError('');
     setLoading(true);
     try {
-      const data = await authApi.forgotPassword(email);
-      if (data?.resetToken) setDevLink(`/restablecer?token=${data.resetToken}`);
+      await authApi.forgotPassword(email);
       setSent(true);
     } catch (err) {
       setError(err.response?.data?.message || 'Ocurrió un error');
@@ -69,14 +67,6 @@ export default function ForgotPassword() {
                 Si el email existe, te enviamos un enlace para restablecer tu contraseña. Revisa tu
                 bandeja (y la carpeta de spam).
               </Alert>
-              {devLink && (
-                <Alert variant="info">
-                  Modo desarrollo:{' '}
-                  <Link to={devLink} className="font-semibold text-brand-600 hover:underline">
-                    abrir enlace de restablecimiento
-                  </Link>
-                </Alert>
-              )}
             </div>
           )}
 

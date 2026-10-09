@@ -21,6 +21,10 @@ export const authApi = {
   verify2fa: (body) => unwrap(api.post('/auth/verify-2fa', body)),
   resendCode: (body) => unwrap(api.post('/auth/resend-code', body)),
   setTwoFactor: (enabled) => unwrap(api.patch('/auth/2fa', { enabled })),
+  // Sesiones activas (Perfil → Seguridad).
+  sessions: () => unwrap(api.get('/auth/sessions')),
+  revokeSession: (id) => unwrap(api.delete(`/auth/sessions/${id}`)),
+  revokeOtherSessions: () => unwrap(api.post('/auth/sessions/revoke-others')),
   updateProfile: (name) => unwrap(api.patch('/auth/profile', { name })),
   requestEmailChange: (newEmail) => unwrap(api.post('/auth/email/request', { newEmail })),
   verifyEmailChange: (code) => unwrap(api.post('/auth/email/verify', { code })),
@@ -144,6 +148,8 @@ export const conversationsApi = {
   templates: () => unwrap(api.get('/conversations/templates')),
   sendTemplate: (id, body) => unwrap(api.post(`/conversations/${id}/template`, body)),
   // PDF que envió el cliente (descarga autenticada como Blob).
+  // Bloquear / desbloquear al cliente de la conversación (el bot lo ignora).
+  setBlocked: (id, blocked) => unwrap(api.post(`/conversations/${id}/block`, { blocked })),
   downloadFile: (id, fileId) =>
     api.get(`/conversations/${id}/files/${fileId}`, { responseType: 'blob' }).then((r) => r.data),
 };
