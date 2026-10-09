@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { PlanCta } from '../../components/ui/PlanCta.jsx';
 import { Button, Card, Badge, Spinner, Alert, Select } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { managementApi } from '../../api/endpoints.js';
@@ -140,9 +141,13 @@ export default function Management() {
             Deja que el bot agende citas, tome reservaciones y capte pedidos y prospectos con criterio real de
             disponibilidad, y gestiónalo todo desde aquí.
           </p>
-          <Button className="mt-4" onClick={() => (window.location.href = '/dashboard/facturacion')}>
-            <Icon name="sparkles" size={16} /> Mejorar a Elite
-          </Button>
+          <div className="mt-4">
+            <PlanCta memberText="Pídele al dueño del negocio que mejore a Elite.">
+              <Button>
+                <Icon name="sparkles" size={16} /> Mejorar a Elite
+              </Button>
+            </PlanCta>
+          </div>
         </Card>
       </div>
     );

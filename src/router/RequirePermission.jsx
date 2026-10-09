@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useBusinessStore } from '../store/businessStore.js';
 import { Card, Button } from '../components/ui/index.jsx';
 import { Icon } from '../components/ui/Icon.jsx';
@@ -38,4 +38,16 @@ export function RequirePermission({ perm, children }) {
       </Link>
     </Card>
   );
+}
+
+/**
+ * Solo el DUEÑO del negocio activo (p. ej. Facturación). Un colaborador que entra
+ * por URL vuelve al inicio.
+ */
+export function RequireOwner({ children }) {
+  const role = useBusinessStore((st) => st.role);
+  if (role && role !== 'owner') {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return children;
 }

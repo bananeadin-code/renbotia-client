@@ -14,7 +14,7 @@ import { Icon } from '../ui/Icon.jsx';
 const money = (n) => `$${Math.round(n || 0).toLocaleString('es-MX')}`;
 const num = (n) => (n == null ? '—' : Number(n).toLocaleString('es-MX'));
 
-export function ImpactCard({ impact, onChange }) {
+export function ImpactCard({ impact, onChange, canEdit = true, canToggleReport = true }) {
   const configured = Boolean(impact?.settings?.configured);
   const [editing, setEditing] = useState(false);
   const [ticket, setTicket] = useState('');
@@ -74,6 +74,7 @@ export function ImpactCard({ impact, onChange }) {
             <p className="text-xs text-muted first-letter:uppercase">{impact?.month || 'Este mes'}</p>
           </div>
         </div>
+        {canToggleReport && (
         <label className="flex cursor-pointer items-center gap-2 text-xs text-muted">
           Reporte cada lunes
           <button
@@ -93,6 +94,7 @@ export function ImpactCard({ impact, onChange }) {
             />
           </button>
         </label>
+        )}
       </div>
 
       {/* Valor en pesos o invitación a configurarlo */}
@@ -152,9 +154,11 @@ export function ImpactCard({ impact, onChange }) {
                 <Icon name="sparkles" size={13} /> ≈ {impact.roiMultiple}× lo que cuesta tu plan
               </span>
             )}
-            <button type="button" onClick={openEditor} className="text-xs font-medium text-muted hover:text-fg">
-              Ajustar valores
-            </button>
+            {canEdit && (
+              <button type="button" onClick={openEditor} className="text-xs font-medium text-muted hover:text-fg">
+                Ajustar valores
+              </button>
+            )}
           </div>
         </div>
       ) : !configured ? (
@@ -162,16 +166,22 @@ export function ImpactCard({ impact, onChange }) {
           <p className="text-sm text-fg">
             ¿Cuánto vale una venta o cita promedio en tu negocio? Con ese dato te decimos cuánto dinero te genera tu bot.
           </p>
-          <Button size="sm" onClick={openEditor} className="shrink-0">
-            Calcularlo
-          </Button>
+          {canEdit ? (
+            <Button size="sm" onClick={openEditor} className="shrink-0">
+              Calcularlo
+            </Button>
+          ) : (
+            <span className="text-xs text-muted">El dueño puede configurarlo.</span>
+          )}
         </div>
       ) : (
         <p className="mt-4 text-sm text-muted">
           Aún no hay ventas ni tiempo ahorrado este mes. En cuanto tu bot atienda clientes, aquí verás cuánto te generó.{' '}
-          <button type="button" onClick={openEditor} className="font-medium text-brand-600 hover:underline">
-            Ajustar valores
-          </button>
+          {canEdit && (
+            <button type="button" onClick={openEditor} className="font-medium text-brand-600 hover:underline">
+              Ajustar valores
+            </button>
+          )}
         </p>
       )}
 

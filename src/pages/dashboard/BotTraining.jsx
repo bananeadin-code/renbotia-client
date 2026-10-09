@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { PlanCta } from '../../components/ui/PlanCta.jsx';
 import { useNavigate, Link } from 'react-router-dom';
 import { botConfigApi, businessApi } from '../../api/endpoints.js';
 import { useBusinessStore } from '../../store/businessStore.js';
@@ -140,9 +141,9 @@ function UpgradeNote({ children }) {
   return (
     <p className="mt-3 text-xs text-muted">
       {children}{' '}
-      <Link to="/dashboard/facturacion" className="font-medium text-brand-600 hover:underline">
+      <PlanCta className="font-medium text-brand-600 hover:underline">
         Mejorar plan
-      </Link>
+      </PlanCta>
     </p>
   );
 }

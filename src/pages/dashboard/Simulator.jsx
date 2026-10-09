@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { PlanCta } from '../../components/ui/PlanCta.jsx';
 import { Link } from 'react-router-dom';
 import { simulatorApi, botConfigApi } from '../../api/endpoints.js';
 import { useBusinessStore } from '../../store/businessStore.js';
@@ -189,9 +190,9 @@ export default function Simulator() {
               <p className="mt-1 text-amber-700 dark:text-amber-300/90">
                 Compra un paquete de créditos para seguir probando y atendiendo clientes.
               </p>
-              <Link to="/dashboard/facturacion" className="mt-3 inline-block">
+              <PlanCta className="mt-3 inline-block" memberText="Pídele al dueño del negocio que compre créditos.">
                 <Button size="sm">Comprar créditos</Button>
-              </Link>
+              </PlanCta>
             </div>
           )}
         </div>

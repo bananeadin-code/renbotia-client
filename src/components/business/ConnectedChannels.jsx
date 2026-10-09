@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { PlanCta } from '../ui/PlanCta.jsx';
 import { Link } from 'react-router-dom';
 import { connectionsApi, widgetApi } from '../../api/endpoints.js';
 import { Card, Badge, Spinner } from '../ui/index.jsx';
@@ -175,9 +176,9 @@ export function ConnectedChannels() {
                 Activar
               </Link>
             ) : (
-              <Link to="/dashboard/facturacion" className="shrink-0 text-xs font-semibold text-brand-600 hover:underline">
+              <PlanCta className="shrink-0 text-xs font-semibold text-brand-600 hover:underline">
                 Ver planes
-              </Link>
+              </PlanCta>
             )}
           </div>
         </div>

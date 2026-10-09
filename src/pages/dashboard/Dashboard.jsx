@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { PlanCta } from '../../components/ui/PlanCta.jsx';
 import { Link } from 'react-router-dom';
 import {
   ResponsiveContainer,
@@ -11,6 +12,7 @@ import {
 } from 'recharts';
 import { usageApi } from '../../api/endpoints.js';
 import { useBusinessStore } from '../../store/businessStore.js';
+import { useAuthStore } from '../../store/authStore.js';
 import { Card, Badge, Spinner, Button } from '../../components/ui/index.jsx';
 import { SpotlightCard } from '../../components/ui/SpotlightCard.jsx';
 import { OnboardingChecklist } from '../../components/dashboard/OnboardingChecklist.jsx';
@@ -38,7 +40,11 @@ function StatCard({ label, value, sub, color, icon }) {
 }
 
 export default function Dashboard() {
-  const { business, subscription, balance, setBalance } = useBusinessStore();
+  const { business, subscription, balance, setBalance, role, permissions } = useBusinessStore();
+  const user = useAuthStore((s) => s.user);
+  const isOwner = role === 'owner';
+  const canSimulate = isOwner || Boolean(permissions?.simulator);
+  const firstName = String(user?.name || '').trim().split(/\s+/)[0];
   const [daily, setDaily] = useState([]);
   const [loading, setLoading] = useState(true);
   const [impact, setImpact] = useState(null);
@@ -72,22 +78,29 @@ export default function Dashboard() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-bold text-fg">Hola, {business?.name}</h1>
-          <p className="text-sm text-muted">Resumen de tu bot este mes</p>
+          <h1 className="text-2xl font-bold text-fg">Hola{firstName ? `, ${firstName}` : ''}</h1>
+          <p className="text-sm text-muted">
+            Resumen del bot de <span className="font-medium text-fg">{business?.name}</span> este mes
+            {!isOwner && ' · colaboras en este proyecto'}
+          </p>
         </div>
-        <Link to="/dashboard/simulador">
-          <Button>
-            <Icon name="message" size={18} />
-            Probar simulador
-          </Button>
-        </Link>
+        {canSimulate && (
+          <Link to="/dashboard/simulador">
+            <Button>
+              <Icon name="message" size={18} />
+              Probar simulador
+            </Button>
+          </Link>
+        )}
       </div>
 
       {/* Primeros pasos (solo cuentas nuevas / incompletas) */}
       <OnboardingChecklist />
 
-      {/* Regalo único: invita a 3 negocios y gana 1 mes de Pro (destacado arriba) */}
-      <ReferralCard />
+      {/* Regalo único: invita a 3 negocios y gana 1 mes de Pro. Es PERSONAL y se
+          aplica al negocio propio: solo se muestra entrando como dueño (en un
+          proyecto donde colaboras no aplica). */}
+      {isOwner && <ReferralCard />}
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -129,7 +142,12 @@ export default function Dashboard() {
       </div>
 
       {/* Lo que generó tu bot: datos reales + estimación en pesos (retención) */}
-      <ImpactCard impact={impact} onChange={setImpact} />
+      <ImpactCard
+        impact={impact}
+        onChange={setImpact}
+        canEdit={isOwner || Boolean(permissions?.profile)}
+        canToggleReport={isOwner}
+      />
 
       {/* Barra de consumo (en conversaciones, tono tranquilo) */}
       <Card>
@@ -146,9 +164,9 @@ export default function Dashboard() {
         {usedPct > 90 ? (
           <p className="mt-2 text-xs text-amber-600">
             Vas muy bien, ya casi usas todo tu plan del mes. Si quieres que el bot no pare, puedes{' '}
-            <Link to="/dashboard/facturacion" className="font-medium underline">
+            <PlanCta className="font-medium underline" memberText="pídeselo al dueño del negocio">
               sumar más conversaciones
-            </Link>
+            </PlanCta>
             .
           </p>
         ) : (

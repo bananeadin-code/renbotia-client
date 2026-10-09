@@ -9,6 +9,7 @@ import ScrollToTop from './router/ScrollToTop.jsx';
 import { Toaster } from './components/ui/Toaster.jsx';
 import { ConfirmDialog } from './components/ui/ConfirmDialog.jsx';
 import { StepUpDialog } from './components/auth/StepUpDialog.jsx';
+import { RequireOwner } from './router/RequirePermission.jsx';
 import { Spinner } from './components/ui/index.jsx';
 
 // La Landing va EAGER (es el LCP y la página más importante para SEO); el resto
@@ -129,7 +130,7 @@ export default function App() {
         <Route path="analiticas" element={<Analytics />} />
         <Route path="conexiones" element={<Connections />} />
         <Route path="gestion" element={<Management />} />
-        <Route path="facturacion" element={<Billing />} />
+        <Route path="facturacion" element={<RequireOwner><Billing /></RequireOwner>} />
         <Route path="equipo" element={<Team />} />
         <Route path="perfil" element={<Profile />} />
         <Route path="actividad" element={<Activity />} />

@@ -77,8 +77,8 @@ export function ReferralCard() {
           </span>
           <h2 className="mt-3 text-xl font-extrabold leading-tight text-white sm:text-2xl">Invita a 3 negocios y gana 1 mes de Pro gratis</h2>
           <p className="mt-1.5 max-w-xl text-sm text-white/85">
-            Cuando 3 negocios creen su cuenta con tu enlace, activamos tu mes de Pro. Si ya pagas un plan, te llega como
-            créditos que no caducan. Es un regalo único.
+            Cuando 3 negocios creen su cuenta con tu enlace y conecten su WhatsApp, Messenger o Instagram, activamos tu
+            mes de Pro. Si ya pagas un plan, te llega como créditos que no caducan. Es un regalo único.
           </p>
 
           {/* Avance hacia el regalo */}
@@ -99,7 +99,8 @@ export function ReferralCard() {
           </div>
           {r.pending > 0 && (
             <p className="mt-2 text-xs text-white/75">
-              {r.pending} {r.pending === 1 ? 'persona se registró' : 'personas se registraron'} y aún no termina de crear su negocio.
+              {r.pending} {r.pending === 1 ? 'persona se registró' : 'personas se registraron'} y aún no conecta su canal. Cuenta
+              en cuanto lo conecte.
             </p>
           )}
         </div>

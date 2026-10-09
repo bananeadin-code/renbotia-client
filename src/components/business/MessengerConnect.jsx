@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { PlanCta } from '../ui/PlanCta.jsx';
 import { Link } from 'react-router-dom';
 import { connectionsApi } from '../../api/endpoints.js';
 import { toast } from '../../store/toastStore.js';
@@ -193,9 +194,9 @@ export function MessengerConnect({ data, isOwner, sdkReady, onChanged }) {
                 Tu plan <strong className="text-fg">Free</strong> permite un canal conectado a la vez y ya tienes
                 {otherChannel}. Mejora a Pro para usar varios al mismo tiempo.
               </p>
-              <Link to="/dashboard/facturacion" className="shrink-0">
+              <PlanCta className="shrink-0">
                 <Button size="sm">Mejorar plan</Button>
-              </Link>
+              </PlanCta>
             </div>
           ) : (
             <>

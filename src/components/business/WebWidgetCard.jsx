@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { PlanCta } from '../ui/PlanCta.jsx';
 import { Link } from 'react-router-dom';
 import { widgetApi } from '../../api/endpoints.js';
 import { toast } from '../../store/toastStore.js';
@@ -109,9 +110,9 @@ export function WebWidgetCard({ isOwner, onStatus }) {
           <p className="text-sm text-muted">
             Disponible en los planes <strong className="text-fg">Pro</strong> y <strong className="text-fg">Elite</strong>.
           </p>
-          <Link to="/dashboard/facturacion" className="shrink-0">
+          <PlanCta className="shrink-0">
             <Button size="sm">Mejorar plan</Button>
-          </Link>
+          </PlanCta>
         </div>
       ) : (
         <div className="mt-5 space-y-5 border-t border-line pt-5">
