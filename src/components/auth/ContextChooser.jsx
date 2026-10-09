@@ -64,7 +64,7 @@ export function ContextChooser({ onDone }) {
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm font-semibold text-fg">{c.name}</span>
         <span className="block text-xs text-subtle">
-          {c.kind === 'owner' ? 'Dueño: pagos, equipo y conexiones' : 'Colaboras con los permisos que te dio el dueño'}
+          {c.kind === 'owner' ? 'Dueño: pagos, equipo y conexiones' : c.roleName ? `Tu rol: ${c.roleName}` : 'Colaboras con el rol que te dio el dueño'}
           {c.requireTeam2fa ? ' · pide código' : ''}
         </span>
       </span>

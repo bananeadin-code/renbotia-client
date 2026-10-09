@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useAccess } from '../../router/RequirePermission.jsx';
 import { confirm } from '../../store/confirmStore.js';
 import { Link, useSearchParams } from 'react-router-dom';
 import { conversationsApi, botConfigApi, learningApi } from '../../api/endpoints.js';
@@ -82,6 +83,10 @@ function deletionLabel(days) {
 }
 
 export default function Conversations() {
+  // IAM: con "conversaciones: ver" se lee la bandeja sin poder actuar.
+  const canEditConv = useAccess('conversations', 'edit');
+  const canViewConv = useAccess('conversations', 'view');
+  const canSimTab = useAccess('simulator', 'edit');
   const [list, setList] = useState([]);
   const [needAttention, setNeedAttention] = useState(0);
   const [hotLeads, setHotLeads] = useState(0);
@@ -90,7 +95,8 @@ export default function Conversations() {
   // Clientes reales vs. pruebas del Simulador (aparte, con quién y cuántos tokens).
   // La pestaña vive en la URL (?vista=simulador) para sobrevivir a recargas.
   const [params, setParams] = useSearchParams();
-  const [scope, setScope] = useState(params.get('vista') === 'simulador' ? 'simulator' : 'real');
+  // Sin acceso a las conversaciones de clientes (solo simulador): abre en Simulador.
+  const [scope, setScope] = useState(params.get('vista') === 'simulador' || !canViewConv ? 'simulator' : 'real');
   const [simulatorCount, setSimulatorCount] = useState(0);
   // Pestaña vigente para los refrescos en segundo plano (los intervalos no ven el
   // estado nuevo), caché por pestaña para cambiar al instante, y número de
@@ -606,7 +612,9 @@ export default function Conversations() {
               aria-selected={on}
               tabIndex={on ? 0 : -1}
               onClick={() => switchScope(val)}
-              className={`relative z-[1] inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 ${
+              disabled={val === 'real' ? !canViewConv : !canSimTab}
+              title={(val === 'real' ? !canViewConv : !canSimTab) ? 'Tu rol no incluye esta vista' : undefined}
+              className={`relative z-[1] inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 disabled:cursor-not-allowed disabled:opacity-40 ${
                 on ? 'text-white' : 'text-muted hover:text-fg'
               }`}
             >
@@ -859,7 +867,7 @@ export default function Conversations() {
                     </button>
                   )}
                   {/* Selector de modo (no aplica a pruebas del simulador) */}
-                  {!threadIsSim && (
+                  {!threadIsSim && canEditConv && (
                   <div className="flex shrink-0 rounded-lg border border-line p-0.5 text-xs">
                     <button
                       onClick={() => !isManual || setMode('bot')}
@@ -906,16 +914,19 @@ export default function Conversations() {
                     {(thread.tags || []).map((t) => (
                       <span key={t} className="inline-flex items-center gap-1 rounded-full bg-surface2 px-2 py-0.5 text-[11px] font-medium text-muted">
                         #{t}
-                        <button
-                          type="button"
-                          onClick={() => removeTag(t)}
-                          aria-label={`Quitar etiqueta ${t}`}
-                          className="leading-none text-subtle hover:text-red-500"
-                        >
-                          ×
-                        </button>
+                        {canEditConv && (
+                          <button
+                            type="button"
+                            onClick={() => removeTag(t)}
+                            aria-label={`Quitar etiqueta ${t}`}
+                            className="leading-none text-subtle hover:text-red-500"
+                          >
+                            ×
+                          </button>
+                        )}
                       </span>
                     ))}
+                    {canEditConv && (
                     <form onSubmit={addTag}>
                       <input
                         value={tagDraft}
@@ -926,7 +937,10 @@ export default function Conversations() {
                         className="w-24 rounded-full border border-line bg-canvas px-2.5 py-0.5 text-[11px] text-fg outline-none focus:border-brand-500"
                       />
                     </form>
+                    )}
                   </div>
+                  {canEditConv && (
+                  <>
                   <button
                     type="button"
                     onClick={runSummary}
@@ -949,6 +963,8 @@ export default function Conversations() {
                   >
                     <Icon name="ban" size={14} /> {blocked ? 'Bloqueado' : 'Bloquear'}
                   </button>
+                  </>
+                  )}
                 </div>
                 )}
 
@@ -1144,7 +1160,7 @@ export default function Conversations() {
                             </span>
                           </div>
                           {/* Calificación de calidad (solo respuestas del bot) */}
-                          {mine && !agent && (
+                          {mine && !agent && canEditConv && (
                             <div className="mt-1 flex items-center justify-end gap-1">
                               <button
                                 onClick={() => rate(i, 'up')}
@@ -1186,6 +1202,10 @@ export default function Conversations() {
                       Simulador
                     </Link>
                     .
+                  </div>
+                ) : !canEditConv ? (
+                  <div className="border-t border-line bg-surface px-4 py-3 text-center text-xs text-muted">
+                    Solo lectura: tu rol te deja ver las conversaciones, pero no responderlas ni cambiarlas.
                   </div>
                 ) : isManual && windowClosed && isMessenger ? (
                   <div className="border-t border-line bg-surface p-3">

@@ -21,7 +21,7 @@ export const useBusinessStore = create((set, get) => ({
   async load(_retry = false) {
     set({ loading: true });
     try {
-      const [{ business, role, permissions, smsEnabled }, subData] = await Promise.all([
+      const [{ business, role, permissions, access, smsEnabled }, subData] = await Promise.all([
         businessApi.me(),
         subscriptionApi.me(),
       ]);
@@ -29,6 +29,8 @@ export const useBusinessStore = create((set, get) => ({
         business,
         role,
         permissions: permissions || null,
+        // IAM: { roleKey, roleName, modules: {módulo: none|view|edit}, channels }
+        access: access || null,
         smsEnabled: Boolean(smsEnabled),
         subscription: subData.subscription,
         balance: subData.balance,
@@ -90,6 +92,7 @@ export const useBusinessStore = create((set, get) => ({
       balance: null,
       role: null,
       permissions: null,
+      access: null,
       hasBusiness: null,
       projects: [],
     });

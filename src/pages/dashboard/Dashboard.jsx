@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import { usageApi } from '../../api/endpoints.js';
 import { useBusinessStore } from '../../store/businessStore.js';
+import { useAccess } from '../../router/RequirePermission.jsx';
 import { useAuthStore } from '../../store/authStore.js';
 import { Card, Badge, Spinner, Button } from '../../components/ui/index.jsx';
 import { SpotlightCard } from '../../components/ui/SpotlightCard.jsx';
@@ -40,18 +41,22 @@ function StatCard({ label, value, sub, color, icon }) {
 }
 
 export default function Dashboard() {
-  const { business, subscription, balance, setBalance, role, permissions } = useBusinessStore();
+  const { business, subscription, balance, setBalance, role } = useBusinessStore();
   const user = useAuthStore((s) => s.user);
   const isOwner = role === 'owner';
-  const canSimulate = isOwner || Boolean(permissions?.simulator);
+  const canSimulate = useAccess('simulator', 'edit');
+  const canTrain = useAccess('training', 'view');
+  const canEditProfile = useAccess('profile', 'edit');
+  // "Lo que generó tu bot" ($ estimados, leads) es información de negocio: analíticas.
+  const canSeeImpact = useAccess('analytics', 'view');
   const firstName = String(user?.name || '').trim().split(/\s+/)[0];
   const [daily, setDaily] = useState([]);
   const [loading, setLoading] = useState(true);
   const [impact, setImpact] = useState(null);
 
   useEffect(() => {
-    usageApi.impact().then(setImpact).catch(() => {});
-  }, []);
+    if (canSeeImpact) usageApi.impact().then(setImpact).catch(() => {});
+  }, [canSeeImpact]);
 
   useEffect(() => {
     usageApi
@@ -142,12 +147,14 @@ export default function Dashboard() {
       </div>
 
       {/* Lo que generó tu bot: datos reales + estimación en pesos (retención) */}
+      {canSeeImpact && (
       <ImpactCard
         impact={impact}
         onChange={setImpact}
-        canEdit={isOwner || Boolean(permissions?.profile)}
+        canEdit={canEditProfile}
         canToggleReport={isOwner}
       />
+      )}
 
       {/* Barra de consumo (en conversaciones, tono tranquilo) */}
       <Card>
@@ -216,7 +223,9 @@ export default function Dashboard() {
       </Card>
 
       {/* Accesos rápidos */}
-      <div className="grid gap-4 sm:grid-cols-2">
+      {(canTrain || canSimulate) && (
+      <div className={`grid gap-4 ${canTrain && canSimulate ? 'sm:grid-cols-2' : ''}`}>
+        {canTrain && (
         <Link to="/dashboard/entrenamiento">
           <SpotlightCard className="group flex items-center gap-4 p-5 transition hover:-translate-y-0.5 [&>*]:relative [&>*]:z-[2]">
             <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-300">
@@ -229,6 +238,8 @@ export default function Dashboard() {
             <Icon name="chevronRight" size={18} className="text-subtle transition group-hover:text-brand-600" />
           </SpotlightCard>
         </Link>
+        )}
+        {canSimulate && (
         <Link to="/dashboard/simulador">
           <SpotlightCard className="group flex items-center gap-4 p-5 transition hover:-translate-y-0.5 [&>*]:relative [&>*]:z-[2]">
             <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-300">
@@ -241,7 +252,9 @@ export default function Dashboard() {
             <Icon name="chevronRight" size={18} className="text-subtle transition group-hover:text-brand-600" />
           </SpotlightCard>
         </Link>
+        )}
       </div>
+      )}
     </div>
   );
 }

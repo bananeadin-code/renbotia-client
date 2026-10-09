@@ -10,11 +10,60 @@ const LABEL = {
   connections: 'administrar las conexiones',
 };
 
-/** ¿El usuario puede hacer `key` en el negocio activo? (el dueño siempre) */
-export function useCan(key) {
+const RANK = { none: 0, view: 1, edit: 2 };
+
+/** ¿El acceso alcanza `level` en `module`? (fuera de un hook) */
+export function canAccess(access, role, module, level = 'view') {
+  if (role === 'owner') return true;
+  if (!access) return level === 'view'; // mientras carga: no ocultar de más
+  return (RANK[access.modules?.[module]] ?? 0) >= (RANK[level] ?? 1);
+}
+
+/** ¿Puede usar `module` con este nivel en el negocio activo? (el dueño siempre) */
+export function useAccess(module, level = 'view') {
   const role = useBusinessStore((s) => s.role);
-  const permissions = useBusinessStore((s) => s.permissions);
-  return role !== 'colaborador' || Boolean(permissions?.[key]);
+  const access = useBusinessStore((s) => s.access);
+  return canAccess(access, role, module, level);
+}
+
+/**
+ * Compatibilidad: los 4 permisos de antes = "editar" en su módulo
+ * (simulator, training, profile, connections).
+ */
+export function useCan(key) {
+  return useAccess(key, 'edit');
+}
+
+const MODULE_LABEL = {
+  conversations: 'las conversaciones',
+  training: 'el entrenamiento',
+  simulator: 'el simulador',
+  management: 'la gestión de trabajo',
+  analytics: 'las analíticas',
+  connections: 'las conexiones',
+  profile: 'los datos del negocio',
+  team: 'el equipo',
+  activity: 'la actividad',
+};
+
+/** Protege una página según el ROL (módulo y nivel). El servidor valida lo mismo. */
+export function RequireAccess({ module, level = 'view', children }) {
+  const ok = useAccess(module, level);
+  if (ok) return children;
+  return (
+    <Card className="mx-auto max-w-md py-12 text-center">
+      <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-surface2 text-subtle">
+        <Icon name="shield" size={24} />
+      </span>
+      <h1 className="mt-3 text-lg font-bold text-fg">Tu rol no incluye esta sección</h1>
+      <p className="mx-auto mt-1 max-w-xs text-sm text-muted">
+        Para ver {MODULE_LABEL[module] || 'esta sección'}, pídele al dueño del negocio que ajuste tu rol en Equipo.
+      </p>
+      <Link to="/dashboard" className="mt-5 inline-block">
+        <Button variant="secondary">Ir al inicio</Button>
+      </Link>
+    </Card>
+  );
 }
 
 /**

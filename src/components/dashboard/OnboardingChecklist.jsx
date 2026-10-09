@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { botConfigApi, chatApi } from '../../api/endpoints.js';
 import { useBusinessStore } from '../../store/businessStore.js';
+import { useAccess } from '../../router/RequirePermission.jsx';
 import { Card } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
 
@@ -15,6 +16,10 @@ const DISMISS_KEY = 'renbotia:checklistDismissed';
 export function OnboardingChecklist() {
   const business = useBusinessStore((s) => s.business);
   const smsEnabled = useBusinessStore((s) => s.smsEnabled);
+  // IAM: cada paso solo si el rol permite completarlo (si no, no se muestra).
+  const canTrain = useAccess('training', 'edit');
+  const canSimulate = useAccess('simulator', 'edit');
+  const canProfile = useAccess('profile', 'edit');
   const [loading, setLoading] = useState(true);
   const [hasFaqs, setHasFaqs] = useState(false);
   const [hasChats, setHasChats] = useState(false);
@@ -27,14 +32,15 @@ export function OnboardingChecklist() {
   });
 
   useEffect(() => {
-    Promise.all([botConfigApi.get(), chatApi.list()])
+    // Solo lo que su rol puede leer (evita 403 innecesarios).
+    Promise.all([canTrain ? botConfigApi.get() : null, canSimulate ? chatApi.list() : null])
       .then(([cfg, chatsData]) => {
-        setHasFaqs((cfg.botConfig?.faqs || []).length > 0);
-        setHasChats((chatsData.chats || []).length > 0);
+        setHasFaqs((cfg?.botConfig?.faqs || []).length > 0);
+        setHasChats((chatsData?.chats || []).length > 0);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [canTrain, canSimulate]);
 
   function dismiss() {
     try {
@@ -45,27 +51,28 @@ export function OnboardingChecklist() {
     setDismissed(true);
   }
 
-  const steps = [
+  const steps = [];
+  if (canTrain) steps.push(
     {
       done: hasFaqs,
       title: 'Entrena tu bot',
       desc: 'Agrega tus FAQs, tono e información del negocio.',
       to: '/dashboard/entrenamiento',
       icon: 'academic',
-    },
+    });
+  if (canSimulate) steps.push(
     {
       done: hasChats,
       title: 'Pruébalo en el simulador',
       desc: 'Escríbele como un cliente y ajusta sus respuestas.',
       to: '/dashboard/simulador',
       icon: 'message',
-    },
-  ];
+    });
 
   // El paso de verificar el número solo aparece cuando esa vía está disponible
   // (proveedor de SMS) o si ya se verificó — para no dejar una tarea que el
   // usuario no puede completar todavía (la conexión real llega con WhatsApp/Meta).
-  if (smsEnabled || business?.whatsappVerified) {
+  if (canProfile && (smsEnabled || business?.whatsappVerified)) {
     steps.push({
       done: Boolean(business?.whatsappVerified),
       title: 'Verifica tu número de WhatsApp',
@@ -78,7 +85,7 @@ export function OnboardingChecklist() {
   const doneCount = steps.filter((s) => s.done).length;
 
   // No mostrar mientras carga, si ya completó todo, o si lo cerró.
-  if (loading || dismissed || doneCount === steps.length) return null;
+  if (loading || dismissed || steps.length === 0 || doneCount === steps.length) return null;
 
   return (
     <Card className="border-brand-200 dark:border-brand-900/60">

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { businessApi, usageApi } from '../../api/endpoints.js';
 import { toast } from '../../store/toastStore.js';
+import { useAccess } from '../../router/RequirePermission.jsx';
 import { Card, Button } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
 
@@ -16,6 +17,7 @@ const num = (n) => (n == null ? '—' : Number(n).toLocaleString('es-MX'));
 
 export function ImpactCard({ impact, onChange, canEdit = true, canToggleReport = true }) {
   const configured = Boolean(impact?.settings?.configured);
+  const canTrain = useAccess('training', 'view');
   const [editing, setEditing] = useState(false);
   const [ticket, setTicket] = useState('');
   const [hourly, setHourly] = useState('');
@@ -223,9 +225,13 @@ export function ImpactCard({ impact, onChange, canEdit = true, canToggleReport =
           <>
             {' '}
             Activa tu{' '}
-            <Link to="/dashboard/entrenamiento" className="font-medium text-brand-600 hover:underline">
-              horario de atención
-            </Link>{' '}
+            {canTrain ? (
+              <Link to="/dashboard/entrenamiento" className="font-medium text-brand-600 hover:underline">
+                horario de atención
+              </Link>
+            ) : (
+              'horario de atención'
+            )}{' '}
             para ver cuántos clientes atiende cuando estás cerrado.
           </>
         )}

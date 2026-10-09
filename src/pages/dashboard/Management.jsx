@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useAccess } from '../../router/RequirePermission.jsx';
 import { PlanCta } from '../../components/ui/PlanCta.jsx';
-import { Button, Card, Badge, Spinner, Alert, Select } from '../../components/ui/index.jsx';
+import { Button, Card, Badge, Spinner, Alert, Select, Notice } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { managementApi } from '../../api/endpoints.js';
 import { downloadFile } from '../../api/download.js';
@@ -23,6 +24,8 @@ import {
  * capta: citas, reservaciones, pedidos y prospectos; define su disponibilidad.
  */
 export default function Management() {
+  // IAM: con "gestión: ver" se consultan registros y agenda sin cambiar nada.
+  const canEditMgmt = useAccess('management', 'edit');
   const subscription = useBusinessStore((s) => s.subscription);
   const planKey = subscription?.plan?.key;
 
@@ -186,14 +189,22 @@ export default function Management() {
                 <span className="hidden sm:inline">{exporting ? 'Exportando…' : 'Exportar'}</span>
               </Button>
             )}
-            <Button onClick={openNew}>
-              <Icon name="plus" size={16} />
-              <span className="hidden sm:inline">Nuevo registro</span>
-              <span className="sm:hidden">Nuevo</span>
-            </Button>
+            {canEditMgmt && (
+              <Button onClick={openNew}>
+                <Icon name="plus" size={16} />
+                <span className="hidden sm:inline">Nuevo registro</span>
+                <span className="sm:hidden">Nuevo</span>
+              </Button>
+            )}
           </div>
         }
       />
+
+      {!canEditMgmt && (
+        <Notice variant="warning" className="mt-4">
+          <strong>Solo lectura.</strong> Tu rol te deja ver los registros y la agenda, pero no crearlos ni cambiarlos.
+        </Notice>
+      )}
 
       {/* Tabs */}
       <div className="mt-4 flex gap-1 rounded-xl border border-line bg-surface2/60 p-1">
@@ -229,13 +240,20 @@ export default function Management() {
 
       {tab === 'config' && (
         <div className="mt-4">
-          <AvailabilityConfig config={config} onSaved={loadAll} />
+          <fieldset disabled={!canEditMgmt} className="min-w-0">
+            <AvailabilityConfig config={config} onSaved={loadAll} />
+          </fieldset>
         </div>
       )}
 
       {tab === 'calendar' && (
         <div className="mt-4">
-          <CalendarView config={config} version={version} onNew={openNewOn} onEdit={openEdit} />
+          <CalendarView
+            config={config}
+            version={version}
+            onNew={canEditMgmt ? openNewOn : () => {}}
+            onEdit={canEditMgmt ? openEdit : () => {}}
+          />
         </div>
       )}
 
@@ -303,6 +321,7 @@ export default function Management() {
                   onStatus={changeStatus}
                   onEdit={openEdit}
                   onDelete={remove}
+                  readOnly={!canEditMgmt}
                 />
               ))
             )}
@@ -386,14 +405,14 @@ function FilterChip({ active, onClick, icon, children }) {
   );
 }
 
-function RecordRow({ rec, onStatus, onEdit, onDelete }) {
+function RecordRow({ rec, onStatus, onEdit, onDelete, readOnly = false }) {
   const meta = TYPE_META[rec.type] || TYPE_META.cita;
   const status = STATUS_META[rec.status] || STATUS_META.pendiente;
   const past = isPast(rec.scheduledAt);
 
   // Acciones (mismo cluster reutilizado): en desktop van a la derecha; en móvil
   // se muestran en su propia fila abajo, con el selector de estado a lo ancho.
-  const actions = (
+  const actions = readOnly ? null : (
     <>
       <select
         value={rec.status}

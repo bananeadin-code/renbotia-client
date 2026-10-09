@@ -8,6 +8,7 @@ import { Icon } from '../ui/Icon.jsx';
 import { Logo } from '../ui/Logo.jsx';
 import { ThemeToggle } from '../ui/ThemeToggle.jsx';
 import { ProjectSwitcher } from './ProjectSwitcher.jsx';
+import { canAccess } from '../../router/RequirePermission.jsx';
 
 const NAV = [
   { to: '/dashboard', label: 'Inicio', end: true, icon: 'home' },
@@ -46,7 +47,7 @@ export function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuthStore();
-  const { hasBusiness, business, subscription, role, permissions, load } = useBusinessStore();
+  const { hasBusiness, business, subscription, role, access, load } = useBusinessStore();
   const [checking, setChecking] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -72,15 +73,29 @@ export function DashboardLayout() {
     const i = NAV.findIndex((n) => n.to === '/dashboard/simulador');
     nav = [...NAV.slice(0, i + 1), { to: '/dashboard/gestion', label: 'Gestión de trabajo', icon: 'calendarCheck' }, ...NAV.slice(i + 1)];
   }
-  // Los colaboradores no ven Facturación (es solo del dueño) ni lo que el dueño
-  // no les permitió (simulador, entrenamiento) en Equipo.
-  if (role === 'colaborador') {
-    nav = nav.filter(
-      (n) =>
-        n.to !== '/dashboard/facturacion' &&
-        !(n.to === '/dashboard/simulador' && !permissions?.simulator) &&
-        !(n.to === '/dashboard/entrenamiento' && !permissions?.training)
-    );
+  // Colaboradores: Facturación es solo del dueño; el resto según su ROL (si su
+  // rol no incluye un módulo, no aparece).
+  if (role && role !== 'owner') {
+    const NAV_MODULE = {
+      '/dashboard/entrenamiento': ['training', 'view'],
+      '/dashboard/simulador': ['simulator', 'edit'],
+      '/dashboard/gestion': ['management', 'view'],
+      '/dashboard/conversaciones': ['conversations', 'view'],
+      '/dashboard/analiticas': ['analytics', 'view'],
+      '/dashboard/conexiones': ['connections', 'view'],
+      '/dashboard/equipo': ['team', 'view'],
+      '/dashboard/actividad': ['activity', 'view'],
+    };
+    nav = nav.filter((n) => {
+      if (n.to === '/dashboard/facturacion') return false;
+      const rule = NAV_MODULE[n.to];
+      if (!rule) return true;
+      // Conversaciones también sirve para revisar las pruebas del simulador.
+      if (n.to === '/dashboard/conversaciones') {
+        return canAccess(access, role, 'conversations', 'view') || canAccess(access, role, 'simulator', 'edit');
+      }
+      return canAccess(access, role, rule[0], rule[1]);
+    });
   }
   if (user?.role === 'admin')
     nav = [

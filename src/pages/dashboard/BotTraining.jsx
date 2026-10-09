@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useAccess } from '../../router/RequirePermission.jsx';
 import { PlanCta } from '../../components/ui/PlanCta.jsx';
 import { useNavigate, Link } from 'react-router-dom';
 import { botConfigApi, businessApi } from '../../api/endpoints.js';
@@ -149,6 +150,7 @@ function UpgradeNote({ children }) {
 }
 
 export default function BotTraining() {
+  const canEditTraining = useAccess('training', 'edit');
   const navigate = useNavigate();
   const business = useBusinessStore((s) => s.business);
   const loadBusiness = useBusinessStore((s) => s.load);
@@ -522,6 +524,14 @@ export default function BotTraining() {
         <Badge color="green">Plan {planName}</Badge>
       </div>
 
+      {!canEditTraining && (
+        <Notice variant="warning">
+          <strong>Solo lectura.</strong> Tu rol te deja ver el entrenamiento del bot, pero no cambiarlo. Si necesitas
+          editarlo, pídele al dueño del negocio que ajuste tu rol en Equipo.
+        </Notice>
+      )}
+
+      <fieldset disabled={!canEditTraining} className="min-w-0 space-y-6 disabled:opacity-80">
       <Notice variant="tip">
         Entre más información le des al bot y más imágenes envíe, cada conversación usa un poco más
         de tu plan del mes. No tienes que contar nada: dale lo esencial y claro, así responde mejor
@@ -1248,7 +1258,10 @@ Solo un seguimiento por conversación mientras el cliente no conteste. No se env
           contenido (Imágenes del bot y demás) al hacer scroll. */}
       <div className="h-16" aria-hidden="true" />
 
-      {/* Acciones (sticky) */}
+      </fieldset>
+
+      {/* Acciones (sticky) — solo con permiso de editar */}
+      {canEditTraining && (
       <div className="sticky bottom-0 flex flex-col gap-2 rounded-xl border border-line bg-surface/95 p-3 backdrop-blur sm:flex-row sm:justify-end">
         <Button variant="secondary" onClick={() => save()} disabled={saving}>
           {saving ? 'Guardando…' : 'Guardar'}
@@ -1258,6 +1271,7 @@ Solo un seguimiento por conversación mientras el cliente no conteste. No se env
           <Icon name="message" size={18} />
         </Button>
       </div>
+      )}
     </div>
   );
 }

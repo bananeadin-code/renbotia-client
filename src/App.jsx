@@ -4,7 +4,7 @@ import { useAuthStore } from './store/authStore.js';
 import { useThemeStore } from './store/themeStore.js';
 import { ProtectedRoute } from './router/ProtectedRoute.jsx';
 import { captureReferral } from './lib/referral.js';
-import { RequirePermission } from './router/RequirePermission.jsx';
+import { RequirePermission, RequireAccess } from './router/RequirePermission.jsx';
 import ScrollToTop from './router/ScrollToTop.jsx';
 import { Toaster } from './components/ui/Toaster.jsx';
 import { ConfirmDialog } from './components/ui/ConfirmDialog.jsx';
@@ -124,16 +124,16 @@ export default function App() {
         }
       >
         <Route index element={<Dashboard />} />
-        <Route path="entrenamiento" element={<RequirePermission perm="training"><BotTraining /></RequirePermission>} />
-        <Route path="simulador" element={<RequirePermission perm="simulator"><Simulator /></RequirePermission>} />
+        <Route path="entrenamiento" element={<RequireAccess module="training"><BotTraining /></RequireAccess>} />
+        <Route path="simulador" element={<RequireAccess module="simulator" level="edit"><Simulator /></RequireAccess>} />
         <Route path="conversaciones" element={<Conversations />} />
-        <Route path="analiticas" element={<Analytics />} />
-        <Route path="conexiones" element={<Connections />} />
-        <Route path="gestion" element={<Management />} />
+        <Route path="analiticas" element={<RequireAccess module="analytics"><Analytics /></RequireAccess>} />
+        <Route path="conexiones" element={<RequireAccess module="connections"><Connections /></RequireAccess>} />
+        <Route path="gestion" element={<RequireAccess module="management"><Management /></RequireAccess>} />
         <Route path="facturacion" element={<RequireOwner><Billing /></RequireOwner>} />
-        <Route path="equipo" element={<Team />} />
+        <Route path="equipo" element={<RequireAccess module="team"><Team /></RequireAccess>} />
         <Route path="perfil" element={<Profile />} />
-        <Route path="actividad" element={<Activity />} />
+        <Route path="actividad" element={<RequireAccess module="activity"><Activity /></RequireAccess>} />
         <Route
           path="admin"
           element={

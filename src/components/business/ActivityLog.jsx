@@ -22,6 +22,16 @@ const ACTION_ICON = {
   'instagram.connect': 'instagram',
   'whatsapp.template': 'message',
   'botconfig.notice': 'clipboard',
+  'member.invite': 'users',
+  'member.accept': 'users',
+  'member.role': 'users',
+  'member.permissions': 'users',
+  'member.remove': 'users',
+  'member.sessions': 'shield',
+  'role.create': 'shield',
+  'role.update': 'shield',
+  'role.delete': 'shield',
+  'team.security': 'shield',
 };
 
 const fmt = (iso) =>

@@ -11,7 +11,7 @@ import { Card, Button, Input, Select, Alert, Notice } from '../../components/ui/
 import { Icon } from '../../components/ui/Icon.jsx';
 import { fileToAvatarDataUri } from '../../lib/image.js';
 import { v } from '../../lib/useForm.js';
-import { useCan } from '../../router/RequirePermission.jsx';
+import { useCan, useAccess } from '../../router/RequirePermission.jsx';
 
 const INDUSTRIES = [
   { value: 'legal', label: 'Despacho legal' },
@@ -123,6 +123,7 @@ export default function Profile() {
   const [savingBiz, setSavingBiz] = useState(false);
   // Datos del negocio: el dueño o un colaborador con permiso (Equipo).
   const canProfile = useCan('profile');
+  const canSeeConnections = useAccess('connections', 'view');
 
   // Foto/avatar del negocio: se comprime en el navegador y se guarda al momento.
   const photoInputRef = useRef(null);
@@ -410,8 +411,8 @@ export default function Profile() {
         </fieldset>
       </Card>
 
-      {/* Canales conectados (informativo) */}
-      <ConnectedChannels />
+      {/* Canales conectados (informativo; según el rol) */}
+      {canSeeConnections && <ConnectedChannels />}
 
       {/* Seguridad: verificación en dos pasos */}
       <Card>

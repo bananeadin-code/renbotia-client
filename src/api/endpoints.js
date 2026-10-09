@@ -248,16 +248,20 @@ export const learningApi = {
 
 export const membersApi = {
   list: () => unwrap(api.get('/members')),
-  invite: (email) => unwrap(api.post('/members/invite', { email })),
+  invite: (email, roleKey) => unwrap(api.post('/members/invite', { email, ...(roleKey ? { roleKey } : {}) })),
   accept: (token) => unwrap(api.post('/members/accept', { token })),
   cancelInvite: (id) => api.delete(`/members/invite/${id}`),
   remove: (userId) => api.delete(`/members/${userId}`),
   // El dueño da o quita permisos a un colaborador.
-  setPermissions: (userId, body) => unwrap(api.patch(`/members/${userId}/permissions`, body)),
   // Sesiones de un colaborador en este negocio y seguridad del equipo (solo dueño).
   sessions: (userId) => unwrap(api.get(`/members/${userId}/sessions`)),
   closeSessions: (userId) => unwrap(api.delete(`/members/${userId}/sessions`)),
   setSecurity: (body) => unwrap(api.put('/members/security', body)),
+  // IAM: rol de una persona y roles personalizados del negocio.
+  setRole: (userId, body) => unwrap(api.put(`/members/${userId}/role`, body)),
+  createRole: (body) => unwrap(api.post('/members/roles', body)),
+  updateRole: (id, body) => unwrap(api.put(`/members/roles/${id}`, body)),
+  deleteRole: (id) => unwrap(api.delete(`/members/roles/${id}`)),
 };
 
 export const adminApi = {

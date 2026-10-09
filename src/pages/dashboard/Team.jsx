@@ -8,20 +8,14 @@ import { limitsFor } from '../../lib/planLimits.js';
 import { Card, Button, Input, Badge, Alert, Spinner } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { TeamSecurityCard, MemberSessions } from '../../components/team/TeamSecurity.jsx';
+import { RoleSelect, AccessSummary, AccessEditor, CustomRolesCard } from '../../components/team/Roles.jsx';
 
 /**
  * Equipo: miembros del negocio (dueño + colaboradores). El dueño invita por
- * correo y gestiona; los colaboradores ven la lista. Multiusuario: varias
+ * correo con un rol (IAM: módulos × nivel y canales); un Administrador también
+ * gestiona; el resto solo ve la lista. Multiusuario: varias
  * personas configuran el mismo bot sin compartir contraseña.
  */
-// Permisos que el dueño puede dar o quitar a cada colaborador.
-const PERMS = [
-  ['simulator', 'Simulador', 'message'],
-  ['training', 'Entrenar el bot', 'academic'],
-  ['profile', 'Datos del negocio', 'building'],
-  ['connections', 'Conexiones', 'link'],
-];
-
 // Texto de vigencia de una invitación (vencen a los 7 días de enviarse).
 function expiryLabel(expiresAt) {
   const ms = new Date(expiresAt).getTime() - Date.now();
@@ -41,6 +35,9 @@ export default function Team() {
   const [error, setError] = useState('');
   const [devLink, setDevLink] = useState('');
   const [resending, setResending] = useState(''); // id de la invitación que se reenvía
+  const [inviteRole, setInviteRole] = useState('agent');
+  const [customFor, setCustomFor] = useState(null); // miembro cuyo acceso se edita a mano
+  const [savingRole, setSavingRole] = useState(false);
 
   async function load() {
     try {
@@ -58,6 +55,8 @@ export default function Team() {
   const subscription = useBusinessStore((s) => s.subscription);
   const canInvite = limitsFor(subscription?.plan?.key).multiUser;
   const isOwner = data?.myRole === 'owner';
+  // Gestionar el equipo: el dueño o quien tenga "Equipo: editar" (p. ej. Administrador).
+  const canManage = Boolean(data?.canManageTeam);
 
   async function invite(e) {
     e.preventDefault();
@@ -65,7 +64,7 @@ export default function Team() {
     setDevLink('');
     setInviting(true);
     try {
-      const res = await membersApi.invite(email.trim());
+      const res = await membersApi.invite(email.trim(), inviteRole === 'custom' ? 'agent' : inviteRole);
       toast.success(
         res.registered
           ? 'Invitación enviada. La persona ya tiene cuenta y abrirá el enlace para unirse.'
@@ -106,7 +105,7 @@ export default function Team() {
     setResending(inv.id);
     setDevLink('');
     try {
-      const res = await membersApi.invite(inv.email);
+      const res = await membersApi.invite(inv.email, inv.roleKey);
       toast.success(`Invitación reenviada a ${inv.email}. Vence en 7 días.`);
       if (res.devLink) setDevLink(res.devLink);
       await load();
@@ -117,18 +116,21 @@ export default function Team() {
     }
   }
 
-  async function togglePermission(m, key) {
-    const next = !m.permissions?.[key];
-    // Optimista: se ve el cambio al instante y se revierte si falla.
-    setData((d) => ({
-      ...d,
-      members: d.members.map((x) => (x.userId === m.userId ? { ...x, permissions: { ...x.permissions, [key]: next } } : x)),
-    }));
+  async function changeRole(m, roleKey, access) {
+    if (roleKey === 'custom' && !access) {
+      setCustomFor(m);
+      return;
+    }
+    setSavingRole(true);
     try {
-      await membersApi.setPermissions(m.userId, { [key]: next });
+      await membersApi.setRole(m.userId, roleKey === 'custom' ? { roleKey, access } : { roleKey });
+      toast.success('Rol actualizado.');
+      setCustomFor(null);
+      await load();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'No se pudo cambiar el permiso.');
-      load();
+      if (err.message !== 'cancelled') toast.error(err.response?.data?.message || 'No se pudo cambiar el rol.');
+    } finally {
+      setSavingRole(false);
     }
   }
 
@@ -177,14 +179,14 @@ export default function Team() {
             </Button>
           </Link>
         </Card>
-      ) : isOwner ? (
+      ) : canManage ? (
         <Card>
           <h2 className="mb-1 font-semibold text-fg">Invitar colaborador</h2>
           <p className="mb-4 text-sm text-muted">
-            Al entrar podrá usar el simulador y entrenar el bot. Debajo de su nombre le das o quitas permisos
-            (datos del negocio, conexiones…). Nunca ve la facturación.
+            Elige con qué rol entra. Puedes cambiarlo cuando quieras; nadie del equipo ve la facturación.
           </p>
           <form onSubmit={invite} className="flex flex-col gap-2 sm:flex-row">
+            <RoleSelect value={inviteRole} roles={data.roles} onChange={setInviteRole} includeCustom={false} />
             <Input
               type="email"
               required
@@ -205,7 +207,7 @@ export default function Team() {
           )}
         </Card>
       ) : (
-        <Alert variant="info">Solo el dueño del negocio puede gestionar el equipo.</Alert>
+        <Alert variant="info">Tu rol te deja ver al equipo, pero no gestionarlo.</Alert>
       )}
 
       {/* Miembros */}
@@ -227,7 +229,7 @@ export default function Team() {
               <Badge color={m.role === 'owner' ? 'green' : 'slate'}>
                 {m.role === 'owner' ? 'Dueño' : 'Colaborador'}
               </Badge>
-              {isOwner && m.role !== 'owner' && (
+              {canManage && m.role !== 'owner' && !m.isMe && (
                 <button
                   onClick={() => removeMember(m)}
                   className="rounded-lg p-1.5 text-muted hover:bg-red-500/10 hover:text-red-500"
@@ -238,30 +240,28 @@ export default function Team() {
               )}
               </div>
               {m.role !== 'owner' && (
-                <div className="mt-2 pl-12">
-                  {isOwner ? (
-                    <div className="flex flex-wrap gap-1.5" role="group" aria-label={`Permisos de ${m.name || m.email}`}>
-                      {PERMS.map(([key, label, icon]) => {
-                        const on = Boolean(m.permissions?.[key]);
-                        return (
-                          <button
-                            key={key}
-                            type="button"
-                            aria-pressed={on}
-                            onClick={() => togglePermission(m, key)}
-                            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium transition ${
-                              on
-                                ? 'border-brand-500 bg-brand-500/10 text-brand-700 dark:text-brand-300'
-                                : 'border-line text-subtle line-through decoration-1 hover:text-fg'
-                            }`}
-                          >
-                            <Icon name={on ? 'check' : icon} size={12} /> {label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ) : null}
-                  {isOwner && <MemberSessions member={m} />}
+                <div className="mt-2 space-y-2 pl-12">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {canManage && !m.isMe ? (
+                      <RoleSelect
+                        value={m.access?.roleKey || 'custom'}
+                        roles={data.roles}
+                        disabled={savingRole}
+                        onChange={(k) => changeRole(m, k)}
+                      />
+                    ) : (
+                      <span className="rounded-full bg-surface2 px-2.5 py-1 text-xs font-medium text-fg">
+                        {m.access?.roleName || 'Colaborador'}
+                      </span>
+                    )}
+                    {canManage && !m.isMe && m.access?.roleKey === 'custom' && (
+                      <button type="button" onClick={() => setCustomFor(m)} className="text-xs font-medium text-brand-600 hover:underline">
+                        Ajustar acceso
+                      </button>
+                    )}
+                  </div>
+                  <AccessSummary access={m.access} />
+                  {canManage && <MemberSessions member={m} />}
                   {m.simulator?.tokens > 0 && (
                     <p className="mt-1.5 text-xs text-subtle">
                       Simulador este mes: {m.simulator.tokens.toLocaleString('es-MX')} tokens en {m.simulator.messages}{' '}
@@ -274,6 +274,19 @@ export default function Team() {
           ))}
         </ul>
       </Card>
+
+      {/* Roles (solo el dueño los define) */}
+      {isOwner && <CustomRolesCard catalog={data.roles} onChanged={load} />}
+
+      <AccessEditor
+        open={Boolean(customFor)}
+        onClose={() => setCustomFor(null)}
+        title={`Acceso de ${customFor?.name || customFor?.email || ''}`}
+        initial={customFor?.access}
+        catalog={data?.roles}
+        saving={savingRole}
+        onSave={(v) => changeRole(customFor, 'custom', { modules: v.modules, channels: v.channels })}
+      />
 
       {/* Seguridad del equipo (solo dueño) */}
       {isOwner && (
@@ -297,7 +310,10 @@ export default function Team() {
                 <li key={inv.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 py-3">
                   <Icon name="message" size={18} className="shrink-0 text-subtle" />
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm text-fg">{inv.email}</div>
+                    <div className="truncate text-sm text-fg">
+                      {inv.email}
+                      {inv.roleName && <span className="ml-2 text-xs text-subtle">· {inv.roleName}</span>}
+                    </div>
                     <div
                       className={`flex items-center gap-1 text-xs ${
                         exp.expired ? 'text-red-500' : exp.soon ? 'text-amber-600' : 'text-subtle'
@@ -307,7 +323,7 @@ export default function Team() {
                       {exp.text}
                     </div>
                   </div>
-                  {isOwner && (
+                  {canManage && (
                     <div className="flex shrink-0 items-center gap-1">
                       <Button
                         variant="secondary"
