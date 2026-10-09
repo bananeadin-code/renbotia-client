@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { botConfigApi } from '../../api/endpoints.js';
 import { toast } from '../../store/toastStore.js';
-import { Card, Button } from '../ui/index.jsx';
+import { Card, Button, Select } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
 
 /**
@@ -125,18 +125,19 @@ export function NoticesCard({ canEdit = true }) {
             aria-label="Nuevo aviso"
             className="min-w-0 flex-1 rounded-lg border border-line bg-canvas px-3 py-2 text-sm text-fg outline-none transition focus:border-brand-500"
           />
-          <select
+          <Select
             value={validity}
             onChange={(e) => setValidity(e.target.value)}
             aria-label="Vigencia del aviso"
-            className="rounded-lg border border-line bg-canvas px-3 py-2 text-sm text-fg outline-none focus:border-brand-500"
+            size="sm"
+            className="py-2 sm:w-44"
           >
             {VALIDITY.map(([v, l]) => (
               <option key={v} value={v}>
                 {l}
               </option>
             ))}
-          </select>
+          </Select>
           <Button type="submit" size="sm" disabled={saving} className="justify-center">
             {saving ? 'Publicando…' : 'Publicar'}
           </Button>

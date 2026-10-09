@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { widgetApi } from '../../api/endpoints.js';
 import { toast } from '../../store/toastStore.js';
 import { confirm } from '../../store/confirmStore.js';
-import { Card, Button, Spinner } from '../ui/index.jsx';
+import { Card, Button, Spinner, Select } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
 
 /**
@@ -433,19 +433,20 @@ function WidgetOptions({ w, isOwner, saving, onSave }) {
               <label htmlFor="w-autoopen" className="text-sm font-medium text-fg">
                 Abrir el chat solo
               </label>
-              <select
+              <Select
                 id="w-autoopen"
                 value={o.autoOpenSeconds}
                 disabled={!isOwner}
                 onChange={(e) => setO((x) => ({ ...x, autoOpenSeconds: Number(e.target.value) }))}
-                className="mt-1.5 w-full rounded-lg border border-line bg-canvas px-3 py-2 text-sm text-fg outline-none focus:border-brand-500"
+                size="sm"
+                className="mt-1.5 py-2"
               >
                 {AUTO_OPEN.map(([v, l]) => (
                   <option key={v} value={v}>
                     {l}
                   </option>
                 ))}
-              </select>
+              </Select>
               <p className="mt-1 text-[11px] text-subtle">Una vez por visita y nunca en celular.</p>
             </div>
             <div>

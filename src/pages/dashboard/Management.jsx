@@ -284,6 +284,7 @@ export default function Management() {
             <div className="grid w-full grid-cols-2 gap-2 sm:ml-auto sm:flex sm:w-auto sm:items-center">
               <Select
                 value={scope}
+                aria-label="Mostrar"
                 onChange={(e) => setScope(e.target.value)}
                 className="w-full !py-1.5 text-xs"
               >
@@ -293,6 +294,7 @@ export default function Management() {
               </Select>
               <Select
                 value={filterStatus}
+                aria-label="Filtrar por estado"
                 onChange={(e) => setFilterStatus(e.target.value)}
                 className="w-full !py-1.5 text-xs"
               >
@@ -414,10 +416,12 @@ function RecordRow({ rec, onStatus, onEdit, onDelete, readOnly = false }) {
   // se muestran en su propia fila abajo, con el selector de estado a lo ancho.
   const actions = readOnly ? null : (
     <>
-      <select
+      <Select
         value={rec.status}
         onChange={(e) => onStatus(rec, e.target.value)}
-        className="min-w-0 flex-1 rounded-lg border border-line bg-surface px-2 py-1.5 text-xs text-fg outline-none focus:border-brand-500 sm:flex-none sm:py-1"
+        size="sm"
+        fullWidth={false}
+        className="min-w-0 flex-1 text-xs sm:flex-none sm:py-1"
         aria-label="Cambiar estado"
       >
         {STATUS_ORDER.map((s) => (
@@ -425,7 +429,7 @@ function RecordRow({ rec, onStatus, onEdit, onDelete, readOnly = false }) {
             {STATUS_META[s].label}
           </option>
         ))}
-      </select>
+      </Select>
       <button
         onClick={() => onEdit(rec)}
         className="shrink-0 rounded-lg p-1.5 text-muted hover:bg-surface2 hover:text-fg"

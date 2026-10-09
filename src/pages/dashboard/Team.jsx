@@ -247,6 +247,7 @@ export default function Team() {
                         value={m.access?.roleKey || 'custom'}
                         roles={data.roles}
                         disabled={savingRole}
+                        className="w-full sm:w-56"
                         onChange={(k) => changeRole(m, k)}
                       />
                     ) : (

@@ -828,18 +828,20 @@ export default function BotTraining() {
                     Abierto 24/7
                   </button>
                 </div>
-                <select
+                <Select
                   value={cfg.schedule.timezone}
                   onChange={(e) => set('schedule', { ...cfg.schedule, timezone: e.target.value })}
                   aria-label="Zona horaria"
-                  className="rounded-lg border border-line bg-canvas px-2.5 py-1.5 text-xs text-fg outline-none focus:border-brand-500"
+                  size="sm"
+                  fullWidth={false}
+                  className="text-xs"
                 >
                   {TIMEZONES.map(([tz, label]) => (
                     <option key={tz} value={tz}>
                       {label}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
               <div className="divide-y divide-line rounded-xl border border-line">
                 {cfg.schedule.days.map((d, i) => {
@@ -1143,18 +1145,19 @@ Sube solo contenido lícito y relacionado con tu negocio; eres responsable de lo
                 <label htmlFor="fu-delay" className="mb-1.5 block text-sm font-medium text-fg">
                   Escribirle después de
                 </label>
-                <select
+                <Select
                   id="fu-delay"
                   value={cfg.followUp.delayHours}
                   onChange={(e) => set('followUp', { ...cfg.followUp, delayHours: Number(e.target.value) })}
-                  className="w-full rounded-lg border border-line bg-canvas px-3 py-2 text-sm text-fg outline-none focus:border-brand-500 sm:w-60"
+                  size="sm"
+                  className="py-2 sm:w-60"
                 >
                   {[1, 2, 3, 4, 6, 8, 12, 20].map((h) => (
                     <option key={h} value={h}>
                       {h === 1 ? '1 hora' : `${h} horas`} sin respuesta
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div>

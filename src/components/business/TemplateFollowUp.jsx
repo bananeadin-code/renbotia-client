@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { conversationsApi } from '../../api/endpoints.js';
-import { Alert, Spinner, Notice } from '../ui/index.jsx';
+import { Alert, Spinner, Notice, Select } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
 
 const DELAYS = [
@@ -109,11 +109,11 @@ export function TemplateFollowUp({ value, onChange }) {
                 <label htmlFor="tfu-name" className="mb-1.5 block text-sm font-medium text-fg">
                   Plantilla
                 </label>
-                <select
+                <Select
                   id="tfu-name"
                   value={selected ? `${selected.name}|${selected.language}` : ''}
                   onChange={(e) => choose(e.target.value)}
-                  className="w-full rounded-lg border border-line bg-canvas px-3 py-2 text-sm text-fg outline-none focus:border-brand-500"
+                  placeholder="Elige una plantilla aprobada"
                 >
                   <option value="" disabled>
                     Elige una plantilla aprobada
@@ -123,24 +123,25 @@ export function TemplateFollowUp({ value, onChange }) {
                       {x.name} ({x.language})
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
               <div>
                 <label htmlFor="tfu-delay" className="mb-1.5 block text-sm font-medium text-fg">
                   Enviarla tras
                 </label>
-                <select
+                <Select
                   id="tfu-delay"
                   value={t.delayHours}
                   onChange={(e) => set({ delayHours: Number(e.target.value) })}
-                  className="w-full rounded-lg border border-line bg-canvas px-3 py-2 text-sm text-fg outline-none focus:border-brand-500"
+                  size="sm"
+                  className="py-2"
                 >
                   {DELAYS.map(([h, label]) => (
                     <option key={h} value={h}>
                       {label} sin respuesta
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
             </div>
 

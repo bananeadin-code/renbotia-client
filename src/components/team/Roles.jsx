@@ -3,7 +3,7 @@ import { membersApi } from '../../api/endpoints.js';
 import { toast } from '../../store/toastStore.js';
 import { confirm } from '../../store/confirmStore.js';
 import { Modal } from '../ui/Modal.jsx';
-import { Card, Button, Input, Notice } from '../ui/index.jsx';
+import { Card, Button, Input, Notice, Select } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
 
 /** Etiquetas e íconos de cada módulo (en el mismo orden que el servidor). */
@@ -48,19 +48,28 @@ export function AccessSummary({ access }) {
   );
 }
 
-/** Selector de rol (listos, personalizados del negocio y "Personalizado…"). */
-export function RoleSelect({ value, roles, onChange, disabled, includeCustom = true, id }) {
+/** Resumen corto de un rol propio para la segunda línea del selector. */
+function roleHint(r) {
+  const mods = Object.entries(r.modules || {}).filter(([, l]) => l !== 'none').map(([m]) => MODULE_INFO[m]?.[0] || m);
+  const ch = r.channels === 'all' || !r.channels ? '' : ` · solo ${r.channels.map((c) => CHANNEL_LABEL[c] || c).join(', ')}`;
+  return (mods.length ? mods.slice(0, 3).join(', ') + (mods.length > 3 ? ` y ${mods.length - 3} más` : '') : 'Sin secciones') + ch;
+}
+
+/** Selector de rol (listos, personalizados del negocio y "Personalizado"). */
+export function RoleSelect({ value, roles, onChange, disabled, includeCustom = true, id, className = 'w-full sm:w-52' }) {
   return (
-    <select
+    <Select
       id={id}
       value={value}
       disabled={disabled}
       onChange={(e) => onChange(e.target.value)}
-      className="rounded-lg border border-line bg-canvas px-2.5 py-1.5 text-sm text-fg outline-none focus:border-brand-500 disabled:opacity-60"
+      aria-label="Rol"
+      className={className}
+      menuClassName="w-72"
     >
       <optgroup label="Roles listos">
         {(roles?.presets || []).map((r) => (
-          <option key={r.key} value={r.key}>
+          <option key={r.key} value={r.key} description={r.description}>
             {r.name}
           </option>
         ))}
@@ -68,14 +77,20 @@ export function RoleSelect({ value, roles, onChange, disabled, includeCustom = t
       {(roles?.custom || []).length > 0 && (
         <optgroup label="Roles de tu negocio">
           {roles.custom.map((r) => (
-            <option key={r.key} value={r.key}>
+            <option key={r.key} value={r.key} description={roleHint(r)}>
               {r.name}
             </option>
           ))}
         </optgroup>
       )}
-      {includeCustom && <option value="custom">{value === 'custom' ? 'Personalizado' : 'Personalizado…'}</option>}
-    </select>
+      {includeCustom && (
+        <optgroup label="A la medida">
+          <option value="custom" description="Elige sección por sección qué puede ver o editar.">
+            Personalizado
+          </option>
+        </optgroup>
+      )}
+    </Select>
   );
 }
 

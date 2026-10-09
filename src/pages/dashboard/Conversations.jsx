@@ -5,7 +5,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { conversationsApi, botConfigApi, learningApi } from '../../api/endpoints.js';
 import { downloadFile } from '../../api/download.js';
 import { toast } from '../../store/toastStore.js';
-import { Card, Button, Badge, Spinner, Alert, Notice } from '../../components/ui/index.jsx';
+import { Card, Button, Badge, Spinner, Alert, Notice, Select } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 
 const timeOf = (iso) =>
@@ -1231,17 +1231,19 @@ export default function Conversations() {
                     ) : templates.length ? (
                       <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <select
+                        <Select
                           value={tplName}
                           onChange={(e) => pickTemplate(templates.find((t) => t.name === e.target.value))}
-                          className="min-w-0 flex-1 rounded-lg border border-line bg-canvas px-3 py-2 text-sm text-fg outline-none focus:border-brand-500"
+                          size="sm"
+                          fullWidth={false}
+                          className="min-w-0 flex-1 py-2"
                         >
                           {templates.map((t) => (
                             <option key={`${t.name}-${t.language}`} value={t.name}>
                               {t.name} ({t.language})
                             </option>
                           ))}
-                        </select>
+                        </Select>
                         <Button size="sm" className="shrink-0" disabled={sendingTpl || !tplName} onClick={sendTemplateMsg}>
                           {sendingTpl ? 'Enviando…' : 'Enviar plantilla'}
                         </Button>
