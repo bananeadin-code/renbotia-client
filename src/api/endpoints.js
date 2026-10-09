@@ -25,6 +25,12 @@ export const authApi = {
   sessions: () => unwrap(api.get('/auth/sessions')),
   revokeSession: (id) => unwrap(api.delete(`/auth/sessions/${id}`)),
   revokeOtherSessions: () => unwrap(api.post('/auth/sessions/revoke-others')),
+  // Contexto (dueño / proyecto) y confirmación de identidad.
+  selectContext: (body) => unwrap(api.post('/auth/context/select', body)),
+  switchContext: (businessId) => unwrap(api.post('/auth/context/switch', { businessId })),
+  contexts: () => unwrap(api.get('/auth/contexts')),
+  stepUp: (body) => unwrap(api.post('/auth/step-up', body)),
+  stepUpCode: () => unwrap(api.post('/auth/step-up/code')),
   updateProfile: (name) => unwrap(api.patch('/auth/profile', { name })),
   requestEmailChange: (newEmail) => unwrap(api.post('/auth/email/request', { newEmail })),
   verifyEmailChange: (code) => unwrap(api.post('/auth/email/verify', { code })),
@@ -248,6 +254,10 @@ export const membersApi = {
   remove: (userId) => api.delete(`/members/${userId}`),
   // El dueño da o quita permisos a un colaborador.
   setPermissions: (userId, body) => unwrap(api.patch(`/members/${userId}/permissions`, body)),
+  // Sesiones de un colaborador en este negocio y seguridad del equipo (solo dueño).
+  sessions: (userId) => unwrap(api.get(`/members/${userId}/sessions`)),
+  closeSessions: (userId) => unwrap(api.delete(`/members/${userId}/sessions`)),
+  setSecurity: (body) => unwrap(api.put('/members/security', body)),
 };
 
 export const adminApi = {

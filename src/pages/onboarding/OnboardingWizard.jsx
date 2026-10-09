@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { setAccessToken } from '../../api/axios.js';
 import { useNavigate } from 'react-router-dom';
 import { onboardingApi, planApi, botConfigApi } from '../../api/endpoints.js';
 import { useBusinessStore } from '../../store/businessStore.js';
@@ -196,7 +197,8 @@ export default function OnboardingWizard() {
 
       if (isFree) {
         // El plan Free se activa al instante, sin Stripe.
-        await onboardingApi.complete({ business, planKey, botConfig });
+        const done = await onboardingApi.complete({ business, planKey, botConfig });
+        if (done?.accessToken) setAccessToken(done.accessToken); // la sesión ahora es de dueño
         clearSaved();
         await loadBusiness();
         navigate('/dashboard', { replace: true });
@@ -206,7 +208,8 @@ export default function OnboardingWizard() {
       // Planes de pago ("tarjeta primero"): se crea la cuenta en Free, y luego se
       // abre el pago: agregar tarjeta → cobrar → mejora al plan elegido. Si cierra
       // el pago, su cuenta queda en Free y puede mejorar desde Facturación.
-      await onboardingApi.complete({ business, planKey: 'free', botConfig });
+      const done = await onboardingApi.complete({ business, planKey: 'free', botConfig });
+      if (done?.accessToken) setAccessToken(done.accessToken); // la sesión ahora es de dueño
       clearSaved();
       await loadBusiness();
       const plan = plans.find((p) => p.key === planKey);

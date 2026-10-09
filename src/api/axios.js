@@ -62,6 +62,24 @@ api.interceptors.response.use(
     const status = error.response?.status;
     const isAuthRoute = original?.url?.includes('/auth/');
 
+    // Acción delicada sin confirmación reciente: se abre "Confirma que eres tú" y,
+    // al confirmar, se repite la misma petición. Si la persona cancela, falla igual.
+    if (
+      status === 403 &&
+      error.response?.data?.details?.code === 'STEP_UP_REQUIRED' &&
+      !original._stepUp &&
+      !original.url?.includes('/auth/step-up')
+    ) {
+      original._stepUp = true;
+      try {
+        const { requestStepUp } = await import('../store/stepUpStore.js');
+        await requestStepUp({ mfaOnly: Boolean(error.response.data.details.mfa) });
+        return api(original);
+      } catch {
+        return Promise.reject(error);
+      }
+    }
+
     if (status === 401 && !original._retry && !isAuthRoute) {
       original._retry = true;
       try {

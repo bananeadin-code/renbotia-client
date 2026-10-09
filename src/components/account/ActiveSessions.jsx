@@ -134,7 +134,7 @@ export function ActiveSessions() {
                   )}
                 </p>
                 <p className="truncate text-xs text-subtle">
-                  {[s.place, s.current ? 'Activa ahora' : ago(s.lastUsedAt)].filter(Boolean).join(' · ')}
+                  {[s.context, s.place, s.current ? 'Activa ahora' : ago(s.lastUsedAt)].filter(Boolean).join(' · ')}
                   {' · '}Inició {new Date(s.createdAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'short' })}
                 </p>
               </div>
@@ -152,8 +152,8 @@ export function ActiveSessions() {
       )}
 
       <Notice variant="security" className="mt-3">
-Las sesiones se cierran solas tras 7 días sin uso y como máximo a los 30 días. Te avisamos por correo cuando
-          alguien entra desde un dispositivo nuevo.
+Como dueño la sesión se cierra tras 3 días sin uso; como colaborador, tras 7; y siempre a los 30 días como
+          máximo. Te avisamos por correo cuando alguien entra desde un dispositivo nuevo.
 </Notice>
     </Card>
   );

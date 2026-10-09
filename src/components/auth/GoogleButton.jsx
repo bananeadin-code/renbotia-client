@@ -37,8 +37,8 @@ export function GoogleButton({ onSuccess, onError }) {
           if (busy.current) return;
           busy.current = true;
           try {
-            await googleLogin(resp.credential);
-            onSuccess?.();
+            const r = await googleLogin(resp.credential);
+            if (!r?.needsContext) onSuccess?.(); // con varios contextos, la página muestra el selector
           } catch (e) {
             onError?.(e);
           } finally {

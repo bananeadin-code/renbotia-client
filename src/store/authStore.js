@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { authApi } from '../api/endpoints.js';
-import { setAccessToken } from '../api/axios.js';
+import { setAccessToken, setActiveBusinessId } from '../api/axios.js';
 import { getReferral } from '../lib/referral.js';
 
 /**
@@ -14,10 +14,37 @@ export const useAuthStore = create((set, get) => ({
   user: null,
   isAuthenticated: false,
   loading: true, // true hasta que bootstrap termina
+  // Tras autenticarse con varios contextos: { contexts, contextToken, name }.
+  pendingContext: null,
 
-  setSession(user, accessToken) {
+  setSession(user, accessToken, context) {
     setAccessToken(accessToken);
-    set({ user, isAuthenticated: true });
+    if (context?.businessId) setActiveBusinessId(context.businessId);
+    set({ user, isAuthenticated: true, pendingContext: null });
+  },
+
+  // Respuesta de un login ya autenticado: sesión directa o elegir contexto.
+  _finish(data) {
+    if (data.needsContext) {
+      set({ pendingContext: { contexts: data.contexts || [], contextToken: data.contextToken, name: data.name || '', needsCode: Boolean(data.needsCode) } });
+      return { needsContext: true };
+    }
+    get().setSession(data.user, data.accessToken, data.context);
+    return { user: data.user };
+  },
+
+  // Elige a qué entrar (dueño o proyecto). Puede pedir un código si el proyecto
+  // exige verificación en dos pasos.
+  async selectContext(businessId, code) {
+    const p = get().pendingContext;
+    const data = await authApi.selectContext({ contextToken: p.contextToken, businessId, ...(code ? { code } : {}) });
+    if (data.needsCode) return { needsCode: true };
+    get().setSession(data.user, data.accessToken, data.context);
+    return { user: data.user };
+  },
+
+  clearPendingContext() {
+    set({ pendingContext: null });
   },
 
   // Registro: ya NO inicia sesión de inmediato. Devuelve un estado pendiente
@@ -33,28 +60,27 @@ export const useAuthStore = create((set, get) => ({
   async login(body) {
     const data = await authApi.login(body);
     if (data.needs2fa || data.needsEmailVerification) return data;
-    get().setSession(data.user, data.accessToken);
-    return { user: data.user };
+    return get()._finish(data);
   },
 
   // Confirma el correo con el código e inicia sesión.
   async verifyEmail(email, code) {
-    const { user, accessToken } = await authApi.verifyEmail({ email, code });
-    get().setSession(user, accessToken);
-    return user;
+    const data = await authApi.verifyEmail({ email, code });
+    const r = get()._finish(data);
+    return r.needsContext ? r : r.user;
   },
 
   // Verifica el 2FA del login e inicia sesión (opcional recordar dispositivo).
   async verify2fa(email, code, rememberDevice) {
-    const { user, accessToken } = await authApi.verify2fa({ email, code, rememberDevice });
-    get().setSession(user, accessToken);
-    return user;
+    const data = await authApi.verify2fa({ email, code, rememberDevice });
+    const r = get()._finish(data);
+    return r.needsContext ? r : r.user;
   },
 
   async googleLogin(credential) {
-    const { user, accessToken } = await authApi.google(credential, getReferral());
-    get().setSession(user, accessToken);
-    return user;
+    const data = await authApi.google(credential, getReferral());
+    const r = get()._finish(data);
+    return r.needsContext ? r : r.user;
   },
 
   async logout() {

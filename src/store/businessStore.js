@@ -65,11 +65,16 @@ export const useBusinessStore = create((set, get) => ({
     }
   },
 
-  // Cambia el proyecto activo (owner ↔ colaborador). Fija el header y recarga la
-  // app para que TODO el dashboard se re-consulte con el nuevo tenant.
-  switchTo(id) {
+  // Cambia de proyecto (dueño ↔ colaborador). El servidor abre una sesión NUEVA
+  // para ese contexto y cierra la anterior (entrar como dueño pide confirmar
+  // identidad: el diálogo lo maneja axios). Luego recarga todo el panel.
+  async switchTo(id) {
     const current = get().business?.id || get().business?._id;
     if (!id || String(id) === String(current)) return;
+    const { authApi } = await import('../api/endpoints.js');
+    const { setAccessToken } = await import('../api/axios.js');
+    const data = await authApi.switchContext(id);
+    if (data?.accessToken) setAccessToken(data.accessToken);
     setActiveBusinessId(id);
     window.location.assign('/dashboard');
   },

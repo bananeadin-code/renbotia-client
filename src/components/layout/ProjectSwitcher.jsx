@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useBusinessStore } from '../../store/businessStore.js';
 import { getActiveBusinessId } from '../../api/axios.js';
 import { Icon } from '../ui/Icon.jsx';
+import { toast } from '../../store/toastStore.js';
 
 const roleLabel = (p) => (p.role === 'owner' ? 'Tuyo' : 'Colaboras');
 
@@ -79,7 +80,14 @@ export function ProjectSwitcher() {
 
   function choose(id) {
     setOpen(false);
-    if (String(id) !== activeId) switchTo(id);
+    if (String(id) === activeId) return;
+    // Cambiar de proyecto abre una sesión nueva; entrar como dueño pide confirmar
+    // identidad (si la persona cancela, se queda donde estaba).
+    switchTo(id).catch((err) => {
+      const code = err.response?.data?.details?.code;
+      if (code === 'STEP_UP_REQUIRED') toast.info('Para entrar como dueño, confirma que eres tú.');
+      else toast.error(err.response?.data?.message || 'No se pudo cambiar de proyecto.');
+    });
   }
 
   return (

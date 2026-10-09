@@ -34,7 +34,7 @@ export function OtpForm({ email, mode, onVerified, devCode }) {
       const user = is2fa
         ? await verify2fa(email, code.trim(), remember)
         : await verifyEmail(email, code.trim());
-      onVerified(user);
+      if (!user?.needsContext) onVerified(user); // si hay que elegir contexto, la página lo muestra
     } catch (err) {
       setError(err.response?.data?.message || 'Código incorrecto o expirado.');
     } finally {

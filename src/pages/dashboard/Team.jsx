@@ -7,6 +7,7 @@ import { useBusinessStore } from '../../store/businessStore.js';
 import { limitsFor } from '../../lib/planLimits.js';
 import { Card, Button, Input, Badge, Alert, Spinner } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
+import { TeamSecurityCard, MemberSessions } from '../../components/team/TeamSecurity.jsx';
 
 /**
  * Equipo: miembros del negocio (dueño + colaboradores). El dueño invita por
@@ -260,6 +261,7 @@ export default function Team() {
                       })}
                     </div>
                   ) : null}
+                  {isOwner && <MemberSessions member={m} />}
                   {m.simulator?.tokens > 0 && (
                     <p className="mt-1.5 text-xs text-subtle">
                       Simulador este mes: {m.simulator.tokens.toLocaleString('es-MX')} tokens en {m.simulator.messages}{' '}
@@ -272,6 +274,14 @@ export default function Team() {
           ))}
         </ul>
       </Card>
+
+      {/* Seguridad del equipo (solo dueño) */}
+      {isOwner && (
+        <TeamSecurityCard
+          requireTeam2fa={Boolean(data.security?.requireTeam2fa)}
+          onChange={(v) => setData((d) => ({ ...d, security: { ...(d.security || {}), requireTeam2fa: v } }))}
+        />
+      )}
 
       {/* Invitaciones pendientes */}
       {data.invitations.length > 0 && (

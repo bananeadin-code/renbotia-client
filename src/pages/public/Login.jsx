@@ -6,6 +6,7 @@ import { useForm, v } from '../../lib/useForm.js';
 import { AuthLayout } from '../../components/layout/AuthLayout.jsx';
 import { GoogleButton } from '../../components/auth/GoogleButton.jsx';
 import { OtpForm } from '../../components/auth/OtpForm.jsx';
+import { ContextChooser } from '../../components/auth/ContextChooser.jsx';
 import { useSeo } from '../../lib/seo.js';
 
 export default function Login() {
@@ -13,6 +14,7 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const login = useAuthStore((s) => s.login);
+  const pendingContext = useAuthStore((s) => s.pendingContext);
   const f = useForm(
     { email: '', password: '' },
     {
@@ -38,7 +40,9 @@ export default function Login() {
     setLoading(true);
     try {
       const res = await login(f.values);
-      if (res.needs2fa) {
+      if (res.needsContext) {
+        // El selector se muestra solo (estado del store).
+      } else if (res.needs2fa) {
         setPending({ mode: 'login_2fa', email: res.email, devCode: res.devCode });
       } else if (res.needsEmailVerification) {
         setPending({ mode: 'verify_email', email: res.email, devCode: res.devCode });
@@ -50,6 +54,18 @@ export default function Login() {
     } finally {
       setLoading(false);
     }
+  }
+
+  // Tiene su negocio y además colabora en otros: elige a dónde entrar.
+  if (pendingContext) {
+    return (
+      <AuthLayout
+        title={pendingContext.name ? `Hola, ${pendingContext.name.split(' ')[0]}` : '¿A dónde quieres entrar?'}
+        subtitle="Elige si entras como dueño de tu negocio o a un proyecto donde colaboras"
+      >
+        <ContextChooser onDone={() => navigate(from, { replace: true })} />
+      </AuthLayout>
+    );
   }
 
   // Paso de código (2FA o verificación de correo).

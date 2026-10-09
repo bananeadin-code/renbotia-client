@@ -6,6 +6,7 @@ import { useForm, v } from '../../lib/useForm.js';
 import { AuthLayout } from '../../components/layout/AuthLayout.jsx';
 import { GoogleButton } from '../../components/auth/GoogleButton.jsx';
 import { OtpForm } from '../../components/auth/OtpForm.jsx';
+import { ContextChooser } from '../../components/auth/ContextChooser.jsx';
 import { useSeo } from '../../lib/seo.js';
 
 export default function Register() {
@@ -16,6 +17,7 @@ export default function Register() {
   });
   const navigate = useNavigate();
   const register = useAuthStore((s) => s.register);
+  const pendingContext = useAuthStore((s) => s.pendingContext);
   const f = useForm(
     { name: '', email: '', password: '' },
     {
@@ -69,6 +71,18 @@ export default function Register() {
   }
 
   // Paso de verificación de correo (tras registrar).
+  // Tiene su negocio y además colabora en otros: elige a dónde entrar.
+  if (pendingContext) {
+    return (
+      <AuthLayout
+        title={pendingContext.name ? `Hola, ${pendingContext.name.split(' ')[0]}` : '¿A dónde quieres entrar?'}
+        subtitle="Elige si entras como dueño de tu negocio o a un proyecto donde colaboras"
+      >
+        <ContextChooser onDone={afterAuth} />
+      </AuthLayout>
+    );
+  }
+
   if (pending) {
     return (
       <AuthLayout
