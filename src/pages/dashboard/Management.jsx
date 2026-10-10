@@ -1,8 +1,9 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useAccess } from '../../router/RequirePermission.jsx';
 import { PlanCta } from '../../components/ui/PlanCta.jsx';
 import { Button, Card, Badge, Spinner, Alert, Select, Notice } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
+import { ChannelBadge, CHANNEL_META } from '../../components/ui/ChannelBadge.jsx';
 import { managementApi } from '../../api/endpoints.js';
 import { downloadFile } from '../../api/download.js';
 import { useBusinessStore } from '../../store/businessStore.js';
@@ -40,6 +41,16 @@ export default function Management() {
   const [filterType, setFilterType] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [scope, setScope] = useState('all');
+  const [filterChannel, setFilterChannel] = useState('');
+
+  // Canales que el rol puede ver (el servidor ya limita; esto arma el filtro).
+  const role = useBusinessStore((s) => s.role);
+  const access = useBusinessStore((s) => s.access);
+  const canSim = useAccess('simulator', 'edit');
+  const channelOptions = useMemo(() => {
+    const mine = role === 'owner' || !access || access.channels === 'all' ? Object.keys(CHANNEL_META).filter((c) => c !== 'simulator') : access.channels;
+    return [...mine, ...(canSim ? ['simulator'] : [])];
+  }, [role, access, canSim]);
 
   const [exporting, setExporting] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -67,7 +78,7 @@ export default function Management() {
       const [{ config: cfg }, { stats: st }, { records: recs }] = await Promise.all([
         managementApi.getConfig(),
         managementApi.stats(),
-        managementApi.records({ type: filterType, status: filterStatus, scope: scope === 'all' ? '' : scope }),
+        managementApi.records({ type: filterType, status: filterStatus, scope: scope === 'all' ? '' : scope, channel: filterChannel }),
       ]);
       setConfig(cfg);
       setStats(st);
@@ -79,7 +90,7 @@ export default function Management() {
     } finally {
       setLoading(false);
     }
-  }, [filterType, filterStatus, scope]);
+  }, [filterType, filterStatus, scope, filterChannel]);
 
   useEffect(() => {
     if (isElite) loadAll();
@@ -281,7 +292,7 @@ export default function Management() {
             ))}
             {/* En móvil los selectores ocupan su propia fila (dos columnas); en
                 desktop se alinean a la derecha con ancho automático. */}
-            <div className="grid w-full grid-cols-2 gap-2 sm:ml-auto sm:flex sm:w-auto sm:items-center">
+            <div className="grid w-full grid-cols-3 gap-2 sm:ml-auto sm:flex sm:w-auto sm:items-center">
               <Select
                 value={scope}
                 aria-label="Mostrar"
@@ -304,6 +315,20 @@ export default function Management() {
                     {STATUS_META[s].label}
                   </option>
                 ))}
+              </Select>
+              <Select
+                value={filterChannel}
+                aria-label="Filtrar por canal"
+                onChange={(e) => setFilterChannel(e.target.value)}
+                className="w-full !py-1.5 text-xs"
+              >
+                <option value="">Cualquier canal</option>
+                {channelOptions.map((c) => (
+                  <option key={c} value={c}>
+                    {CHANNEL_META[c].label}
+                  </option>
+                ))}
+                <option value="manual">Creados a mano</option>
               </Select>
             </div>
           </div>
@@ -463,6 +488,7 @@ function RecordRow({ rec, onStatus, onEdit, onDelete, readOnly = false }) {
                 <Icon name="bot" size={12} /> bot
               </span>
             )}
+            {rec.source === 'bot' && <ChannelBadge channel={rec.channel} />}
           </div>
 
           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted">

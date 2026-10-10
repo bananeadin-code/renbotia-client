@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAccess } from '../../router/RequirePermission.jsx';
+import { ChannelBadge } from '../../components/ui/ChannelBadge.jsx';
 import { confirm } from '../../store/confirmStore.js';
 import { Link, useSearchParams } from 'react-router-dom';
 import { conversationsApi, botConfigApi, learningApi } from '../../api/endpoints.js';
@@ -726,26 +727,7 @@ export default function Conversations() {
                   </div>
                 ) : (
                 <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                  {c.channel === 'whatsapp' && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600">
-                      <Icon name="whatsapp" size={10} /> WhatsApp
-                    </span>
-                  )}
-                  {c.channel === 'facebook' && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-[#0866FF]/10 px-2 py-0.5 text-[10px] font-medium text-[#0866FF]">
-                      <Icon name="messenger" size={10} /> Messenger
-                    </span>
-                  )}
-                  {c.channel === 'instagram' && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-[#E1306C]/10 px-2 py-0.5 text-[10px] font-medium text-[#E1306C]">
-                      <Icon name="instagram" size={10} /> Instagram
-                    </span>
-                  )}
-                  {c.channel === 'web' && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-brand-500/10 px-2 py-0.5 text-[10px] font-medium text-brand-600">
-                      <Icon name="globe" size={10} /> Sitio web
-                    </span>
-                  )}
+                  <ChannelBadge channel={c.channel} size="xs" />
                   {c.needsAttention && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-600">
                       <Icon name="alert" size={11} /> Requiere atención
