@@ -11,7 +11,7 @@ import { Icon } from '../ui/Icon.jsx';
  * enviarlo al número del bot desde el celular a vincular. Mientras el código
  * está vigente, se revisa cada pocos segundos si ya quedó vinculado.
  */
-const EXAMPLES = ['¿Cómo vamos hoy?', 'Pásame los leads', 'Pausa el bot hasta las 6', 'Hoy cerramos a las 4'];
+const EXAMPLES = ['¿Cómo vamos hoy?', '¿Qué quería Laura?', '¿El bot está pausado?', 'Pausa el bot hasta las 6', 'Hoy cerramos a las 4'];
 
 export function OwnerControlCard() {
   const [state, setState] = useState(null);
@@ -169,7 +169,8 @@ export function OwnerControlCard() {
       )}
 
       <Notice variant="security" className="mt-4">
-Solo el dueño puede vincular números (máximo {state.maxNumbers}). Los cambios piden que respondas “sí”, quedan en la
+Solo el dueño puede vincular números (máximo {state.maxNumbers}). Lo que llega a tus clientes (pausar el bot, avisos,
+          preguntas nuevas) te pide un “sí” antes; reactivar el bot o cambiar la agenda se aplica al momento. Todo queda en la
           bitácora y la vinculación vence tras 30 días sin uso. Para probar tu bot como cliente escribe “modo cliente”.
 </Notice>
     </Card>
