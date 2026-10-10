@@ -33,7 +33,7 @@ export function AnnouncementBar() {
   return (
     <Link to={showGift ? to : '/#pruebalo'} className="group block bg-ink-900 text-white transition hover:bg-ink-700">
       <div className="mx-auto flex max-w-6xl items-center justify-center gap-2 px-4 py-2 text-center text-sm">
-        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white/10 px-2 py-0.5 text-xs font-semibold">
+        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-white/10 px-2 py-0.5 text-xs font-semibold">
           <Icon name={showGift ? 'gift' : 'sparkles'} size={13} />
           {showGift ? 'Regalo' : 'Nuevo'}
         </span>

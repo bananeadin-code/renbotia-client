@@ -220,7 +220,7 @@ export default function Solution() {
               <Link
                 key={c.slug}
                 to={`/soluciones/${sol.slug}/${c.slug}`}
-                className="rounded-full border border-line bg-surface px-3 py-1.5 text-sm text-fg transition hover:border-brand-300 hover:text-brand-700 dark:hover:text-brand-300"
+                className="rounded-md border border-line bg-surface px-3 py-1.5 text-sm text-fg transition hover:border-brand-300 hover:text-brand-700 dark:hover:text-brand-300"
               >
                 {c.name}
               </Link>
@@ -228,7 +228,7 @@ export default function Solution() {
             {city && (
               <Link
                 to={`/soluciones/${sol.slug}`}
-                className="rounded-full px-3 py-1.5 text-sm font-medium text-brand-700 hover:underline dark:text-brand-300"
+                className="rounded-md px-3 py-1.5 text-sm font-medium text-brand-700 hover:underline dark:text-brand-300"
               >
                 Todo México
               </Link>

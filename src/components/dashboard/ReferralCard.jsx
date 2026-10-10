@@ -72,7 +72,7 @@ export function ReferralCard() {
       </div>
       <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center">
         <div className="min-w-0 flex-1">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-xs font-semibold">
+          <span className="inline-flex items-center gap-1.5 rounded-md bg-white/15 px-2.5 py-1 text-xs font-semibold">
             <Icon name="gift" size={14} /> Regalo de bienvenida
           </span>
           <h2 className="mt-3 text-xl font-extrabold leading-tight text-white sm:text-2xl">Invita a 3 negocios y gana 1 mes de Pro gratis</h2>

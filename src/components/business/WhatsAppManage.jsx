@@ -350,7 +350,7 @@ export function WhatsAppManage({ isOwner }) {
                   {t.name} <span className="text-subtle">({t.language})</span>
                 </span>
                 <span
-                  className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                  className={`shrink-0 rounded-md px-2 py-0.5 text-[10px] font-semibold ${
                     STATUS_STYLE[t.status] || 'bg-surface2 text-muted'
                   }`}
                 >
@@ -370,7 +370,7 @@ export function WhatsAppManage({ isOwner }) {
                   type="button"
                   key={p.name}
                   onClick={() => setTpl({ name: p.name, category: p.category, bodyText: p.bodyText, buttons: p.buttons })}
-                  className="rounded-full border border-line px-3 py-1 text-xs font-medium text-muted hover:border-brand-300 hover:text-fg"
+                  className="rounded-md border border-line px-3 py-1 text-xs font-medium text-muted hover:border-brand-300 hover:text-fg"
                 >
                   {p.label}
                 </button>

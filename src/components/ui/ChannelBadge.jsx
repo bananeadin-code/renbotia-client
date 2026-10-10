@@ -15,7 +15,7 @@ export function ChannelBadge({ channel, size = 'sm', className = '' }) {
   if (!m) return null;
   const s = size === 'xs' ? 'px-2 py-0.5 text-[10px]' : 'px-2 py-0.5 text-[11px]';
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full font-medium ${s} ${m.cls} ${className}`} title={`Llegó por ${m.label}`}>
+    <span className={`inline-flex items-center gap-1 rounded-md font-medium ${s} ${m.cls} ${className}`} title={`Llegó por ${m.label}`}>
       <Icon name={m.icon} size={size === 'xs' ? 10 : 12} /> {m.label}
     </span>
   );

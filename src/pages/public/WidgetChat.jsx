@@ -329,7 +329,7 @@ export default function WidgetChat() {
             <Icon name="close" size={18} />
           </button>
         ) : (
-          <span className="shrink-0 rounded-full bg-black/15 px-2 py-0.5 text-[10px] font-semibold">Vista de prueba</span>
+          <span className="shrink-0 rounded-md bg-black/15 px-2 py-0.5 text-[10px] font-semibold">Vista de prueba</span>
         )}
       </header>
 
@@ -429,7 +429,7 @@ export default function WidgetChat() {
               key={q}
               type="button"
               onClick={() => send(null, q)}
-              className="rounded-full border px-3 py-1.5 text-xs font-medium transition hover:opacity-80"
+              className="rounded-md border px-3 py-1.5 text-xs font-medium transition hover:opacity-80"
               style={{ borderColor: color, color }}
             >
               {q}
@@ -473,7 +473,7 @@ export default function WidgetChat() {
           placeholder="Escribe tu mensaje…"
           maxLength={1000}
           aria-label="Mensaje"
-          className="min-w-0 flex-1 rounded-full border border-line bg-canvas px-4 py-2.5 text-sm text-fg outline-none transition focus:border-brand-500"
+          className="min-w-0 flex-1 rounded-md border border-line bg-canvas px-4 py-2.5 text-sm text-fg outline-none transition focus:border-brand-500"
         />
         <button
           type="submit"

@@ -74,7 +74,7 @@ export default function Blog() {
                     {post.tags.map((t) => (
                       <span
                         key={t}
-                        className="rounded-full bg-surface2 px-2.5 py-0.5 text-[11px] font-medium text-muted"
+                        className="rounded-md bg-surface2 px-2.5 py-0.5 text-[11px] font-medium text-muted"
                       >
                         {t}
                       </span>

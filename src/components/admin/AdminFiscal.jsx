@@ -133,7 +133,7 @@ export function AdminFiscal() {
                 </div>
                 <div className="text-xs text-muted">{o.when}</div>
               </div>
-              <span className="shrink-0 rounded-full bg-brand-500/10 px-2 py-0.5 text-[10px] font-semibold text-brand-600">
+              <span className="shrink-0 rounded-md bg-brand-500/10 px-2 py-0.5 text-[10px] font-semibold text-brand-600">
                 {o.freq}
               </span>
             </div>

@@ -120,12 +120,12 @@ export default function SiteAssistant() {
             aria-checked={cfg.enabled}
             aria-label="Activar asistente del sitio"
             onClick={() => set('enabled', !cfg.enabled)}
-            className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition ${
+            className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-md transition ${
               cfg.enabled ? 'bg-brand-600' : 'border border-line bg-canvas'
             }`}
           >
             <span
-              className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition ${
+              className={`inline-block h-5 w-5 transform rounded bg-white shadow transition ${
                 cfg.enabled ? 'translate-x-5' : 'translate-x-0.5'
               }`}
             />

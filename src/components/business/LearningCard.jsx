@@ -87,7 +87,7 @@ export function LearningCard({ onLearned }) {
         <div className="min-w-0">
           <h2 className="flex flex-wrap items-center gap-2 font-semibold text-fg">
             Aprende de ti
-            <span className="rounded-full bg-brand-500/10 px-2 py-0.5 text-xs font-semibold text-brand-600">
+            <span className="rounded-md bg-brand-500/10 px-2 py-0.5 text-xs font-semibold text-brand-600">
               {total} por enseñar
             </span>
           </h2>
@@ -105,7 +105,7 @@ export function LearningCard({ onLearned }) {
           return (
             <li key={s.id} className="rounded-xl border border-line p-3 animate-fade-up">
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${src.tone}`}>
+                <span className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium ${src.tone}`}>
                   <Icon name={src.icon} size={11} /> {src.label}
                 </span>
                 {s.chatId && (

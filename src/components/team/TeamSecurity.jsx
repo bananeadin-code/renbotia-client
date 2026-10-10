@@ -68,12 +68,12 @@ export function TeamSecurityCard({ requireTeam2fa, onChange }) {
           aria-label="Exigir verificación en dos pasos al equipo"
           disabled={busy}
           onClick={toggle}
-          className={`relative mt-1 h-6 w-11 shrink-0 rounded-full transition disabled:opacity-50 ${
+          className={`relative mt-1 h-6 w-11 shrink-0 rounded-md transition disabled:opacity-50 ${
             requireTeam2fa ? 'bg-brand-600' : 'bg-surface2 ring-1 ring-inset ring-line'
           }`}
         >
           <span
-            className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
+            className={`absolute top-0.5 h-5 w-5 rounded bg-white shadow transition-all ${
               requireTeam2fa ? 'left-[22px]' : 'left-0.5'
             }`}
           />

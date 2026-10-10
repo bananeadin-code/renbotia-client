@@ -224,7 +224,7 @@ export default function Simulator() {
             onChange={(e) => setInput(e.target.value)}
             disabled={limitReached}
             placeholder={limitReached ? 'Sin créditos disponibles' : 'Escribe un mensaje…'}
-            className="flex-1 rounded-full border border-line bg-surface px-4 py-2.5 text-sm text-fg outline-none placeholder:text-subtle focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 disabled:bg-surface2"
+            className="flex-1 rounded-md border border-line bg-surface px-4 py-2.5 text-sm text-fg outline-none placeholder:text-subtle focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 disabled:bg-surface2"
           />
           <button
             type="submit"

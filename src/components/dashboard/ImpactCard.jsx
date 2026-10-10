@@ -85,12 +85,12 @@ export function ImpactCard({ impact, onChange, canEdit = true, canToggleReport =
             aria-checked={impact?.weeklyReport !== false}
             aria-label="Recibir el reporte semanal por correo"
             onClick={toggleReport}
-            className={`relative h-5 w-9 shrink-0 rounded-full transition ${
+            className={`relative h-5 w-9 shrink-0 rounded-md transition ${
               impact?.weeklyReport !== false ? 'bg-brand-600' : 'bg-surface2 ring-1 ring-inset ring-line'
             }`}
           >
             <span
-              className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all ${
+              className={`absolute top-0.5 h-4 w-4 rounded bg-white shadow transition-all ${
                 impact?.weeklyReport !== false ? 'left-[18px]' : 'left-0.5'
               }`}
             />
@@ -152,7 +152,7 @@ export function ImpactCard({ impact, onChange, canEdit = true, canToggleReport =
           </div>
           <div className="flex flex-col items-end gap-1.5">
             {impact.roiMultiple >= 1 && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+              <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
                 <Icon name="sparkles" size={13} /> ≈ {impact.roiMultiple}× lo que cuesta tu plan
               </span>
             )}

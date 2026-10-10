@@ -74,7 +74,7 @@ export default function Landing() {
         <AuroraBackground />
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:py-24 lg:grid-cols-2">
           <div className="animate-fade-up">
-            <span className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-brand-500/30 bg-brand-500/10 px-3 py-1 text-xs font-semibold text-brand-700 dark:text-brand-300">
+            <span className="mb-5 inline-flex items-center gap-1.5 rounded-md border border-brand-500/30 bg-brand-500/10 px-3 py-1 text-xs font-semibold text-brand-700 dark:text-brand-300">
               <Icon name="sparkles" size={14} />
               Atención por WhatsApp con IA
             </span>
@@ -201,7 +201,7 @@ export default function Landing() {
           {SECTORS.map((s) => (
             <span
               key={s}
-              className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 text-sm font-medium text-fg shadow-card"
+              className="inline-flex items-center gap-2 rounded-md border border-line bg-surface px-4 py-2 text-sm font-medium text-fg shadow-card"
             >
               <Icon name="building" size={16} className="text-brand-500" />
               {s}

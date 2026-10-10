@@ -85,12 +85,12 @@ export function WebWidgetCard({ isOwner, onStatus }) {
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="text-lg font-semibold text-fg">Chat para tu sitio web</h2>
             {w?.enabled && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600">
+              <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600">
                 <Icon name="check" size={13} /> Activo
               </span>
             )}
             {w && !w.error && !w.allowed && (
-              <span className="rounded-full bg-brand-500/10 px-2 py-0.5 text-xs font-medium text-brand-600">Pro y Elite</span>
+              <span className="rounded-md bg-brand-500/10 px-2 py-0.5 text-xs font-medium text-brand-600">Pro y Elite</span>
             )}
           </div>
           <p className="mt-1 text-sm text-muted">
@@ -129,12 +129,12 @@ export function WebWidgetCard({ isOwner, onStatus }) {
               aria-label="Mostrar el chat en mi sitio"
               disabled={!isOwner || saving}
               onClick={() => save({ enabled: !w.enabled }, w.enabled ? 'Widget desactivado.' : 'Widget activado.')}
-              className={`relative h-6 w-11 shrink-0 rounded-full transition disabled:opacity-50 ${
+              className={`relative h-6 w-11 shrink-0 rounded-md transition disabled:opacity-50 ${
                 w.enabled ? 'bg-brand-600' : 'bg-surface2 ring-1 ring-inset ring-line'
               }`}
             >
               <span
-                className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
+                className={`absolute top-0.5 h-5 w-5 rounded bg-white shadow transition-all ${
                   w.enabled ? 'left-[22px]' : 'left-0.5'
                 }`}
               />
@@ -296,12 +296,12 @@ function Switch({ checked, onChange, label, disabled }) {
       aria-label={label}
       disabled={disabled}
       onClick={() => onChange(!checked)}
-      className={`relative h-6 w-11 shrink-0 rounded-full transition disabled:opacity-50 ${
+      className={`relative h-6 w-11 shrink-0 rounded-md transition disabled:opacity-50 ${
         checked ? 'bg-brand-600' : 'bg-surface2 ring-1 ring-inset ring-line'
       }`}
     >
       <span
-        className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${checked ? 'left-[22px]' : 'left-0.5'}`}
+        className={`absolute top-0.5 h-5 w-5 rounded bg-white shadow transition-all ${checked ? 'left-[22px]' : 'left-0.5'}`}
       />
     </button>
   );

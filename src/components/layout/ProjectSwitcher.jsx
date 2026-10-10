@@ -33,7 +33,7 @@ function RoleChip({ project }) {
   const owner = project.role === 'owner';
   return (
     <span
-      className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
+      className={`shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${
         owner
           ? 'bg-brand-500/10 text-brand-600 dark:text-brand-300'
           : 'bg-sky-500/10 text-sky-600 dark:text-sky-300'

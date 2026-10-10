@@ -104,7 +104,7 @@ export function ConnectedChannels() {
                 </span>
                 <div className="text-sm font-medium text-fg">Messenger</div>
               </div>
-              <span className="shrink-0 rounded-full bg-surface2 px-2 py-0.5 text-[10px] font-medium text-muted">
+              <span className="shrink-0 rounded-md bg-surface2 px-2 py-0.5 text-[10px] font-medium text-muted">
                 Próximamente
               </span>
             </div>
@@ -143,7 +143,7 @@ export function ConnectedChannels() {
                 </span>
                 <div className="text-sm font-medium text-fg">Instagram</div>
               </div>
-              <span className="shrink-0 rounded-full bg-surface2 px-2 py-0.5 text-[10px] font-medium text-muted">
+              <span className="shrink-0 rounded-md bg-surface2 px-2 py-0.5 text-[10px] font-medium text-muted">
                 Próximamente
               </span>
             </div>

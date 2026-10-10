@@ -68,7 +68,7 @@ export default function Solutions() {
               <Link
                 key={c.slug}
                 to={`/bot-whatsapp/${c.slug}`}
-                className="rounded-full border border-line bg-surface px-3 py-1.5 text-sm text-fg transition hover:border-brand-300 hover:text-brand-700 dark:hover:text-brand-300"
+                className="rounded-md border border-line bg-surface px-3 py-1.5 text-sm text-fg transition hover:border-brand-300 hover:text-brand-700 dark:hover:text-brand-300"
               >
                 {c.name}
               </Link>

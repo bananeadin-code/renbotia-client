@@ -421,7 +421,7 @@ function FilterChip({ active, onClick, icon, children }) {
   return (
     <button
       onClick={onClick}
-      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+      className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition ${
         active
           ? 'border-brand-500 bg-brand-500/10 text-brand-700 dark:text-brand-300'
           : 'border-line text-muted hover:bg-surface2'
@@ -484,7 +484,7 @@ function RecordRow({ rec, onStatus, onEdit, onDelete, readOnly = false }) {
             <span className="font-semibold text-fg">{rec.summary || meta.label}</span>
             <Badge color={status.color}>{status.label}</Badge>
             {rec.source === 'bot' && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-surface2 px-2 py-0.5 text-[11px] font-medium text-muted">
+              <span className="inline-flex items-center gap-1 rounded-md bg-surface2 px-2 py-0.5 text-[11px] font-medium text-muted">
                 <Icon name="bot" size={12} /> bot
               </span>
             )}
@@ -545,7 +545,7 @@ function ReminderBadge({ reminder }) {
   const m = REMINDER_META[reminder?.status];
   if (!m) return null;
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${m[1]}`} title={reminder.note || undefined}>
+    <span className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium ${m[1]}`} title={reminder.note || undefined}>
       <Icon name={m[2]} size={11} /> {m[0]}
     </span>
   );

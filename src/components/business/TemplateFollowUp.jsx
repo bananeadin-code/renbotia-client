@@ -71,12 +71,12 @@ export function TemplateFollowUp({ value, onChange }) {
           aria-checked={t.enabled}
           aria-label="Activar seguimiento con plantilla"
           onClick={() => set({ enabled: !t.enabled })}
-          className={`relative mt-1 h-6 w-11 shrink-0 rounded-full transition ${
+          className={`relative mt-1 h-6 w-11 shrink-0 rounded-md transition ${
             t.enabled ? 'bg-brand-600' : 'bg-surface2 ring-1 ring-inset ring-line'
           }`}
         >
           <span
-            className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
+            className={`absolute top-0.5 h-5 w-5 rounded bg-white shadow transition-all ${
               t.enabled ? 'left-[22px]' : 'left-0.5'
             }`}
           />
@@ -184,7 +184,7 @@ export function TemplateFollowUp({ value, onChange }) {
                 {selected?.quickReplies?.length > 0 && (
                   <span className="mt-1.5 flex flex-wrap gap-1">
                     {selected.quickReplies.map((q) => (
-                      <span key={q} className="rounded-full border border-line px-2 py-0.5 text-[10px] text-fg">
+                      <span key={q} className="rounded-md border border-line px-2 py-0.5 text-[10px] text-fg">
                         {q}
                       </span>
                     ))}

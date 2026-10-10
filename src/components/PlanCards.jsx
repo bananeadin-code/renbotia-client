@@ -57,7 +57,7 @@ export function PlanCards({ plans, selectedKey, onSelect, ctaLabel = 'Elegir pla
           >
             {gated ? (
               <span className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <span className="rounded-full border border-amber-500/40 bg-amber-500/15 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-300">
+                <span className="rounded-md border border-amber-500/40 bg-amber-500/15 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-300">
                   Próximamente
                 </span>
               </span>

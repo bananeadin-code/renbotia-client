@@ -272,7 +272,7 @@ export function ImportTraining({ open, onClose, onApply, allow = {}, faqRoom = n
                         type="button"
                         onClick={() => setBusiness((b) => (on ? b.filter((x) => x !== name) : [...b, name]))}
                         aria-pressed={on}
-                        className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                        className={`rounded-md border px-3 py-1 text-xs font-medium transition ${
                           on ? 'border-brand-500 bg-brand-500/10 text-brand-700 dark:text-brand-300' : 'border-line text-muted hover:text-fg'
                         }`}
                       >

@@ -123,13 +123,13 @@ export function InstagramConnect({ data, isOwner, sdkReady, onChanged }) {
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="text-lg font-semibold text-fg">Instagram</h2>
             {connected ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600">
+              <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600">
                 <Icon name="check" size={13} /> Conectado
               </span>
             ) : enabled ? (
-              <span className="rounded-full bg-surface2 px-2 py-0.5 text-xs font-medium text-muted">Sin conectar</span>
+              <span className="rounded-md bg-surface2 px-2 py-0.5 text-xs font-medium text-muted">Sin conectar</span>
             ) : (
-              <span className="rounded-full bg-brand-500/10 px-2 py-0.5 text-xs font-medium text-brand-600">
+              <span className="rounded-md bg-brand-500/10 px-2 py-0.5 text-xs font-medium text-brand-600">
                 Próximamente
               </span>
             )}

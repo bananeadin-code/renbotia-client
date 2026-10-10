@@ -90,7 +90,7 @@ export function Badge({ children, color = 'slate' }) {
     red: 'bg-red-500/15 text-red-700 dark:text-red-300',
   };
   return (
-    <span className={clsx('inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium', colors[color])}>
+    <span className={clsx('inline-flex rounded-md px-2.5 py-0.5 text-xs font-medium', colors[color])}>
       {children}
     </span>
   );

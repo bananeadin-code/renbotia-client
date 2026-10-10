@@ -116,7 +116,7 @@ export function RenChat({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
             <span className="font-bold leading-none">{name}</span>
-            <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+            <span className="rounded-md bg-white/20 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
               IA
             </span>
           </div>
@@ -182,7 +182,7 @@ export function RenChat({
               <button
                 key={s}
                 onClick={() => send(s)}
-                className="rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-medium text-fg shadow-sm transition hover:border-brand-400 hover:text-brand-600"
+                className="rounded-md border border-line bg-surface px-3 py-1.5 text-xs font-medium text-fg shadow-sm transition hover:border-brand-400 hover:text-brand-600"
               >
                 {s}
               </button>

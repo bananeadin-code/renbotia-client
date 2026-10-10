@@ -30,7 +30,7 @@ export function AccessSummary({ access }) {
       {mods.map(([m, l]) => (
         <span
           key={m}
-          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${
+          className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium ${
             l === 'edit' ? 'bg-brand-500/10 text-brand-700 dark:text-brand-300' : 'bg-surface2 text-muted'
           }`}
           title={`${MODULE_INFO[m]?.[0] || m}: ${LEVEL_LABEL[l]}`}
@@ -40,7 +40,7 @@ export function AccessSummary({ access }) {
         </span>
       ))}
       {access.channels !== 'all' && (
-        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-700 dark:text-amber-300">
+        <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-700 dark:text-amber-300">
           Solo {(access.channels || []).map((c) => CHANNEL_LABEL[c] || c).join(', ') || 'ningún canal'}
         </span>
       )}
@@ -179,7 +179,7 @@ export function AccessEditor({ open, onClose, title, withName = false, initial, 
                   type="button"
                   aria-pressed={on}
                   onClick={() => toggleChannel(c)}
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition ${
+                  className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1 text-xs font-medium transition ${
                     on ? 'border-brand-500 bg-brand-500/10 text-brand-700 dark:text-brand-300' : 'border-line text-muted hover:text-fg'
                   }`}
                 >

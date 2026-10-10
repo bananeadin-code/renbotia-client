@@ -128,7 +128,7 @@ export function ActiveSessions() {
                 <p className="flex flex-wrap items-center gap-2 text-sm font-medium text-fg">
                   {s.device}
                   {s.current && (
-                    <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">
+                    <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">
                       Este dispositivo
                     </span>
                   )}

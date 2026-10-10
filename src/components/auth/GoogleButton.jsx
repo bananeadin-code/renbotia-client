@@ -52,7 +52,7 @@ export function GoogleButton({ onSuccess, onError }) {
         theme: isDark ? 'filled_black' : 'outline',
         size: 'large',
         text: 'continue_with',
-        shape: 'pill',
+        shape: 'rectangular',
         logo_alignment: 'center',
       });
     }

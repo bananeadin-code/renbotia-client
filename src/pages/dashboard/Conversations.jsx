@@ -514,7 +514,7 @@ export default function Conversations() {
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-2xl font-bold text-fg">Conversaciones</h1>
             {!isSim && needAttention > 0 && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-600">
+              <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-600">
                 <Icon name="alert" size={13} />
                 {needAttention} {needAttention === 1 ? 'requiere' : 'requieren'} atención
               </span>
@@ -524,7 +524,7 @@ export default function Conversations() {
                 type="button"
                 onClick={() => setOnlyHot((v) => !v)}
                 title={onlyHot ? 'Mostrar todas' : 'Ver solo leads calientes'}
-                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold transition ${
+                className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-semibold transition ${
                   onlyHot ? 'bg-rose-600 text-white' : 'bg-rose-500/15 text-rose-600 hover:bg-rose-500/25'
                 }`}
               >
@@ -537,7 +537,7 @@ export default function Conversations() {
                 type="button"
                 onClick={() => setOnlyWaiting((v) => !v)}
                 title={onlyWaiting ? 'Mostrar todas' : 'Ver solo las que esperan respuesta'}
-                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold transition ${
+                className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-semibold transition ${
                   onlyWaiting ? 'bg-sky-600 text-white' : 'bg-sky-500/15 text-sky-600 hover:bg-sky-500/25'
                 }`}
               >
@@ -622,7 +622,7 @@ export default function Conversations() {
               <Icon name={icon} size={15} /> {label}
               {val === 'simulator' && simulatorCount > 0 && (
                 <span
-                  className={`rounded-full px-1.5 text-[11px] tabular transition-colors ${
+                  className={`rounded-md px-1.5 text-[11px] tabular transition-colors ${
                     on ? 'bg-white/20 text-white' : 'bg-surface2 text-muted'
                   }`}
                 >
@@ -676,7 +676,7 @@ export default function Conversations() {
                     key={p.value}
                     type="button"
                     onClick={() => setDatePreset(p.value)}
-                    className={`rounded-full px-2.5 py-1 text-xs font-medium transition ${
+                    className={`rounded-md px-2.5 py-1 text-xs font-medium transition ${
                       datePreset === p.value
                         ? 'bg-brand-600 text-white'
                         : 'border border-line text-muted hover:text-fg'
@@ -715,13 +715,13 @@ export default function Conversations() {
                 <p className="mt-0.5 truncate text-xs text-muted">{c.lastMessage}</p>
                 {isSim ? (
                   <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-surface2 px-2 py-0.5 text-[10px] font-medium text-muted">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-surface2 px-2 py-0.5 text-[10px] font-medium text-muted">
                       <Icon name="user" size={10} /> {c.startedBy?.name || 'Prueba anterior'}
                     </span>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-brand-500/10 px-2 py-0.5 text-[10px] font-medium text-brand-700 dark:text-brand-300">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-brand-500/10 px-2 py-0.5 text-[10px] font-medium text-brand-700 dark:text-brand-300">
                       <Icon name="zap" size={10} /> {(c.tokens || 0).toLocaleString('es-MX')} tokens
                     </span>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-surface2 px-2 py-0.5 text-[10px] font-medium text-muted">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-surface2 px-2 py-0.5 text-[10px] font-medium text-muted">
                       {c.messageCount} mensajes
                     </span>
                   </div>
@@ -729,13 +729,13 @@ export default function Conversations() {
                 <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                   <ChannelBadge channel={c.channel} size="xs" />
                   {c.needsAttention && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-600">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-600">
                       <Icon name="alert" size={11} /> Requiere atención
                     </span>
                   )}
                   {daysUntilDeletion(c.lastAt, retentionDays) <= 5 && (
                     <span
-                      className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2 py-0.5 text-[10px] font-medium text-red-600"
+                      className="inline-flex items-center gap-1 rounded-md bg-red-500/10 px-2 py-0.5 text-[10px] font-medium text-red-600"
                       title="Se eliminará automáticamente por inactividad"
                     >
                       <Icon name="trash" size={10} />
@@ -743,17 +743,17 @@ export default function Conversations() {
                     </span>
                   )}
                   {c.hotLead && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/15 px-2 py-0.5 text-[10px] font-semibold text-rose-600">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-rose-500/15 px-2 py-0.5 text-[10px] font-semibold text-rose-600">
                       <Icon name="flame" size={11} /> Lead caliente
                     </span>
                   )}
                   {isWaitingReply(c) && !c.needsAttention && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-sky-500/15 px-2 py-0.5 text-[10px] font-semibold text-sky-600">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-sky-500/15 px-2 py-0.5 text-[10px] font-semibold text-sky-600">
                       <Icon name="clock" size={11} /> Espera respuesta
                     </span>
                   )}
                   <span
-                    className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                    className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-medium ${
                       c.handoffMode === 'manual'
                         ? 'bg-brand-500/10 text-brand-600'
                         : 'bg-surface2 text-muted'
@@ -763,17 +763,17 @@ export default function Conversations() {
                     {c.handoffMode === 'manual' ? 'Manual' : 'Bot'}
                   </span>
                   {c.whatsappWindow && !c.whatsappWindow.open && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-600">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-600">
                       <Icon name="alert" size={11} /> Ventana cerrada
                     </span>
                   )}
                   {c.capturedRecordType && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-brand-500/15 px-2 py-0.5 text-[10px] font-semibold text-brand-700 dark:text-brand-300">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-brand-500/15 px-2 py-0.5 text-[10px] font-semibold text-brand-700 dark:text-brand-300">
                       <Icon name="clipboard" size={11} /> {RECORD_LABEL[c.capturedRecordType] || 'Registro'}
                     </span>
                   )}
                   {(c.tags || []).slice(0, 3).map((t) => (
-                    <span key={t} className="inline-flex items-center rounded-full bg-surface2 px-2 py-0.5 text-[10px] font-medium text-muted">
+                    <span key={t} className="inline-flex items-center rounded-md bg-surface2 px-2 py-0.5 text-[10px] font-medium text-muted">
                       #{t}
                     </span>
                   ))}
@@ -894,7 +894,7 @@ export default function Conversations() {
                 <div className="flex flex-wrap items-center gap-2 border-b border-line bg-surface px-4 py-2">
                   <div className="flex flex-wrap items-center gap-1.5">
                     {(thread.tags || []).map((t) => (
-                      <span key={t} className="inline-flex items-center gap-1 rounded-full bg-surface2 px-2 py-0.5 text-[11px] font-medium text-muted">
+                      <span key={t} className="inline-flex items-center gap-1 rounded-md bg-surface2 px-2 py-0.5 text-[11px] font-medium text-muted">
                         #{t}
                         {canEditConv && (
                           <button
@@ -916,7 +916,7 @@ export default function Conversations() {
                         placeholder="+ etiqueta"
                         maxLength={24}
                         aria-label="Agregar etiqueta"
-                        className="w-24 rounded-full border border-line bg-canvas px-2.5 py-0.5 text-[11px] text-fg outline-none focus:border-brand-500"
+                        className="w-24 rounded-md border border-line bg-canvas px-2.5 py-0.5 text-[11px] text-fg outline-none focus:border-brand-500"
                       />
                     </form>
                     )}
@@ -1289,7 +1289,7 @@ Enviar plantillas requiere un método de pago en tu cuenta de Meta.{' '}
                             type="button"
                             onClick={() => setReply(qr)}
                             title={qr}
-                            className="max-w-[170px] shrink-0 truncate rounded-full border border-line px-2.5 py-1 text-xs text-muted transition hover:border-brand-300 hover:text-fg"
+                            className="max-w-[170px] shrink-0 truncate rounded-md border border-line px-2.5 py-1 text-xs text-muted transition hover:border-brand-300 hover:text-fg"
                           >
                             {qr}
                           </button>
@@ -1302,7 +1302,7 @@ Enviar plantillas requiere un método de pago en tu cuenta de Meta.{' '}
                         onChange={(e) => setReply(e.target.value)}
                         placeholder="Escribe como persona…"
                         maxLength={2000}
-                        className="min-w-0 flex-1 rounded-full border border-line bg-canvas px-4 py-2 text-sm text-fg outline-none focus:border-brand-500"
+                        className="min-w-0 flex-1 rounded-md border border-line bg-canvas px-4 py-2 text-sm text-fg outline-none focus:border-brand-500"
                       />
                       <button
                         type="submit"

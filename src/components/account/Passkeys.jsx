@@ -91,7 +91,7 @@ export function PasskeysCard({ onChange }) {
         {list === null ? (
           <Spinner className="text-brand-600" />
         ) : list.length === 0 ? (
-          <p className="text-sm text-subtle">Aún no tienes llaves. Es opcional: tu cuenta sigue protegida con contraseña y código.</p>
+          <p className="text-sm text-subtle">Aún no tienes llaves. Es opcional: puedes seguir entrando con tu contraseña como siempre.</p>
         ) : (
           <ul className="divide-y divide-line rounded-xl border border-line">
             {list.map((pk) => (

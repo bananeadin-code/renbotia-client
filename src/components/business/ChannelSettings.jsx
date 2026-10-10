@@ -80,12 +80,12 @@ export function ChannelSettings({ channel, settings, isOwner, onChanged }) {
           onClick={() =>
             save({ paused: !paused }, paused ? `Bot reactivado en ${LABEL[channel]}.` : `Bot en pausa en ${LABEL[channel]}.`, 'pause')
           }
-          className={`relative mt-0.5 h-6 w-11 shrink-0 rounded-full transition disabled:opacity-50 ${
+          className={`relative mt-0.5 h-6 w-11 shrink-0 rounded-md transition disabled:opacity-50 ${
             !paused ? 'bg-brand-600' : 'bg-surface2 ring-1 ring-inset ring-line'
           }`}
         >
           <span
-            className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
+            className={`absolute top-0.5 h-5 w-5 rounded bg-white shadow transition-all ${
               !paused ? 'left-[22px]' : 'left-0.5'
             }`}
           />

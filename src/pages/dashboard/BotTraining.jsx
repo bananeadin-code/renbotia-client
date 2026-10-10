@@ -547,7 +547,7 @@ export default function BotTraining() {
             </span>
             <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
               <h2 className="font-semibold text-fg">Plantillas de arranque</h2>
-              <span className="rounded-full bg-brand-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-600 dark:text-brand-300">
+              <span className="rounded-md bg-brand-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-600 dark:text-brand-300">
                 Recomendado
               </span>
             </div>
@@ -762,12 +762,12 @@ export default function BotTraining() {
             aria-checked={cfg.schedule.enabled}
             aria-label="Activar horario de atención"
             onClick={() => set('schedule', { ...cfg.schedule, enabled: !cfg.schedule.enabled })}
-            className={`relative mt-1 h-6 w-11 shrink-0 rounded-full transition ${
+            className={`relative mt-1 h-6 w-11 shrink-0 rounded-md transition ${
               cfg.schedule.enabled ? 'bg-brand-600' : 'bg-surface2 ring-1 ring-inset ring-line'
             }`}
           >
             <span
-              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
+              className={`absolute top-0.5 h-5 w-5 rounded bg-white shadow transition-all ${
                 cfg.schedule.enabled ? 'left-[22px]' : 'left-0.5'
               }`}
             />
@@ -823,7 +823,7 @@ export default function BotTraining() {
                         days: cfg.schedule.days.map((d) => ({ ...d, enabled: true, open: '00:00', close: '23:59' })),
                       })
                     }
-                    className="rounded-full border border-line px-2 py-0.5 text-[11px] font-medium text-muted transition hover:border-brand-300 hover:text-fg"
+                    className="rounded-md border border-line px-2 py-0.5 text-[11px] font-medium text-muted transition hover:border-brand-300 hover:text-fg"
                   >
                     Abierto 24/7
                   </button>
@@ -1123,12 +1123,12 @@ Sube solo contenido lícito y relacionado con tu negocio; eres responsable de lo
               aria-checked={cfg.followUp.enabled}
               aria-label="Activar seguimiento automático"
               onClick={() => set('followUp', { ...cfg.followUp, enabled: !cfg.followUp.enabled })}
-              className={`relative mt-1 h-6 w-11 shrink-0 rounded-full transition ${
+              className={`relative mt-1 h-6 w-11 shrink-0 rounded-md transition ${
                 cfg.followUp.enabled ? 'bg-brand-600' : 'bg-surface2 ring-1 ring-inset ring-line'
               }`}
             >
               <span
-                className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
+                className={`absolute top-0.5 h-5 w-5 rounded bg-white shadow transition-all ${
                   cfg.followUp.enabled ? 'left-[22px]' : 'left-0.5'
                 }`}
               />

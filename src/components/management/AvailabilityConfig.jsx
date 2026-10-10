@@ -219,7 +219,7 @@ export function AvailabilityConfig({ config, onSaved }) {
               {form.blackoutDates.map((date) => (
                 <span
                   key={date}
-                  className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2.5 py-1 text-xs font-medium text-red-700 dark:text-red-300"
+                  className="inline-flex items-center gap-1 rounded-md bg-red-500/10 px-2.5 py-1 text-xs font-medium text-red-700 dark:text-red-300"
                 >
                   {date}
                   <button
@@ -280,12 +280,12 @@ function Toggle({ checked, onChange, small }) {
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className={`relative inline-flex ${w} shrink-0 items-center rounded-full transition ${
+      className={`relative inline-flex ${w} shrink-0 items-center rounded-md transition ${
         checked ? 'bg-brand-600' : 'bg-surface2 ring-1 ring-inset ring-line'
       }`}
     >
       <span
-        className={`inline-block ${dot} transform rounded-full bg-white shadow transition ${
+        className={`inline-block ${dot} transform rounded bg-white shadow transition ${
           checked ? translate : 'translate-x-1'
         }`}
       />

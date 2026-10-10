@@ -101,7 +101,7 @@ export function OwnerControlCard() {
           </p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {EXAMPLES.map((e) => (
-              <span key={e} className="rounded-full bg-surface2 px-2.5 py-0.5 text-xs text-muted">
+              <span key={e} className="rounded-md bg-surface2 px-2.5 py-0.5 text-xs text-muted">
                 “{e}”
               </span>
             ))}

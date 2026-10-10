@@ -251,7 +251,7 @@ export default function Team() {
                         onChange={(k) => changeRole(m, k)}
                       />
                     ) : (
-                      <span className="rounded-full bg-surface2 px-2.5 py-1 text-xs font-medium text-fg">
+                      <span className="rounded-md bg-surface2 px-2.5 py-1 text-xs font-medium text-fg">
                         {m.access?.roleName || 'Colaborador'}
                       </span>
                     )}
