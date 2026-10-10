@@ -3,6 +3,7 @@ import { Button, Input, Textarea, Card, Spinner, Alert } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
 import { managementApi } from '../../api/endpoints.js';
 import { TYPE_META, ALL_TYPES, DAY_NAMES_LONG } from '../../lib/managementMeta.js';
+import { ReminderSettings } from './ReminderSettings.jsx';
 
 /**
  * Formulario de configuración del módulo: qué capta el bot y la disponibilidad
@@ -20,6 +21,15 @@ export function AvailabilityConfig({ config, onSaved }) {
     schedule: (config.schedule || []).map((d) => ({ ...d })),
     blackoutDates: [...(config.blackoutDates || [])],
     instructions: config.instructions || '',
+    reminders: {
+      enabled: Boolean(config.reminders?.enabled),
+      hoursBefore: config.reminders?.hoursBefore || 24,
+      template: {
+        name: config.reminders?.template?.name || '',
+        language: config.reminders?.template?.language || '',
+        params: [...(config.reminders?.template?.params || [])],
+      },
+    },
   }));
   const [newBlackout, setNewBlackout] = useState('');
   const [saving, setSaving] = useState(false);
@@ -65,6 +75,7 @@ export function AvailabilityConfig({ config, onSaved }) {
         schedule: form.schedule,
         blackoutDates: form.blackoutDates,
         instructions: form.instructions,
+        reminders: form.reminders,
       });
       setMsg({ variant: 'success', text: 'Configuración guardada.' });
       onSaved?.();
@@ -234,6 +245,9 @@ export function AvailabilityConfig({ config, onSaved }) {
           </div>
         </Card>
       )}
+
+      {/* Recordatorios con confirmación (solo si capta citas o reservaciones) */}
+      {hasScheduled && <ReminderSettings value={form.reminders} onChange={(reminders) => set({ reminders })} Toggle={Toggle} />}
 
       {/* Instrucciones para el bot */}
       <Card>

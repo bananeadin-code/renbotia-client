@@ -15,11 +15,12 @@ import { Icon } from '../ui/Icon.jsx';
  * @param {boolean} props.isOwner
  * @param {() => Promise<any>} props.onChanged
  */
-const LABEL = { whatsapp: 'WhatsApp', facebook: 'Messenger', instagram: 'Instagram' };
+const LABEL = { whatsapp: 'WhatsApp', facebook: 'Messenger', instagram: 'Instagram', web: 'el chat del sitio web' };
+const TITLE = { whatsapp: 'WhatsApp', facebook: 'Messenger', instagram: 'Instagram', web: 'Sitio web' };
 const MAX_QUESTIONS = 4;
 
 export function ChannelSettings({ channel, settings, isOwner, onChanged }) {
-  const supportsQuestions = channel !== 'whatsapp';
+  const supportsQuestions = channel === 'facebook' || channel === 'instagram';
   const supportsGreeting = channel === 'facebook';
   const paused = Boolean(settings?.paused);
 
@@ -54,7 +55,7 @@ export function ChannelSettings({ channel, settings, isOwner, onChanged }) {
 
   return (
     <Card>
-      <h2 className="font-semibold text-fg">Ajustes de {LABEL[channel]}</h2>
+      <h2 className="font-semibold text-fg">Ajustes de {TITLE[channel]}</h2>
 
       {/* Pausa del bot en este canal */}
       <div className="mt-4 flex items-start justify-between gap-4 rounded-xl border border-line p-3">

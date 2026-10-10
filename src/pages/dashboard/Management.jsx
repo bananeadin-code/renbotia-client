@@ -489,6 +489,7 @@ function RecordRow({ rec, onStatus, onEdit, onDelete, readOnly = false }) {
               </span>
             )}
             {rec.source === 'bot' && <ChannelBadge channel={rec.channel} />}
+            <ReminderBadge reminder={rec.reminder} />
           </div>
 
           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted">
@@ -528,5 +529,24 @@ function RecordRow({ rec, onStatus, onEdit, onDelete, readOnly = false }) {
         {actions}
       </div>
     </Card>
+  );
+}
+
+const REMINDER_META = {
+  sent: ['Recordatorio enviado', 'bg-surface2 text-muted', 'clock'],
+  confirmed: ['Confirmó', 'bg-brand-500/10 text-brand-700 dark:text-brand-300', 'check'],
+  cancelled: ['Canceló', 'bg-red-500/10 text-red-600 dark:text-red-400', 'x'],
+  reschedule: ['Quiere cambiarla', 'bg-amber-500/15 text-amber-700 dark:text-amber-300', 'alert'],
+  skipped: ['Sin recordatorio', 'bg-surface2 text-subtle', 'clock'],
+};
+
+/** Estado del recordatorio de una cita (con el motivo si no se envió). */
+function ReminderBadge({ reminder }) {
+  const m = REMINDER_META[reminder?.status];
+  if (!m) return null;
+  return (
+    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${m[1]}`} title={reminder.note || undefined}>
+      <Icon name={m[2]} size={11} /> {m[0]}
+    </span>
   );
 }

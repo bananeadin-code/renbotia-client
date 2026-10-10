@@ -47,6 +47,7 @@ function channelStatus(key, data, widget) {
     case 'web':
       if (!widget) return { text: '…', tone: 'off' };
       if (!widget.allowed) return { text: 'Pro y Elite', tone: 'soon' };
+      if (widget.enabled && data?.settings?.web?.paused) return { text: 'Bot en pausa', tone: 'soon' };
       return widget.enabled ? { text: 'Activo', tone: 'on' } : { text: 'Apagado', tone: 'off' };
     default:
       return { text: '', tone: 'off' };
@@ -520,6 +521,9 @@ Se abrirá una ventana segura de Meta para iniciar sesión y verificar tu númer
 
       {/* Widget de chat para el sitio web del negocio (Pro/Elite) */}
       {active === 'web' && <WebWidgetCard isOwner={isOwner} onStatus={onWidgetStatus} />}
+      {active === 'web' && widget?.enabled && (
+        <ChannelSettings channel="web" settings={data?.settings?.web} isOwner={isOwner} onChanged={refresh} />
+      )}
       </div>
     </div>
   );

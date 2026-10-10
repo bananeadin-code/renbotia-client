@@ -121,6 +121,13 @@ export default function AdminPanel() {
                     <div className="text-xs text-subtle">
                       ${b.costMxn.toLocaleString('es-MX', { maximumFractionDigits: 1 })} MXN
                     </div>
+                    {(b.ownerCostUsd > 0 || b.auditCostUsd > 0) && (
+                      <div className="text-[11px] text-subtle" title="Incluido en el total">
+                        {b.ownerCostUsd > 0 && `Asistente dueño $${b.ownerCostUsd.toFixed(2)}`}
+                        {b.ownerCostUsd > 0 && b.auditCostUsd > 0 && ' · '}
+                        {b.auditCostUsd > 0 && `Prueba bot $${b.auditCostUsd.toFixed(2)}`}
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
