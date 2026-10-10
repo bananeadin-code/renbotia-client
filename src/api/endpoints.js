@@ -14,7 +14,7 @@ export const authApi = {
   logout: () => api.post('/auth/logout'),
   refresh: () => unwrap(api.post('/auth/refresh')),
   me: () => unwrap(api.get('/auth/me')),
-  forgotPassword: (email) => unwrap(api.post('/auth/forgot-password', { email })),
+  forgotPassword: (email, turnstileToken) => unwrap(api.post('/auth/forgot-password', { email, ...(turnstileToken ? { turnstileToken } : {}) })),
   resetPassword: (body) => api.post('/auth/reset-password', body),
   // Verificación de correo (registro) y 2FA de login por código.
   verifyEmail: (body) => unwrap(api.post('/auth/verify-email', body)),
@@ -25,12 +25,23 @@ export const authApi = {
   sessions: () => unwrap(api.get('/auth/sessions')),
   revokeSession: (id) => unwrap(api.delete(`/auth/sessions/${id}`)),
   revokeOtherSessions: () => unwrap(api.post('/auth/sessions/revoke-others')),
+  // "Tu seguridad": nivel, sugerencias y accesos recientes.
+  security: () => unwrap(api.get('/auth/security')),
   // Contexto (dueño / proyecto) y confirmación de identidad.
   selectContext: (body) => unwrap(api.post('/auth/context/select', body)),
   switchContext: (businessId) => unwrap(api.post('/auth/context/switch', { businessId })),
   contexts: () => unwrap(api.get('/auth/contexts')),
   stepUp: (body) => unwrap(api.post('/auth/step-up', body)),
   stepUpCode: () => unwrap(api.post('/auth/step-up/code')),
+  // Llaves de acceso (passkeys).
+  passkeys: () => unwrap(api.get('/auth/passkeys')),
+  passkeyRegisterOptions: () => unwrap(api.post('/auth/passkeys/register/options')),
+  passkeyRegisterVerify: (body) => unwrap(api.post('/auth/passkeys/register/verify', body)),
+  deletePasskey: (id) => unwrap(api.delete(`/auth/passkeys/${id}`)),
+  passkeyLoginOptions: () => unwrap(api.post('/auth/passkeys/login/options')),
+  passkeyLogin: (body) => unwrap(api.post('/auth/passkeys/login/verify', body)),
+  stepUpPasskeyOptions: () => unwrap(api.post('/auth/step-up/passkey/options')),
+  stepUpPasskey: (body) => unwrap(api.post('/auth/step-up/passkey/verify', body)),
   updateProfile: (name) => unwrap(api.patch('/auth/profile', { name })),
   requestEmailChange: (newEmail) => unwrap(api.post('/auth/email/request', { newEmail })),
   verifyEmailChange: (code) => unwrap(api.post('/auth/email/verify', { code })),
@@ -69,6 +80,9 @@ export const botConfigApi = {
   notices: () => unwrap(api.get('/botconfig/notices')),
   addNotice: (body) => unwrap(api.post('/botconfig/notices', body)),
   removeNotice: (id) => unwrap(api.delete(`/botconfig/notices/${id}`)),
+  // Prueba de seguridad del bot (7 clientes tramposos, sin efectos).
+  audit: () => unwrap(api.get('/botconfig/audit')),
+  runAudit: () => unwrap(api.post('/botconfig/audit', {}, { timeout: 120000 })),
 };
 
 export const usageApi = {

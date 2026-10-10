@@ -7,6 +7,8 @@ import { businessApi } from '../../api/endpoints.js';
 import { toast } from '../../store/toastStore.js';
 import { ConnectedChannels } from '../../components/business/ConnectedChannels.jsx';
 import { ActiveSessions } from '../../components/account/ActiveSessions.jsx';
+import { PasskeysCard } from '../../components/account/Passkeys.jsx';
+import { SecurityOverview } from '../../components/account/SecurityOverview.jsx';
 import { Card, Button, Input, Select, Alert, Notice } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { fileToAvatarDataUri } from '../../lib/image.js';
@@ -104,6 +106,7 @@ export default function Profile() {
       const { user: updated } = await authApi.setTwoFactor(next);
       updateUser({ twoFactorEnabled: updated.twoFactorEnabled });
       toast.success(next ? 'Verificación en dos pasos activada.' : 'Verificación en dos pasos desactivada.');
+      setSecKey((k) => k + 1);
     } catch (err) {
       setTwoFA(prev); // revertir si falla
       toast.error(err.response?.data?.message || 'No se pudo actualizar.');
@@ -124,6 +127,7 @@ export default function Profile() {
   // Datos del negocio: el dueño o un colaborador con permiso (Equipo).
   const canProfile = useCan('profile');
   const canSeeConnections = useAccess('connections', 'view');
+  const [secKey, setSecKey] = useState(0); // refresca "Tu seguridad" al cambiar algo
 
   // Foto/avatar del negocio: se comprime en el navegador y se guarda al momento.
   const photoInputRef = useRef(null);
@@ -414,8 +418,9 @@ export default function Profile() {
       {/* Canales conectados (informativo; según el rol) */}
       {canSeeConnections && <ConnectedChannels />}
 
-      {/* Seguridad: verificación en dos pasos */}
-      <Card>
+      {/* Seguridad: resumen amable + verificación en dos pasos */}
+      <SecurityOverview refreshKey={secKey} />
+      <Card id="dos-pasos">
         <h2 className="mb-1 font-semibold text-fg">Verificación en dos pasos</h2>
         <p className="mb-4 text-sm text-muted">
           Al iniciar sesión con correo y contraseña te pediremos un código de 6 dígitos enviado a tu
@@ -442,6 +447,9 @@ export default function Profile() {
           </button>
         </div>
       </Card>
+
+      {/* Llaves de acceso (huella, cara o PIN) */}
+      <PasskeysCard onChange={() => setSecKey((k) => k + 1)} />
 
       {/* Sesiones activas (dispositivos con la cuenta abierta) */}
       <ActiveSessions />

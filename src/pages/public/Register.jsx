@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Turnstile } from '../../components/auth/Turnstile.jsx';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore.js';
 import { Button, Input, Alert, PasswordInput } from '../../components/ui/index.jsx';
@@ -29,6 +30,8 @@ export default function Register() {
   const [password2, setPassword2] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const [needsHuman, setNeedsHuman] = useState(false);
   // Estado pendiente de verificación de correo tras registrar.
   const [pending, setPending] = useState(null); // { email, devCode? }
 
@@ -60,7 +63,11 @@ export default function Register() {
     }
     setLoading(true);
     try {
-      const res = await register(f.values);
+      if (needsHuman && !turnstileToken) {
+        setError('Espera un segundo: estamos confirmando que eres una persona.');
+        return;
+      }
+      const res = await register({ ...f.values, ...(turnstileToken ? { turnstileToken } : {}) });
       // El registro ya no inicia sesión: pide verificar el correo por código.
       setPending({ email: res.email || f.values.email, devCode: res.devCode });
     } catch (err) {
@@ -165,6 +172,7 @@ export default function Register() {
             </p>
           )}
         </div>
+        <Turnstile onToken={setTurnstileToken} onReady={setNeedsHuman} />
         <Button type="submit" size="lg" className="w-full" disabled={loading || mismatch}>
           {loading ? 'Creando…' : 'Crear cuenta'}
         </Button>

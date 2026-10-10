@@ -8,6 +8,7 @@ import { ChatBubble } from '../../components/whatsapp/ChatBubble.jsx';
 import { TypingIndicator } from '../../components/whatsapp/TypingIndicator.jsx';
 import { Button, Alert } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
+import { BotAuditCard } from '../../components/business/BotAuditCard.jsx';
 import { compressImageForUpload, fileToBase64 } from '../../lib/image.js';
 
 const hhmm = (d = new Date()) =>
@@ -242,6 +243,9 @@ export default function Simulator() {
           ? ' Puedes adjuntar fotos o PDF como lo haría un cliente.'
           : ' Puedes adjuntar fotos o PDF para ver cómo responde: en tu plan el bot pide que se lo escriban; en Elite los lee.'}
       </p>
+
+      {/* Prueba de seguridad del bot (clientes tramposos) */}
+      <BotAuditCard />
     </div>
   );
 }

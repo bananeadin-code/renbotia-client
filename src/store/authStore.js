@@ -77,6 +77,14 @@ export const useAuthStore = create((set, get) => ({
     return r.needsContext ? r : r.user;
   },
 
+  // Entrar con llave de acceso (huella, cara o PIN). Cuenta como 2º factor.
+  async passkeyLogin() {
+    const { signInWithPasskey } = await import('../lib/passkeys.js');
+    const data = await signInWithPasskey();
+    const r = get()._finish(data);
+    return r.needsContext ? r : r.user;
+  },
+
   async googleLogin(credential) {
     const data = await authApi.google(credential, getReferral());
     const r = get()._finish(data);

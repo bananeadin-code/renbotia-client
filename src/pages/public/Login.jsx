@@ -8,12 +8,17 @@ import { GoogleButton } from '../../components/auth/GoogleButton.jsx';
 import { OtpForm } from '../../components/auth/OtpForm.jsx';
 import { ContextChooser } from '../../components/auth/ContextChooser.jsx';
 import { useSeo } from '../../lib/seo.js';
+import { Icon } from '../../components/ui/Icon.jsx';
+import { passkeysSupported, PasskeyCancelled } from '../../lib/passkeys.js';
 
 export default function Login() {
   useSeo({ title: 'Inicia sesión | RenBotIA', description: 'Entra a tu panel de RenBotIA.', path: '/login' });
   const navigate = useNavigate();
   const location = useLocation();
   const login = useAuthStore((s) => s.login);
+  const passkeyLogin = useAuthStore((s) => s.passkeyLogin);
+  const [canPasskey] = useState(() => passkeysSupported());
+  const [passkeyBusy, setPasskeyBusy] = useState(false);
   const pendingContext = useAuthStore((s) => s.pendingContext);
   const f = useForm(
     { email: '', password: '' },
@@ -53,6 +58,20 @@ export default function Login() {
       setError(err.response?.data?.message || 'No se pudo iniciar sesión');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function enterWithPasskey() {
+    setError('');
+    setPasskeyBusy(true);
+    try {
+      const r = await passkeyLogin();
+      if (!r?.needsContext) navigate(from, { replace: true });
+    } catch (err) {
+      if (err instanceof PasskeyCancelled) return;
+      setError(err.response?.data?.message || err.message || 'No se pudo entrar con tu llave de acceso.');
+    } finally {
+      setPasskeyBusy(false);
     }
   }
 
@@ -108,6 +127,12 @@ export default function Login() {
         </p>
       }
     >
+      {canPasskey && (
+        <Button type="button" variant="secondary" size="lg" className="mb-3 w-full" onClick={enterWithPasskey} disabled={passkeyBusy}>
+          <Icon name="shieldCheck" size={18} />
+          {passkeyBusy ? 'Esperando tu dispositivo…' : 'Entrar con huella, cara o PIN'}
+        </Button>
+      )}
       <GoogleButton
         onSuccess={() => navigate(from, { replace: true })}
         onError={(e) => setError(e.response?.data?.message || 'No se pudo entrar con Google.')}

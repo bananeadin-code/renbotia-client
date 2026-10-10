@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Turnstile } from '../../components/auth/Turnstile.jsx';
 import { Link } from 'react-router-dom';
 import { authApi } from '../../api/endpoints.js';
 import { Button, Input, Alert } from '../../components/ui/index.jsx';
@@ -16,13 +17,15 @@ export default function ForgotPassword() {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const [needsHuman, setNeedsHuman] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      await authApi.forgotPassword(email);
+      await authApi.forgotPassword(email, turnstileToken);
       setSent(true);
     } catch (err) {
       setError(err.response?.data?.message || 'Ocurrió un error');
@@ -57,7 +60,8 @@ export default function ForgotPassword() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="tu@email.com"
               />
-              <Button type="submit" size="lg" className="w-full" disabled={loading}>
+              <Turnstile onToken={setTurnstileToken} onReady={setNeedsHuman} />
+              <Button type="submit" size="lg" className="w-full" disabled={loading || (needsHuman && !turnstileToken)}>
                 {loading ? 'Enviando…' : 'Enviar enlace'}
               </Button>
             </form>

@@ -3,6 +3,8 @@ import { authApi } from '../../api/endpoints.js';
 import { useStepUpStore } from '../../store/stepUpStore.js';
 import { Modal } from '../ui/Modal.jsx';
 import { Button, Input, PasswordInput, Notice } from '../ui/index.jsx';
+import { Icon } from '../ui/Icon.jsx';
+import { passkeysSupported, stepUpWithPasskey, PasskeyCancelled } from '../../lib/passkeys.js';
 
 /**
  * Diálogo "Confirma que eres tú". Pide la contraseña o, si la cuenta entra con
@@ -17,9 +19,18 @@ export function StepUpDialog() {
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [hasPasskey, setHasPasskey] = useState(false);
 
   useEffect(() => {
     if (!open) return;
+    // Si tiene llave de acceso en una cuenta compatible, es la vía más rápida.
+    setHasPasskey(false);
+    if (passkeysSupported()) {
+      authApi
+        .passkeys()
+        .then(({ passkeys }) => setHasPasskey(passkeys.length > 0))
+        .catch(() => {});
+    }
     setPassword('');
     setCode('');
     setError('');
@@ -61,6 +72,19 @@ export function StepUpDialog() {
     }
   }
 
+  async function usePasskey() {
+    setBusy(true);
+    setError('');
+    try {
+      await stepUpWithPasskey();
+      done();
+    } catch (err) {
+      if (!(err instanceof PasskeyCancelled)) setError(err.response?.data?.message || err.message || 'No se pudo confirmar con tu llave.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
   function useCode() {
     setMode('code');
     if (!sent) sendCode();
@@ -76,6 +100,17 @@ export function StepUpDialog() {
         </p>
 
         {error && <Notice variant="error">{error}</Notice>}
+
+        {hasPasskey && (
+          <>
+            <Button type="button" className="w-full" onClick={usePasskey} disabled={busy}>
+              <Icon name="shieldCheck" size={17} /> Usar mi huella, cara o PIN
+            </Button>
+            <div className="flex items-center gap-2 text-[11px] text-subtle">
+              <span className="h-px flex-1 bg-line" /> o {mode === 'code' ? 'con el código' : 'con tu contraseña'} <span className="h-px flex-1 bg-line" />
+            </div>
+          </>
+        )}
 
         {mode === 'password' ? (
           <PasswordInput
