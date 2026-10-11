@@ -328,6 +328,33 @@ const ICONS = {
       <path d="M20 13v2a4 4 0 0 1-4 4H4" {...P} />
     </>
   ),
+  // ── Sectores (mosaicos de la portada y soluciones) ──
+  scale: (
+    <>
+      <path d="M12 3v18M7 21h10" {...P} />
+      <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" {...P} />
+      <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1z" {...P} />
+      <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1z" {...P} />
+    </>
+  ),
+  calculator: (
+    <>
+      <rect x="4" y="2" width="16" height="20" rx="2" {...P} />
+      <path d="M8 6h8M16 14v4M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01" {...P} />
+    </>
+  ),
+  briefcase: (
+    <>
+      <rect x="2" y="7" width="20" height="14" rx="2" {...P} />
+      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" {...P} />
+    </>
+  ),
+  megaphone: (
+    <>
+      <path d="m3 11 18-5v12L3 14v-3z" {...P} />
+      <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" {...P} />
+    </>
+  ),
 };
 
 export function Icon({ name, size = 20, className = '', title, ...rest }) {

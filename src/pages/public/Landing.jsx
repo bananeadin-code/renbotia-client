@@ -7,6 +7,9 @@ import { TryYourBusiness } from '../../components/landing/TryYourBusiness.jsx';
 import { AuroraBackground } from '../../components/ui/AuroraBackground.jsx';
 import { SpotlightCard } from '../../components/ui/SpotlightCard.jsx';
 import { Reveal } from '../../components/ui/Reveal.jsx';
+import { IconTile } from '../../components/ui/IconTile.jsx';
+import { ChannelsShowcase } from '../../components/landing/ChannelsShowcase.jsx';
+import { SOLUTIONS } from '../../content/solutions.js';
 import { AnnouncementBar } from '../../components/landing/AnnouncementBar.jsx';
 import { Faq, FAQS } from '../../components/landing/Faq.jsx';
 import { StickyMobileCTA } from '../../components/landing/StickyMobileCTA.jsx';
@@ -45,7 +48,13 @@ const FEATURES = [
   { icon: 'chart', title: 'Control de consumo', desc: 'Mide cuántas conversaciones atiende y administra tu plan desde un panel claro.' },
 ];
 
-const SECTORS = ['Despachos legales', 'Contadores', 'Consultoras', 'Agencias de marketing'];
+// Sectores destacados: cada mosaico lleva a su página de solución (con su ícono).
+const SECTORS = [
+  ['despachos-legales', 'Despachos legales'],
+  ['despachos-contables', 'Contadores'],
+  ['consultoras', 'Consultoras'],
+  ['agencias-marketing', 'Agencias de marketing'],
+].map(([slug, label]) => ({ slug, label, icon: SOLUTIONS.find((x) => x.slug === slug)?.icon || 'building' }));
 
 const STEPS = [
   { n: '01', title: 'Configura tu bot', desc: 'Responde 3 pasos: negocio, plan y preguntas frecuentes.' },
@@ -191,21 +200,20 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Canales donde atiende el bot */}
+      <Reveal>
+        <ChannelsShowcase />
+      </Reveal>
+
       {/* Sectores */}
       <Reveal as="section" className="mx-auto w-full max-w-6xl px-4 py-20 text-center">
         <h2 className="text-4xl font-bold tracking-tight text-fg sm:text-5xl">Pensado para tu sector</h2>
         <p className="mt-3 text-muted">
           Ideal para negocios de servicios profesionales que reciben muchas consultas repetidas.
         </p>
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
+        <div className="mx-auto mt-10 flex max-w-6xl flex-wrap justify-center gap-x-8 gap-y-6">
           {SECTORS.map((s) => (
-            <span
-              key={s}
-              className="inline-flex items-center gap-2 rounded-md border border-line bg-surface px-4 py-2 text-sm font-medium text-fg shadow-card"
-            >
-              <Icon name="building" size={16} className="text-brand-500" />
-              {s}
-            </span>
+            <IconTile key={s.slug} icon={s.icon} label={s.label} to={`/soluciones/${s.slug}`} />
           ))}
         </div>
         <div className="mt-7">

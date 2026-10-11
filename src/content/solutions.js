@@ -11,7 +11,7 @@ export const SOLUTIONS = [
   {
     slug: 'despachos-legales',
     industry: 'Despachos y abogados',
-    icon: 'building',
+    icon: 'scale',
     title: 'Bot de WhatsApp con IA para despachos legales | RenBotIA',
     description:
       'Automatiza la atención de tu despacho por WhatsApp: responde consultas frecuentes, filtra casos y agenda citas 24/7 sin descuidar la asesoría.',
@@ -45,7 +45,7 @@ export const SOLUTIONS = [
   {
     slug: 'despachos-contables',
     industry: 'Contadores y despachos fiscales',
-    icon: 'chart',
+    icon: 'calculator',
     title: 'Bot de WhatsApp con IA para despachos contables | RenBotIA',
     description:
       'Atiende por WhatsApp las dudas fiscales frecuentes de tus clientes, recuerda fechas y agenda citas, sin saturar a tu equipo en temporada de impuestos.',
@@ -79,7 +79,7 @@ export const SOLUTIONS = [
   {
     slug: 'consultoras',
     industry: 'Consultoras y servicios profesionales',
-    icon: 'sparkles',
+    icon: 'briefcase',
     title: 'Bot de WhatsApp con IA para consultoras | RenBotIA',
     description:
       'Convierte las consultas por WhatsApp en reuniones agendadas: tu asistente con IA responde, califica y agenda mientras tú entregas el proyecto.',
@@ -113,7 +113,7 @@ export const SOLUTIONS = [
   {
     slug: 'agencias-marketing',
     industry: 'Agencias de marketing',
-    icon: 'message',
+    icon: 'megaphone',
     title: 'Bot de WhatsApp con IA para agencias de marketing | RenBotIA',
     description:
       'Atiende y califica leads por WhatsApp 24/7: tu asistente con IA responde, muestra tus servicios y agenda la llamada, para que cierres más.',
