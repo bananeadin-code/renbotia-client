@@ -9,6 +9,17 @@ const api = axios.create({
   withCredentials: true,
 });
 
+/**
+ * Para rutas PÚBLICAS (chat del sitio web): sin cookies ni sesión. Las rutas
+ * abiertas responden "Access-Control-Allow-Origin: *" y el navegador rechaza
+ * esa respuesta si la petición lleva credenciales; además, el chat de un
+ * visitante no debe mandar la sesión de quien esté logueado en el navegador.
+ */
+export const publicApi = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || '/api',
+  withCredentials: false,
+});
+
 // El access token vive en memoria (no en localStorage, por seguridad XSS).
 // El authStore lo inyecta aquí tras login/refresh.
 let accessToken = null;

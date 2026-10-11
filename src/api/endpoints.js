@@ -1,4 +1,4 @@
-import api from './axios.js';
+import api, { publicApi } from './axios.js';
 
 /**
  * Capa fina sobre los endpoints del backend. Todas devuelven `response.data.data`
@@ -226,11 +226,11 @@ export const widgetApi = {
   // Público (dentro del iframe /w/:key): apariencia, enviar y sondear mensajes.
   // `host`: sitio donde está incrustado el chat (para "dominios permitidos").
   publicConfig: (key, host = '') =>
-    unwrap(api.get(`/widget/public/${encodeURIComponent(key)}`, { params: host ? { host } : {} })),
-  send: (key, body) => unwrap(api.post(`/widget/public/${encodeURIComponent(key)}/message`, body)),
+    unwrap(publicApi.get(`/widget/public/${encodeURIComponent(key)}`, { params: host ? { host } : {} })),
+  send: (key, body) => unwrap(publicApi.post(`/widget/public/${encodeURIComponent(key)}/message`, body)),
   thread: (key, sessionId, after = 0, host = '') =>
     unwrap(
-      api.get(`/widget/public/${encodeURIComponent(key)}/messages`, {
+      publicApi.get(`/widget/public/${encodeURIComponent(key)}/messages`, {
         params: { sessionId, after, ...(host ? { host } : {}) },
       })
     ),
