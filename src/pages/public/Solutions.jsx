@@ -42,7 +42,7 @@ export default function Solutions() {
               <Link to={`/soluciones/${s.slug}`}>
               <SpotlightCard className="group h-full p-6">
                 <div className="relative z-[2]">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-500/10 text-brand-600 ring-1 ring-inset ring-brand-500/20">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-fg text-canvas shadow-card">
                     <Icon name={s.icon} size={22} />
                   </span>
                   <h2 className="mt-4 text-lg font-bold text-fg group-hover:text-brand-700 dark:group-hover:text-brand-300">

@@ -40,6 +40,9 @@ function StatCard({ label, value, sub, color, icon }) {
   );
 }
 
+
+// Ejes de gráficas: 165000 → 165k, 1200000 → 1.2M (sin que se corten los dígitos).
+const compactNumber = (n) => new Intl.NumberFormat('es-MX', { notation: 'compact', maximumFractionDigits: 1 }).format(n);
 export default function Dashboard() {
   const { business, subscription, balance, setBalance, role } = useBusinessStore();
   const user = useAuthStore((s) => s.user);
@@ -202,7 +205,7 @@ export default function Dashboard() {
               <BarChart data={daily}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(148 163 184 / 0.18)" />
                 <XAxis dataKey="date" tick={{ fontSize: 12, fill: '#94a3b8' }} />
-                <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} width={40} />
+                <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} width={44} tickFormatter={compactNumber} />
                 <Tooltip
                   cursor={{ fill: 'rgb(148 163 184 / 0.14)', radius: 6 }}
                   formatter={(v) => [`${v.toLocaleString('es-MX')} tokens`, 'Consumo']}
@@ -228,7 +231,7 @@ export default function Dashboard() {
         {canTrain && (
         <Link to="/dashboard/entrenamiento">
           <SpotlightCard className="group flex items-center gap-4 p-5 transition hover:-translate-y-0.5 [&>*]:relative [&>*]:z-[2]">
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-300">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-fg text-canvas shadow-card">
               <Icon name="academic" size={22} />
             </span>
             <div className="flex-1">
@@ -242,7 +245,7 @@ export default function Dashboard() {
         {canSimulate && (
         <Link to="/dashboard/simulador">
           <SpotlightCard className="group flex items-center gap-4 p-5 transition hover:-translate-y-0.5 [&>*]:relative [&>*]:z-[2]">
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-300">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-fg text-canvas shadow-card">
               <Icon name="message" size={22} />
             </span>
             <div className="flex-1">

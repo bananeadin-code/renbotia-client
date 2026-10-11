@@ -166,7 +166,7 @@ export default function Team() {
       {/* Invitar (solo dueño y en planes Pro/Elite) */}
       {isOwner && !canInvite ? (
         <Card className="text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-600">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-fg text-canvas shadow-card">
             <Icon name="users" size={26} />
           </div>
           <h2 className="mt-3 font-bold text-fg">Colaboradores en Pro y Elite</h2>

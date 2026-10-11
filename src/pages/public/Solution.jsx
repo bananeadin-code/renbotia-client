@@ -246,7 +246,7 @@ export default function Solution() {
               <Link key={o.slug} to={`/soluciones/${o.slug}${city ? `/${city.slug}` : ''}`}>
                 <SpotlightCard className="group h-full p-4">
                   <div className="relative z-[2] flex items-center gap-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-fg text-canvas shadow-card">
                       <Icon name={o.icon} size={18} />
                     </span>
                     <span className="text-sm font-semibold text-fg group-hover:text-brand-700 dark:group-hover:text-brand-300">

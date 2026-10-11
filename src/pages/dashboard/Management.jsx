@@ -147,7 +147,7 @@ export default function Management() {
       <div>
         <PageHeader />
         <Card className="mt-4 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-600">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-fg text-canvas shadow-card">
             <Icon name="calendarCheck" size={28} />
           </div>
           <h2 className="mt-3 text-lg font-bold text-fg">Disponible en el plan Elite</h2>

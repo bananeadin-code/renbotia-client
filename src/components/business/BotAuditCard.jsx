@@ -48,7 +48,7 @@ export function BotAuditCard() {
   return (
     <Card>
       <div className="flex items-center gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500/10 text-brand-600">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-fg text-canvas shadow-card">
           <Icon name="shieldCheck" size={20} />
         </span>
         <h2 className="min-w-0 flex-1 font-semibold text-fg">Prueba de seguridad de tu bot</h2>

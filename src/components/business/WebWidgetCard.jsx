@@ -78,7 +78,7 @@ export function WebWidgetCard({ isOwner, onStatus }) {
   return (
     <Card className={w?.enabled ? '' : w?.allowed ? 'border-brand-200 dark:border-brand-900/60' : ''}>
       <div className="flex items-start gap-4">
-        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-500/10 text-brand-600">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-fg text-canvas shadow-card">
           <Icon name="globe" size={24} />
         </span>
         <div className="min-w-0 flex-1">

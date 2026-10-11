@@ -235,7 +235,7 @@ export default function Analytics() {
                 <BarChart data={monthly} barGap={4}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(148 163 184 / 0.18)" />
                   <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#94a3b8' }} />
-                  <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} width={32} allowDecimals={false} />
+                  <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} width={40} allowDecimals={false} tickFormatter={(n) => new Intl.NumberFormat('es-MX', { notation: 'compact', maximumFractionDigits: 1 }).format(n)} />
                   <Tooltip
                     cursor={{ fill: 'rgb(148 163 184 / 0.14)', radius: 6 }}
                     contentStyle={{

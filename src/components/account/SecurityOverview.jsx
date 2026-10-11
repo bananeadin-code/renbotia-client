@@ -63,7 +63,7 @@ export function SecurityOverview({ refreshKey = 0 }) {
   return (
     <Card id="seguridad">
       <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500/10 text-brand-600">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-fg text-canvas shadow-card">
           <Icon name="shieldCheck" size={20} />
         </span>
         <div className="min-w-0 flex-1">

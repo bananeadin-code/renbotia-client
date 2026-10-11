@@ -233,7 +233,7 @@ export function ImportTraining({ open, onClose, onApply, allow = {}, faqRoom = n
                 onClick={() => setSource(s.key)}
                 className="flex w-full items-center gap-3 rounded-xl border border-line p-3 text-left transition hover:border-brand-300 hover:bg-surface2/40"
               >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500/10 text-brand-600">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-fg text-canvas shadow-card">
                   <Icon name={s.icon} size={19} />
                 </span>
                 <span className="min-w-0 flex-1">

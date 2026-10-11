@@ -4,6 +4,7 @@
  */
 import { clsx } from './clsx.js';
 import { Icon } from './Icon.jsx';
+import { BotLoader, Dots } from './Loader.jsx';
 
 export function Button({
   children,
@@ -96,17 +97,18 @@ export function Badge({ children, color = 'slate' }) {
   );
 }
 
-export function Spinner({ className = '', size = 20 }) {
-  return (
-    <Icon
-      name="spinner"
-      size={size}
-      className={clsx('animate-spin', className)}
-      role="status"
-      aria-label="Cargando"
-    />
-  );
+/**
+ * Carga. Sin `size`: carga de página/sección con la marca (burbuja que flota,
+ * destello, anillo y texto que rota). size ≤ 16: tres puntos "escribiendo"
+ * (botones). Otro tamaño: la burbuja sin texto.
+ */
+export function Spinner({ className = '', size, label }) {
+  if (size && size <= 16) return <Dots className={className} />;
+  if (size) return <BotLoader size={Math.max(28, size * 1.6)} showText={false} className={className} />;
+  return <BotLoader label={label} className={className} />;
 }
+
+export { BotLoader, Dots };
 
 // Avisos, advertencias y sugerencias: fondo SÓLIDO (sin transparencias ni
 // cristal), barra de color a la izquierda según el tipo y texto principal

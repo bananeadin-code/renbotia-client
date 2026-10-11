@@ -542,7 +542,7 @@ export default function BotTraining() {
       {showTemplates && (
         <Card className="border-brand-400/30 bg-gradient-to-br from-brand-500/[0.07] to-transparent">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-500/15 text-brand-600 dark:text-brand-300">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-fg text-canvas shadow-card">
               <Icon name="academic" size={18} />
             </span>
             <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
@@ -612,7 +612,7 @@ export default function BotTraining() {
       {/* Entrénalo con lo que ya tienes: chats de WhatsApp, sitio o texto */}
       <Card className="border-brand-400/30 bg-gradient-to-br from-brand-500/[0.06] to-transparent">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-500/15 text-brand-600">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-fg text-canvas shadow-card">
             <Icon name="sparkles" size={21} />
           </span>
           <div className="min-w-0 flex-1">
@@ -745,7 +745,7 @@ export default function BotTraining() {
       <Card>
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-fg text-canvas shadow-card">
               <Icon name="clock" size={18} />
             </span>
             <div>
@@ -1105,7 +1105,7 @@ Sube solo contenido lícito y relacionado con tu negocio; eres responsable de lo
       <Card>
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-fg text-canvas shadow-card">
               <Icon name="repeat" size={18} />
             </span>
             <div>

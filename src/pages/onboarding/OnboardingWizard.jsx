@@ -360,7 +360,7 @@ export default function OnboardingWizard() {
                 onClick={() => setImportOpen(true)}
                 className="flex w-full items-center gap-3 rounded-xl border border-brand-400/40 bg-brand-500/[0.06] p-3 text-left transition hover:border-brand-500"
               >
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-500/15 text-brand-600">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-fg text-canvas shadow-card">
                   <Icon name="sparkles" size={18} />
                 </span>
                 <span className="min-w-0 flex-1">

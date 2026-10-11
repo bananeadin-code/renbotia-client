@@ -102,7 +102,7 @@ export default function CityHub() {
               <Link key={s.slug} to={`/soluciones/${s.slug}/${city.slug}`}>
                 <SpotlightCard className="group h-full p-4">
                   <div className="relative z-[2] flex items-center gap-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-fg text-canvas shadow-card">
                       <Icon name={s.icon} size={18} />
                     </span>
                     <span className="min-w-0">

@@ -215,7 +215,7 @@ export function ReferralTeaser() {
       to="/dashboard#invita"
       className="group flex items-center gap-3 rounded-2xl border border-brand-400/40 bg-brand-500/[0.06] px-4 py-3 transition hover:border-brand-500"
     >
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-500/15 text-brand-600">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-fg text-canvas shadow-card">
         <Icon name="gift" size={18} />
       </span>
       <p className="min-w-0 flex-1 text-sm text-fg">

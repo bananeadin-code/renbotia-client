@@ -47,7 +47,7 @@ export function ConnectedChannels() {
           {/* WhatsApp */}
           <div className="flex items-center justify-between gap-3 rounded-lg border border-line bg-surface2/40 px-3 py-2.5">
             <div className="flex min-w-0 items-center gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600">
                 <Icon name="whatsapp" size={18} />
               </span>
               <div className="min-w-0">

@@ -81,7 +81,7 @@ export function LearningCard({ onLearned }) {
     <div id="aprender" className="scroll-mt-20">
     <Card className="border-brand-400/30">
       <div className="flex items-start gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-fg text-canvas shadow-card">
           <Icon name="sparkles" size={18} />
         </span>
         <div className="min-w-0">
