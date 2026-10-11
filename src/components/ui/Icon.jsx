@@ -110,6 +110,7 @@ const ICONS = {
   ),
   menu: <path d="M4 6h16M4 12h16M4 18h16" {...P} />,
   close: <path d="M18 6 6 18M6 6l12 12" {...P} />,
+  x: <path d="M18 6 6 18M6 6l12 12" {...P} />, // alias de close (lo usan modales y avisos)
   send: (
     <>
       <path d="M22 2 11 13" {...P} />

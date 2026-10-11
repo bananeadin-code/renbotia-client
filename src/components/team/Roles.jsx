@@ -64,6 +64,7 @@ export function RoleSelect({ value, roles, onChange, disabled, includeCustom = t
       disabled={disabled}
       onChange={(e) => onChange(e.target.value)}
       aria-label="Rol"
+      sheetTitle="Elige un rol"
       className={className}
       menuClassName="w-72"
     >
@@ -137,12 +138,17 @@ export function AccessEditor({ open, onClose, title, withName = false, initial, 
               const levels = catalog?.moduleLevels?.[m] || ['none', 'view', 'edit'];
               const current = modules[m] || 'none';
               return (
-                <div key={m} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2.5">
-                  <span className="flex items-center gap-2 text-sm text-fg">
-                    <Icon name={MODULE_INFO[m]?.[1] || 'sliders'} size={15} className="text-subtle" />
+                <div key={m} className="flex flex-col gap-2 px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:py-2.5">
+                  <span className="flex items-center gap-2 text-sm font-medium text-fg sm:font-normal">
+                    <Icon name={MODULE_INFO[m]?.[1] || 'sliders'} size={16} className="text-subtle" />
                     {MODULE_INFO[m]?.[0] || m}
                   </span>
-                  <div className="flex rounded-lg border border-line p-0.5 text-xs" role="radiogroup" aria-label={MODULE_INFO[m]?.[0]}>
+                  <div
+                    className="grid gap-1 rounded-lg border border-line p-1 text-sm sm:inline-grid sm:w-auto sm:p-0.5 sm:text-xs"
+                    style={{ gridTemplateColumns: `repeat(${levels.length}, minmax(0, 1fr))` }}
+                    role="radiogroup"
+                    aria-label={MODULE_INFO[m]?.[0]}
+                  >
                     {levels.map((l) => (
                       <button
                         key={l}
@@ -150,7 +156,7 @@ export function AccessEditor({ open, onClose, title, withName = false, initial, 
                         role="radio"
                         aria-checked={current === l}
                         onClick={() => setModules((x) => ({ ...x, [m]: l }))}
-                        className={`rounded-md px-2.5 py-1 font-medium transition ${
+                        className={`min-h-[40px] rounded-md px-2.5 py-1 font-medium transition sm:min-h-0 ${
                           current === l
                             ? l === 'none'
                               ? 'bg-surface2 text-fg'
@@ -179,11 +185,11 @@ export function AccessEditor({ open, onClose, title, withName = false, initial, 
                   type="button"
                   aria-pressed={on}
                   onClick={() => toggleChannel(c)}
-                  className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1 text-xs font-medium transition ${
+                  className={`inline-flex min-h-[40px] items-center gap-1.5 rounded-md border px-3 py-1 text-sm font-medium transition sm:min-h-0 sm:text-xs ${
                     on ? 'border-brand-500 bg-brand-500/10 text-brand-700 dark:text-brand-300' : 'border-line text-muted hover:text-fg'
                   }`}
                 >
-                  <Icon name={on ? 'check' : 'plus'} size={12} /> {CHANNEL_LABEL[c]}
+                  <Icon name={on ? 'check' : 'plus'} size={14} /> {CHANNEL_LABEL[c]}
                 </button>
               );
             })}

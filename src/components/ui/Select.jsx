@@ -46,6 +46,7 @@ export function Select({
   className = '',
   menuClassName = '',
   placeholder = 'Selecciona…',
+  sheetTitle,
   'aria-label': ariaLabel,
 }) {
   const autoId = useId();
@@ -56,8 +57,11 @@ export function Select({
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const [pos, setPos] = useState(null);
+  // En teléfono el menú se abre como panel inferior (opciones grandes, a lo ancho).
+  const [sheet, setSheet] = useState(false);
   const triggerRef = useRef(null);
   const listRef = useRef(null);
+  const sheetRef = useRef(null);
   const typed = useRef({ text: '', at: 0 });
 
   const enabledIdx = useMemo(() => options.map((o, i) => (o.disabled ? -1 : i)).filter((i) => i >= 0), [options]);
@@ -79,13 +83,23 @@ export function Select({
   }, [options.length]);
 
   useLayoutEffect(() => {
-    if (open) place();
-  }, [open, place]);
+    if (open && !sheet) place();
+  }, [open, sheet, place]);
+
+  // Panel inferior: la página de atrás no se desplaza mientras está abierto.
+  useEffect(() => {
+    if (!open || !sheet) return undefined;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open, sheet]);
 
   useEffect(() => {
     if (!open) return undefined;
     const onDoc = (e) => {
-      if (triggerRef.current?.contains(e.target) || listRef.current?.contains(e.target)) return;
+      if (triggerRef.current?.contains(e.target) || listRef.current?.contains(e.target) || sheetRef.current?.contains(e.target)) return;
       setOpen(false);
     };
     // Escape cierra solo el menú (en captura, antes que el modal que lo contiene).
@@ -98,15 +112,17 @@ export function Select({
     };
     document.addEventListener('mousedown', onDoc);
     window.addEventListener('keydown', onEsc, true);
-    window.addEventListener('resize', place);
-    window.addEventListener('scroll', place, true);
+    if (!sheet) {
+      window.addEventListener('resize', place);
+      window.addEventListener('scroll', place, true);
+    }
     return () => {
       document.removeEventListener('mousedown', onDoc);
       window.removeEventListener('keydown', onEsc, true);
       window.removeEventListener('resize', place);
       window.removeEventListener('scroll', place, true);
     };
-  }, [open, place]);
+  }, [open, sheet, place]);
 
   // Mantener visible la opción activa al navegar con el teclado.
   useEffect(() => {
@@ -115,6 +131,7 @@ export function Select({
   }, [open, active, pos]);
 
   function openMenu() {
+    setSheet(typeof window !== 'undefined' && window.matchMedia?.('(max-width: 639px)').matches);
     if (disabled) return;
     const i = options.indexOf(current);
     setActive(i >= 0 && !options[i].disabled ? i : enabledIdx[0] ?? -1);
@@ -171,7 +188,6 @@ export function Select({
   }
 
   const shown = current || null;
-  let lastGroup = null;
 
   const trigger = (
     <button
@@ -206,64 +222,112 @@ export function Select({
     </button>
   );
 
-  const menu =
-    open && pos
-      ? createPortal(
-          <ul
-            ref={listRef}
-            id={listId}
-            role="listbox"
-            aria-labelledby={triggerId}
-            style={{ position: 'fixed', left: pos.left, top: pos.top, bottom: pos.bottom, minWidth: pos.width, maxHeight: Math.min(288, pos.maxHeight) }}
+  const renderOptions = (big) => {
+    let lastGroup = null;
+    return options.map((o, i) => {
+      const header = o.group && o.group !== lastGroup ? o.group : null;
+      lastGroup = o.group;
+      const selected = o === current;
+      return (
+        <Fragment key={`${o.group || ''}:${o.value}`}>
+          {header && (
+            <li
+              role="presentation"
+              className={clsx(
+                'font-semibold uppercase tracking-wide text-subtle',
+                big ? 'px-3 pb-1.5 text-xs' : 'px-2.5 pb-1 text-[11px]',
+                i > 0 ? 'mt-1 border-t border-line pt-3' : 'pt-1.5'
+              )}
+            >
+              {header}
+            </li>
+          )}
+          <li
+            id={`${listId}-${i}`}
+            data-idx={i}
+            role="option"
+            aria-selected={selected}
+            aria-disabled={o.disabled || undefined}
+            onMouseEnter={() => !o.disabled && setActive(i)}
+            onClick={() => choose(i)}
             className={clsx(
-              'z-[70] max-w-[min(22rem,calc(100vw-16px))] overflow-y-auto overscroll-contain rounded-xl border border-line bg-surface p-1 shadow-elevated animate-scale-in',
-              menuClassName
+              'flex cursor-pointer items-start gap-3 rounded-lg transition-colors',
+              big ? 'min-h-[48px] px-3 py-3 text-[15px]' : 'px-2.5 py-2 text-sm',
+              o.disabled && 'cursor-not-allowed opacity-50',
+              i === active && !o.disabled ? 'bg-surface2' : '',
+              selected ? 'text-brand-700 dark:text-brand-300' : 'text-fg'
             )}
-            onMouseDown={(e) => e.preventDefault() /* conservar el foco en el botón */}
           >
-            {options.map((o, i) => {
-              const header = o.group && o.group !== lastGroup ? o.group : null;
-              lastGroup = o.group;
-              const selected = o === current;
-              return (
-                <Fragment key={`${o.group || ''}:${o.value}`}>
-                  {header && (
-                    <li role="presentation" className={clsx('px-2.5 pb-1 text-[11px] font-semibold uppercase tracking-wide text-subtle', i > 0 ? 'mt-1 border-t border-line pt-2' : 'pt-1.5')}>
-                      {header}
-                    </li>
-                  )}
-                  <li
-                    id={`${listId}-${i}`}
-                    data-idx={i}
-                    role="option"
-                    aria-selected={selected}
-                    aria-disabled={o.disabled || undefined}
-                    onMouseEnter={() => !o.disabled && setActive(i)}
-                    onClick={() => choose(i)}
-                    className={clsx(
-                      'flex cursor-pointer items-start gap-2 rounded-lg px-2.5 py-2 text-sm transition-colors',
-                      o.disabled && 'cursor-not-allowed opacity-50',
-                      i === active && !o.disabled ? 'bg-surface2' : '',
-                      selected ? 'text-brand-700 dark:text-brand-300' : 'text-fg'
-                    )}
-                  >
-                    <span className="min-w-0 flex-1">
-                      <span className={clsx('block', selected && 'font-semibold')}>{o.label}</span>
-                      {o.description && <span className="mt-0.5 block text-xs leading-snug text-muted">{o.description}</span>}
-                    </span>
-                    {selected ? (
-                      <Icon name="check" size={16} className="mt-0.5 shrink-0 text-brand-600 dark:text-brand-400" />
-                    ) : (
-                      <span className="w-4 shrink-0" aria-hidden="true" />
-                    )}
-                  </li>
-                </Fragment>
-              );
-            })}
-          </ul>,
+            <span className="min-w-0 flex-1">
+              <span className={clsx('block', selected && 'font-semibold')}>{o.label}</span>
+              {o.description && <span className={clsx('mt-0.5 block leading-snug text-muted', big ? 'text-[13px]' : 'text-xs')}>{o.description}</span>}
+            </span>
+            {selected ? (
+              <Icon name="check" size={big ? 20 : 16} className="mt-0.5 shrink-0 text-brand-600 dark:text-brand-400" />
+            ) : (
+              <span className={clsx('shrink-0', big ? 'w-5' : 'w-4')} aria-hidden="true" />
+            )}
+          </li>
+        </Fragment>
+      );
+    });
+  };
+
+  const title = sheetTitle || label || ariaLabel || placeholder;
+  const menu = !open
+    ? null
+    : sheet
+      ? createPortal(
+          <div className="fixed inset-0 z-[70] flex items-end" onMouseDown={(e) => e.preventDefault()}>
+            <button
+              type="button"
+              aria-label="Cerrar"
+              className="absolute inset-0 bg-slate-900/50 backdrop-blur-[2px]"
+              onClick={() => close()}
+            />
+            <div
+              ref={sheetRef}
+              className="relative flex max-h-[80vh] w-full flex-col rounded-t-2xl border-t border-line bg-surface shadow-pop animate-slide-up"
+              style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+            >
+              <div className="mx-auto mt-2 h-1 w-10 rounded bg-line" aria-hidden="true" />
+              <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
+                <p className="text-base font-semibold text-fg">{title}</p>
+                <button
+                  type="button"
+                  onClick={() => close()}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-muted hover:bg-surface2 hover:text-fg"
+                  aria-label="Cerrar"
+                >
+                  <Icon name="x" size={20} />
+                </button>
+              </div>
+              <ul ref={listRef} id={listId} role="listbox" aria-labelledby={triggerId} className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-2">
+                {renderOptions(true)}
+              </ul>
+            </div>
+          </div>,
           document.body
         )
-      : null;
+      : pos
+        ? createPortal(
+            <ul
+              ref={listRef}
+              id={listId}
+              role="listbox"
+              aria-labelledby={triggerId}
+              style={{ position: 'fixed', left: pos.left, top: pos.top, bottom: pos.bottom, minWidth: pos.width, maxHeight: Math.min(288, pos.maxHeight) }}
+              className={clsx(
+                'z-[70] max-w-[min(22rem,calc(100vw-16px))] overflow-y-auto overscroll-contain rounded-xl border border-line bg-surface p-1 shadow-elevated animate-scale-in',
+                menuClassName
+              )}
+              onMouseDown={(e) => e.preventDefault() /* conservar el foco en el botón */}
+            >
+              {renderOptions(false)}
+            </ul>,
+            document.body
+          )
+        : null;
 
   return (
     <div className={label ? 'block' : 'contents'}>

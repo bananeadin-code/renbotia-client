@@ -226,9 +226,11 @@ export default function Team() {
                 </div>
                 <div className="truncate text-xs text-subtle">{m.email}</div>
               </div>
-              <Badge color={m.role === 'owner' ? 'green' : 'slate'}>
-                {m.role === 'owner' ? 'Dueño' : 'Colaborador'}
-              </Badge>
+              <span className={m.role === 'owner' ? 'shrink-0' : 'hidden shrink-0 sm:inline-flex'}>
+                <Badge color={m.role === 'owner' ? 'green' : 'slate'}>
+                  {m.role === 'owner' ? 'Dueño' : 'Colaborador'}
+                </Badge>
+              </span>
               {canManage && m.role !== 'owner' && !m.isMe && (
                 <button
                   onClick={() => removeMember(m)}
