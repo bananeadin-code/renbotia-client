@@ -1,7 +1,7 @@
 /**
  * Documentos legales (Aviso de Privacidad + Términos y Condiciones). Plantillas
- * base orientadas a México (LFPDPPP). Datos: RenBotIA, operado por Damián,
- * contacto servicios@renbotia.com, dominio renbotia.com.
+ * base orientadas a México (LFPDPPP). Datos: RenBotIA, operado por el Equipo
+ * RenBotIA (responsable legal: persona física en Durango, México), contacto servicios@renbotia.com, dominio renbotia.com.
  *
  * NOTA para el operador: son una base razonable para un MVP; conviene que un
  * profesional legal las revise antes de escalar con clientes de paga.
@@ -10,7 +10,7 @@ export const LEGAL = {
   privacidad: {
     slug: 'privacidad',
     title: 'Aviso de Privacidad',
-    updated: '7 de octubre de 2026',
+    updated: '12 de octubre de 2026',
     description:
       'Aviso de Privacidad de RenBotIA: qué datos recabamos, para qué, con quién los compartimos y cómo ejercer tus derechos ARCO.',
     intro:
@@ -19,7 +19,7 @@ export const LEGAL = {
       {
         h: '1. Responsable de tus datos',
         p: [
-          'El responsable del tratamiento de tus datos es Damián, quien opera el servicio “RenBotIA” (en adelante, “RenBotIA”, “nosotros”), con ubicación en Durango, México. Puedes contactarnos en cualquier momento en servicios@renbotia.com.',
+          'El responsable del tratamiento de tus datos es el Equipo RenBotIA, que opera el servicio “RenBotIA” (en adelante, “RenBotIA”, “nosotros”) a través de su responsable legal, una persona física con domicilio en Durango, México. Puedes contactarnos en cualquier momento en servicios@renbotia.com.',
         ],
       },
       {
