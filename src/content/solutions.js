@@ -7,6 +7,8 @@
  * Estructura por entrada: slug, industria, título/meta SEO, dolores, beneficios,
  * un ejemplo de conversación y FAQs específicas (para el schema FAQPage).
  */
+import { META_CHANNELS_ANSWER, META_CHANNELS_LIVE } from './channels.js';
+
 export const SOLUTIONS = [
   {
     slug: 'despachos-legales',
@@ -272,7 +274,7 @@ export const SOLUTIONS = [
     faqs: [
       {
         q: '¿Puede atender mi Instagram?',
-        a: 'Sí. El mismo bot responde WhatsApp, los mensajes directos de Instagram, Messenger y el chat de tu sitio web.',
+        a: META_CHANNELS_ANSWER,
       },
       {
         q: '¿Cómo aprende mis precios?',
@@ -344,7 +346,7 @@ export const SOLUTIONS = [
       },
       {
         q: '¿Funciona en Instagram?',
-        a: 'Sí. El mismo bot atiende WhatsApp, Instagram, Messenger y el chat de tu sitio web.',
+        a: META_CHANNELS_ANSWER,
       },
     ],
   },
@@ -412,7 +414,7 @@ export const SOLUTIONS = [
       },
       {
         q: '¿Se conecta con mi sitio web?',
-        a: 'Sí. Pegas una línea de código en tu sitio y aparece un chat con el mismo bot, que también atiende WhatsApp e Instagram.',
+        a: `Sí. Pegas una línea de código en tu sitio y aparece un chat con el mismo bot, que también atiende tu WhatsApp${META_CHANNELS_LIVE ? ' e Instagram' : ''}.`,
       },
     ],
   },

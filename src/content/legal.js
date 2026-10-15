@@ -10,7 +10,7 @@ export const LEGAL = {
   privacidad: {
     slug: 'privacidad',
     title: 'Aviso de Privacidad',
-    updated: '12 de octubre de 2026',
+    updated: '14 de octubre de 2026',
     description:
       'Aviso de Privacidad de RenBotIA: qué datos recabamos, para qué, con quién los compartimos y cómo ejercer tus derechos ARCO.',
     intro:
@@ -70,7 +70,17 @@ export const LEGAL = {
       {
         h: '7. Cookies y almacenamiento local',
         p: [
-          'Usamos almacenamiento local del navegador para recordar tu sesión y tus preferencias (como el tema claro u oscuro). No usamos cookies de publicidad de terceros.',
+          'Solo usamos cookies y almacenamiento local necesarios para que el servicio funcione. No usamos cookies de publicidad ni de rastreo, y no vendemos ni compartimos tu navegación con anunciantes.',
+        ],
+        ul: [
+          'Cookies de sesión (propias): mantienen tu sesión iniciada de forma segura y, si lo eliges, recuerdan tu dispositivo para no pedirte el código de verificación cada vez.',
+          'Almacenamiento local: recuerda preferencias como el tema claro u oscuro.',
+          'Pagos (Stripe): al pagar o guardar una tarjeta, Stripe usa cookies propias para prevenir fraudes.',
+          'Inicio de sesión con Google y conexión con Meta: solo si usas “Continuar con Google” o conectas tus canales de Facebook, Instagram o WhatsApp, esos servicios pueden usar sus propias cookies conforme a sus políticas.',
+          'Estadísticas de visitas: usamos Cloudflare Web Analytics, que no usa cookies ni identifica a las personas.',
+        ],
+        p2: [
+          'Puedes borrar o bloquear las cookies desde la configuración de tu navegador; si bloqueas las de sesión no podrás iniciar sesión en el panel.',
         ],
       },
       {

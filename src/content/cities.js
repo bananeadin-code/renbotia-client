@@ -7,6 +7,8 @@
  * Datos: nombre, estado y región (para enlazar ciudades cercanas). No inventamos
  * cifras locales: solo hechos verificables (estado, región, zona horaria).
  */
+import { CHANNELS_TODAY } from './channels.js';
+
 export const CITIES = [
   { slug: 'ciudad-de-mexico', name: 'Ciudad de México', state: 'CDMX', region: 'centro' },
   { slug: 'guadalajara', name: 'Guadalajara', state: 'Jalisco', region: 'occidente' },
@@ -71,7 +73,7 @@ export function localCopy(sol, city) {
     local: `En ${city.name}, como en todo México, tus clientes prefieren escribir por WhatsApp antes que llamar. Si un negocio de ${city.state} tarda horas en responder, el cliente pregunta en el siguiente. Con RenBotIA atiendes al instante, a cualquier hora, con la información y los precios de tu negocio en ${city.name}.${tz}`,
     faq: {
       q: `¿RenBotIA funciona para ${sol.industry.toLowerCase()} en ${city.name}?`,
-      a: `Sí. Funciona en cualquier ciudad de México, incluida ${city.name}: conectas tu propio WhatsApp, Instagram, Messenger o tu sitio web, y el bot responde con los datos de tu negocio. No necesitas oficina ni equipo técnico; se configura en línea en minutos.`,
+      a: `Sí. Funciona en cualquier ciudad de México, incluida ${city.name}: conectas ${CHANNELS_TODAY}, y el bot responde con los datos de tu negocio. No necesitas oficina ni equipo técnico; se configura en línea en minutos.`,
     },
   };
 }

@@ -7,6 +7,7 @@ import { Reveal } from '../../components/ui/Reveal.jsx';
 import { contactApi } from '../../api/endpoints.js';
 import { useForm, v } from '../../lib/useForm.js';
 import { useSeo } from '../../lib/seo.js';
+import { PAGE_SEO } from '../../content/pages.js';
 
 const TOPICS = ['Conexión de WhatsApp', 'Ventas y planes', 'Facturación', 'Soporte', 'Otro'];
 
@@ -16,9 +17,7 @@ const MOTIVO_TO_TOPIC = { conexion: 'Conexión de WhatsApp', ventas: 'Ventas y p
 
 export default function Contact() {
   useSeo({
-    title: 'Contacto | RenBotIA',
-    description: 'Escríbenos: dudas sobre planes, conexión de WhatsApp, facturación o soporte. Te respondemos pronto.',
-    path: '/contacto',
+    ...PAGE_SEO.contacto,
   });
 
   const [params] = useSearchParams();

@@ -16,12 +16,25 @@ import { fileURLToPath } from 'node:url';
 import { SOLUTIONS } from '../src/content/solutions.js';
 import { CITIES, nearbyCities, localCopy } from '../src/content/cities.js';
 import { POSTS } from '../src/content/blog.js';
+import { LEGAL } from '../src/content/legal.js';
+import { PAGE_SEO, PRICE_SUMMARY } from '../src/content/pages.js';
+import { execFileSync } from 'node:child_process';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const DIST = path.join(ROOT, 'dist');
 const SITE = 'https://renbotia.com';
 const template = fs.readFileSync(path.join(DIST, 'index.html'), 'utf8');
 const today = new Date().toISOString().slice(0, 10);
+
+/** Fecha (AAAA-MM-DD) del último commit que tocó estos archivos; si no hay historial, hoy. */
+function lastChanged(...files) {
+  try {
+    const out = execFileSync('git', ['log', '-1', '--format=%cs', '--', ...files], { cwd: ROOT, encoding: 'utf8' }).trim();
+    return /^\d{4}-\d{2}-\d{2}$/.test(out) ? out : today;
+  } catch {
+    return today;
+  }
+}
 
 const esc = (s = '') =>
   String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -76,19 +89,96 @@ const serviceLd = (name, audience, area, url) => ({
   url,
 });
 
-const urls = []; // [{ loc, priority, changefreq }]
-const add = (loc, priority, changefreq = 'monthly') => urls.push({ loc, priority, changefreq });
+const urls = []; // [{ loc, priority, changefreq, lastmod }]
+const add = (loc, priority, changefreq = 'monthly', lastmod = today) => urls.push({ loc, priority, changefreq, lastmod });
 
-// Estáticas (las mismas que el sitemap anterior).
-add('/', '1.0', 'weekly');
-add('/precios', '0.8');
-add('/blog', '0.7', 'weekly');
-add('/soluciones', '0.8');
-add('/contacto', '0.5');
-add('/privacidad', '0.3', 'yearly');
-add('/terminos', '0.3', 'yearly');
+const CONTENT = {
+  solutions: lastChanged('src/content/solutions.js', 'src/content/cities.js', 'src/content/channels.js'),
+  cities: lastChanged('src/content/cities.js', 'src/content/solutions.js', 'src/content/channels.js'),
+  pages: lastChanged('src/content/pages.js', 'index.html'),
+  legal: lastChanged('src/content/legal.js'),
+  blog: lastChanged('src/content/blog.js'),
+};
 
 let pages = 0;
+
+// Páginas fijas: cada una con su título, descripción, canonical y vista previa propia
+// (antes heredaban las del inicio, con canonical hacia "/").
+const page = (key, body, { jsonLd } = {}) => {
+  const seo = PAGE_SEO[key];
+  const head = withHead(template, { title: seo.title, description: seo.description, url: `${SITE}${seo.path}`, jsonLd });
+  write(seo.path, body ? withBody(head, body) : head);
+  pages++;
+};
+
+add('/', '1.0', 'weekly', CONTENT.pages);
+
+page(
+  'precios',
+  `<nav><a href="/">RenBotIA</a> › Precios</nav>
+   <h1>Planes simples y transparentes</h1>
+   <p>Elige según cuántas conversaciones atiende tu bot al mes. Precios en pesos mexicanos; cambia o cancela cuando quieras.</p>
+   ${PRICE_SUMMARY.map((p) => `<h2>${esc(p.name)} — ${p.price ? `$${p.price} MXN al mes` : 'Gratis'}</h2><p>${esc(p.detail)}</p>`).join('')}
+   <p><a href="/registro">Crear mi bot gratis</a></p>`,
+  {
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: 'RenBotIA',
+      description: PAGE_SEO.precios.description,
+      brand: { '@type': 'Brand', name: 'RenBotIA' },
+      offers: PRICE_SUMMARY.map((p) => ({
+        '@type': 'Offer',
+        name: p.name,
+        price: String(p.price),
+        priceCurrency: 'MXN',
+        url: `${SITE}/precios`,
+        availability: 'https://schema.org/InStock',
+      })),
+    },
+  }
+);
+add('/precios', '0.8', 'monthly', CONTENT.pages);
+
+page(
+  'blog',
+  `<nav><a href="/">RenBotIA</a> › Blog</nav><h1>Blog de RenBotIA</h1><p>${esc(PAGE_SEO.blog.description)}</p>
+   ${links(POSTS.map((p) => [`/blog/${p.slug}`, p.title]))}`
+);
+add('/blog', '0.7', 'weekly', CONTENT.blog);
+
+page(
+  'soluciones',
+  `<nav><a href="/">RenBotIA</a> › Soluciones</nav><h1>Soluciones por industria</h1><p>${esc(PAGE_SEO.soluciones.description)}</p>
+   ${links(SOLUTIONS.map((s) => [`/soluciones/${s.slug}`, s.industry]))}
+   <h2>Por ciudad</h2>${links(CITIES.map((c) => [`/bot-whatsapp/${c.slug}`, c.name]))}`
+);
+add('/soluciones', '0.8', 'monthly', CONTENT.solutions);
+
+page(
+  'contacto',
+  `<nav><a href="/">RenBotIA</a> › Contacto</nav><h1>Contacto</h1><p>${esc(PAGE_SEO.contacto.description)}</p>
+   <p>Correo: <a href="mailto:servicios@renbotia.com">servicios@renbotia.com</a></p>`
+);
+add('/contacto', '0.5', 'monthly', CONTENT.pages);
+
+// Documentos legales completos (Meta y Google los revisan sin JS).
+for (const doc of Object.values(LEGAL)) {
+  const route = `/${doc.slug}`;
+  const paras = (arr = []) => arr.map((t) => `<p>${esc(t)}</p>`).join('');
+  const body = `<nav><a href="/">RenBotIA</a> › ${esc(doc.title)}</nav><article><h1>${esc(doc.title)}</h1>
+    <p>Última actualización: ${esc(doc.updated)}</p><p>${esc(doc.intro)}</p>
+    ${doc.sections.map((sec) => `<h2>${esc(sec.h)}</h2>${paras(sec.p)}${sec.ul ? list(sec.ul) : ''}${paras(sec.p2)}`).join('')}</article>`;
+  write(route, withBody(withHead(template, { title: `${doc.title} | RenBotIA`, description: doc.description, url: `${SITE}${route}` }), body));
+  pages++;
+  if (doc.slug !== 'eliminar-datos') add(route, '0.3', 'yearly', CONTENT.legal);
+}
+
+// Solo cabecera (sin contenido): para que el enlace compartido muestre su propio título.
+page('registro');
+page('login');
+page('status');
+
 
 // Soluciones por giro y giro × ciudad.
 for (const sol of SOLUTIONS) {
@@ -113,7 +203,7 @@ for (const sol of SOLUTIONS) {
        <h2>Para otros sectores</h2>${links(others.map((o) => [`/soluciones/${o.slug}`, o.industry]))}`
     )
   );
-  add(route, '0.7');
+  add(route, '0.7', 'monthly', CONTENT.solutions);
   pages++;
 
   for (const city of CITIES) {
@@ -141,7 +231,7 @@ for (const sol of SOLUTIONS) {
          <h2>Otros negocios en ${esc(city.name)}</h2>${links(others.map((o) => [`/soluciones/${o.slug}/${city.slug}`, `${o.industry} en ${city.name}`]))}`
       )
     );
-    add(r, '0.6');
+    add(r, '0.6', 'monthly', CONTENT.solutions);
     pages++;
   }
 }
@@ -168,7 +258,7 @@ for (const city of CITIES) {
        <h2>Cerca de ${esc(city.name)}</h2>${links(nearbyCities(city, 6).map((c) => [`/bot-whatsapp/${c.slug}`, c.name]))}`
     )
   );
-  add(r, '0.6');
+  add(r, '0.6', 'monthly', CONTENT.cities);
   pages++;
 }
 
@@ -201,14 +291,24 @@ for (const post of POSTS) {
       `<nav><a href="/">RenBotIA</a> › <a href="/blog">Blog</a></nav><article><h1>${esc(post.title)}</h1>${body}</article>`
     )
   );
-  add(r, '0.6');
+  add(r, '0.6', 'monthly', post.updated || post.date || CONTENT.blog);
   pages++;
 }
+
+// Respaldo de la SPA (vercel.json reescribe aquí lo que no es un archivo): panel,
+// login, rutas inexistentes… Sin canonical y con noindex, para que Google no
+// indexe URLs inventadas como copias del inicio (soft 404).
+fs.writeFileSync(
+  path.join(DIST, 'app.html'),
+  template
+    .replace(/\s*<link rel="canonical"[^>]*>/, '')
+    .replace(/(<meta name="robots" content=")[^"]*(")/, '$1noindex, follow$2')
+);
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls
-  .map((u) => `  <url>\n    <loc>${SITE}${u.loc}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>${u.changefreq}</changefreq>\n    <priority>${u.priority}</priority>\n  </url>`)
+  .map((u) => `  <url>\n    <loc>${SITE}${u.loc}</loc>\n    <lastmod>${u.lastmod}</lastmod>\n    <changefreq>${u.changefreq}</changefreq>\n    <priority>${u.priority}</priority>\n  </url>`)
   .join('\n')}
 </urlset>
 `;

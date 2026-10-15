@@ -4,6 +4,7 @@ import { Card, Spinner } from '../../components/ui/index.jsx';
 import { Reveal } from '../../components/ui/Reveal.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { useSeo } from '../../lib/seo.js';
+import { PAGE_SEO } from '../../content/pages.js';
 
 const LABELS = {
   web: 'Sitio web',
@@ -14,9 +15,7 @@ const LABELS = {
 /** Página pública de estado del servicio. Genera confianza para un servicio 24/7. */
 export default function Status() {
   useSeo({
-    title: 'Estado del servicio | RenBotIA',
-    description: 'Estado en tiempo real de los sistemas de RenBotIA: sitio, API y base de datos.',
-    path: '/status',
+    ...PAGE_SEO.status,
   });
 
   const [state, setState] = useState({ loading: true, ok: false, components: {}, checkedAt: null });

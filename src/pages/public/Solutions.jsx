@@ -7,14 +7,12 @@ import { Icon } from '../../components/ui/Icon.jsx';
 import { SOLUTIONS } from '../../content/solutions.js';
 import { CITIES } from '../../content/cities.js';
 import { useSeo, SITE_URL } from '../../lib/seo.js';
+import { PAGE_SEO } from '../../content/pages.js';
 
 /** Índice de soluciones por industria (hub de enlazado interno + SEO). */
 export default function Solutions() {
   useSeo({
-    title: 'Soluciones por industria — Bot de WhatsApp con IA | RenBotIA',
-    description:
-      'Bots de WhatsApp con IA para despachos, consultorios, clínicas, estéticas, inmobiliarias, gimnasios, escuelas, tiendas y restaurantes en todo México. Encuentra la solución para tu sector y tu ciudad.',
-    path: '/soluciones',
+    ...PAGE_SEO.soluciones,
     image: `${SITE_URL}/og-cover.png`,
   });
 

@@ -6,6 +6,7 @@ import { Reveal } from '../../components/ui/Reveal.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { POSTS } from '../../content/blog.js';
 import { useSeo, SITE_URL } from '../../lib/seo.js';
+import { PAGE_SEO } from '../../content/pages.js';
 
 const fmtDate = (iso) =>
   new Date(iso + 'T00:00:00').toLocaleDateString('es-MX', {
@@ -17,10 +18,7 @@ const fmtDate = (iso) =>
 /** Índice del blog: recursos sobre atención por WhatsApp e IA para negocios en México. */
 export default function Blog() {
   useSeo({
-    title: 'Blog — Atención por WhatsApp con IA para negocios | RenBotIA',
-    description:
-      'Guías y consejos prácticos para automatizar la atención por WhatsApp de tu negocio en México: bots con IA, agendado de citas y experiencia del cliente.',
-    path: '/blog',
+    ...PAGE_SEO.blog,
     image: `${SITE_URL}/og-cover.png`,
     jsonLd: {
       '@context': 'https://schema.org',

@@ -8,6 +8,7 @@ import { Spinner, Button } from '../../components/ui/index.jsx';
 import { Reveal } from '../../components/ui/Reveal.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { useSeo, SITE_URL } from '../../lib/seo.js';
+import { PAGE_SEO } from '../../content/pages.js';
 
 const GUARANTEES = [
   { icon: 'check', text: 'Sin contratos ni permanencia' },
@@ -21,10 +22,7 @@ export default function Pricing() {
   const [loading, setLoading] = useState(true);
 
   useSeo({
-    title: 'Precios — Planes desde $0 | RenBotIA',
-    description:
-      'Planes simples y transparentes para tu bot de WhatsApp con IA: empieza gratis y escala a Pro o Elite según tu volumen. Sin contratos, en pesos mexicanos.',
-    path: '/precios',
+    ...PAGE_SEO.precios,
     image: `${SITE_URL}/og-cover.png`,
   });
 

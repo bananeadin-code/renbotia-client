@@ -15,6 +15,7 @@ import { Faq, FAQS } from '../../components/landing/Faq.jsx';
 import { StickyMobileCTA } from '../../components/landing/StickyMobileCTA.jsx';
 import { SupportWidget } from '../../components/whatsapp/SupportWidget.jsx';
 import { useSeo, SITE_URL } from '../../lib/seo.js';
+import { PAGE_SEO } from '../../content/pages.js';
 
 // Datos estructurados FAQPage: Google puede mostrar estas preguntas directo en
 // resultados (rich result), subiendo el CTR sin contenido extra.
@@ -64,10 +65,7 @@ const STEPS = [
 
 export default function Landing() {
   useSeo({
-    title: 'RenBotIA — Bot de WhatsApp con IA para negocios en México',
-    description:
-      'Automatiza la atención por WhatsApp de tu negocio con un asistente de IA entrenado con tu información. Responde dudas, agenda citas y capta clientes 24/7. Empieza gratis.',
-    path: '/',
+    ...PAGE_SEO.home,
     image: `${SITE_URL}/og-cover.png`,
     jsonLd: FAQ_JSONLD,
   });

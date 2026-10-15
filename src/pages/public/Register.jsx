@@ -9,12 +9,11 @@ import { GoogleButton } from '../../components/auth/GoogleButton.jsx';
 import { OtpForm } from '../../components/auth/OtpForm.jsx';
 import { ContextChooser } from '../../components/auth/ContextChooser.jsx';
 import { useSeo } from '../../lib/seo.js';
+import { PAGE_SEO } from '../../content/pages.js';
 
 export default function Register() {
   useSeo({
-    title: 'Crea tu cuenta gratis | RenBotIA',
-    description: 'Crea tu cuenta y arma tu bot de WhatsApp con IA en minutos. Empieza gratis, sin tarjeta.',
-    path: '/registro',
+    ...PAGE_SEO.registro,
   });
   const navigate = useNavigate();
   const register = useAuthStore((s) => s.register);

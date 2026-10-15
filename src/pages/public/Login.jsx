@@ -8,11 +8,12 @@ import { GoogleButton } from '../../components/auth/GoogleButton.jsx';
 import { OtpForm } from '../../components/auth/OtpForm.jsx';
 import { ContextChooser } from '../../components/auth/ContextChooser.jsx';
 import { useSeo } from '../../lib/seo.js';
+import { PAGE_SEO } from '../../content/pages.js';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { passkeysSupported, PasskeyCancelled } from '../../lib/passkeys.js';
 
 export default function Login() {
-  useSeo({ title: 'Inicia sesión | RenBotIA', description: 'Entra a tu panel de RenBotIA.', path: '/login' });
+  useSeo(PAGE_SEO.login);
   const navigate = useNavigate();
   const location = useLocation();
   const login = useAuthStore((s) => s.login);
@@ -33,10 +34,10 @@ export default function Login() {
   const [pending, setPending] = useState(null); // { mode, email, devCode? }
 
   // Preserva la ruta COMPLETA de origen (incluye ?token=… de una invitación).
+  // Solo rutas internas: nada de `//dominio` ni `/\dominio` (redirección abierta).
   const fromState = location.state?.from;
-  const from = fromState
-    ? `${fromState.pathname}${fromState.search || ''}`
-    : '/dashboard';
+  const fromPath = fromState ? `${fromState.pathname || ''}${fromState.search || ''}` : '';
+  const from = /^\/(?![/\\])/.test(fromPath) ? fromPath : '/dashboard';
 
   async function handleSubmit(e) {
     e.preventDefault();

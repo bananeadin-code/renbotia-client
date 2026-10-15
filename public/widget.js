@@ -24,6 +24,10 @@
   } catch (e) {
     origin = 'https://renbotia.com';
   }
+  // En producción la config se pide directo a la API (Cloudflare ve la IP real de
+  // cada visitante; por el proxy de Vercel todos compartirían pocas IPs y el
+  // límite por IP podría ocultar el chat en sitios con mucho tráfico).
+  var api = origin === 'https://renbotia.com' ? 'https://api.renbotia.com' : origin;
 
   var Z = 2147483000;
   var CHAT_ICON =
@@ -243,7 +247,7 @@
   }
 
   function start() {
-    fetch(origin + '/api/widget/public/' + encodeURIComponent(key), { credentials: 'omit' })
+    fetch(api + '/api/widget/public/' + encodeURIComponent(key), { credentials: 'omit' })
       .then(function (r) {
         return r.ok ? r.json() : null;
       })
