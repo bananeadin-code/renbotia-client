@@ -14,7 +14,7 @@ export const PAGE_SEO = {
     path: '/precios',
     title: 'Precios — Planes desde $0 | RenBotIA',
     description:
-      'Planes simples y transparentes para tu bot de WhatsApp con IA: empieza gratis y escala a Pro o Elite según tu volumen. Sin contratos, en pesos mexicanos.',
+      'Planes simples y transparentes para tu bot de WhatsApp con IA: empieza gratis y escala a Pro o Elite según tu volumen. Sin contratos, en pesos mexicanos con IVA incluido.',
   },
   blog: {
     path: '/blog',

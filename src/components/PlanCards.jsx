@@ -76,6 +76,7 @@ export function PlanCards({ plans, selectedKey, onSelect, ctaLabel = 'Elegir pla
                     ${plan.priceMXN.toLocaleString('es-MX')}
                   </span>
                   <span className="text-sm text-muted"> MXN/mes</span>
+                  <span className="block text-xs text-subtle">IVA incluido</span>
                 </>
               )}
             </div>

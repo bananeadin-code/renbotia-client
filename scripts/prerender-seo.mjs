@@ -118,7 +118,7 @@ page(
   'precios',
   `<nav><a href="/">RenBotIA</a> › Precios</nav>
    <h1>Planes simples y transparentes</h1>
-   <p>Elige según cuántas conversaciones atiende tu bot al mes. Precios en pesos mexicanos; cambia o cancela cuando quieras.</p>
+   <p>Elige según cuántas conversaciones atiende tu bot al mes. Precios en pesos mexicanos con IVA incluido; cambia o cancela cuando quieras.</p>
    ${PRICE_SUMMARY.map((p) => `<h2>${esc(p.name)} — ${p.price ? `$${p.price} MXN al mes` : 'Gratis'}</h2><p>${esc(p.detail)}</p>`).join('')}
    <p><a href="/registro">Crear mi bot gratis</a></p>`,
   {

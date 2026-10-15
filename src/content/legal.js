@@ -107,7 +107,7 @@ export const LEGAL = {
   terminos: {
     slug: 'terminos',
     title: 'Términos y Condiciones',
-    updated: '7 de octubre de 2026',
+    updated: '14 de octubre de 2026',
     description:
       'Términos y Condiciones de uso de RenBotIA: qué es el servicio, planes y pagos, uso aceptable, contenido generado por IA y responsabilidades.',
     intro:
@@ -128,8 +128,9 @@ export const LEGAL = {
       {
         h: '3. Planes, créditos y pagos',
         p: [
-          'Ofrecemos planes de suscripción y paquetes de créditos (tokens de uso), en pesos mexicanos, procesados por nuestro proveedor de pagos (Stripe). Los créditos se consumen conforme al uso del bot: a mayor cantidad de información y contexto configurados, y al enviar o interpretar imágenes, el bot consume más tokens, por la naturaleza propia de la inteligencia artificial y del manejo de contexto y caché. Salvo que la ley disponga lo contrario, los pagos no son reembolsables. Puedes cancelar la renovación cuando quieras; conservarás el acceso hasta que termine el periodo ya pagado.',
+          'Ofrecemos planes de suscripción y paquetes de créditos (tokens de uso), en pesos mexicanos con IVA incluido, procesados por nuestro proveedor de pagos (Stripe). Los créditos se consumen conforme al uso del bot: a mayor cantidad de información y contexto configurados, y al enviar o interpretar imágenes, el bot consume más tokens, por la naturaleza propia de la inteligencia artificial y del manejo de contexto y caché. Salvo que la ley disponga lo contrario, los pagos no son reembolsables. Puedes cancelar la renovación cuando quieras; conservarás el acceso hasta que termine el periodo ya pagado.',
           'Tarjeta y renovación automática: para comprar un plan o créditos primero guardas una tarjeta, que procesa y resguarda Stripe (RenBotIA solo conserva la marca, los últimos 4 dígitos y la fecha de vencimiento para identificarla). Los planes de pago se renuevan automáticamente cada mes y se cobran a esa tarjeta en la fecha de renovación; te avisamos por correo unos días antes con el monto y la fecha. Si el cobro no se puede realizar, te avisamos y lo reintentamos durante 3 días; si para entonces no se resuelve, tu cuenta pasa al plan Free, conservando tu bot, tu entrenamiento y los créditos que hayas comprado. Puedes cambiar tu tarjeta en cualquier momento desde Facturación; para quitarla sin reemplazo, primero cancela la renovación.',
+          'Facturas (CFDI): si necesitas factura, escríbenos a servicios@renbotia.com dentro del mes de tu pago con tu RFC, razón social, régimen fiscal, código postal y uso del CFDI (o tu constancia de situación fiscal), y te la enviamos por correo. Los pagos sin solicitud de factura se incluyen en la factura global al público en general.',
           'Conexión con WhatsApp y costos de Meta: para operar tu bot en WhatsApp conectas tu propia cuenta de WhatsApp Business a través de Meta, usando un número de teléfono dedicado a tu negocio. Las conversaciones de WhatsApp las cobra Meta directamente a tu cuenta, conforme a sus tarifas vigentes (que incluyen un volumen mensual gratuito). Ese costo es independiente de tu plan RenBotIA, no lo cobra ni lo determina RenBotIA, y corresponde a tu relación con Meta.',
         ],
       },

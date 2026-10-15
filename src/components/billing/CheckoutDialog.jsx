@@ -102,7 +102,10 @@ export function CheckoutDialog({ open, onClose, kind, planKey, packKey, itemName
             {note || (recurring ? 'Se renueva cada mes con tu tarjeta. Cancela cuando quieras.' : 'Pago único')}
           </div>
         </div>
-        <div className="shrink-0 text-lg font-extrabold text-brand-600">{money}</div>
+        <div className="shrink-0 text-right">
+          <div className="text-lg font-extrabold text-brand-600">{money}</div>
+          <div className="text-[11px] text-subtle">IVA incluido</div>
+        </div>
       </div>
 
       {error && (
