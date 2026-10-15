@@ -7,7 +7,7 @@
  * Estructura por entrada: slug, industria, título/meta SEO, dolores, beneficios,
  * un ejemplo de conversación y FAQs específicas (para el schema FAQPage).
  */
-import { META_CHANNELS_ANSWER, META_CHANNELS_LIVE } from './channels.js';
+import { META_CHANNELS_ANSWER, META_CHANNELS_LIVE, CHANNELS_SHORT, CHANNELS_LONG } from './channels.js';
 
 export const SOLUTIONS = [
   {
@@ -254,7 +254,7 @@ export const SOLUTIONS = [
     icon: 'sparkles',
     title: 'Bot de WhatsApp con IA para estéticas, barberías y spas | RenBotIA',
     description:
-      'Agenda citas, responde precios de cortes, uñas y tratamientos y llena tu agenda por WhatsApp, Instagram y tu sitio, aunque tengas las manos ocupadas.',
+      `Agenda citas, responde precios de cortes, uñas y tratamientos y llena tu agenda por ${CHANNELS_SHORT}, aunque tengas las manos ocupadas.`,
     h1: 'Tu agenda llena por WhatsApp, aunque estés atendiendo',
     lede: 'Mientras cortas, pintas o das un masaje, un asistente con IA responde precios y agenda la siguiente cita con el horario disponible.',
     pains: [
@@ -265,7 +265,9 @@ export const SOLUTIONS = [
     benefits: [
       'Responde precios, servicios, promociones y ubicación con tu forma de hablar.',
       'Agenda citas sin cruces y te deja la lista del día organizada.',
-      'Atiende también los mensajes directos de Instagram, donde te descubren tus clientes.',
+      META_CHANNELS_LIVE
+        ? 'Atiende también los mensajes directos de Instagram, donde te descubren tus clientes.'
+        : 'Atiende también el chat de tu sitio web, y muy pronto los mensajes directos de Instagram.',
     ],
     example: {
       user: 'Hola, ¿cuánto el corte con barba? ¿Tienes hoy en la tarde?',
@@ -390,8 +392,8 @@ export const SOLUTIONS = [
     icon: 'cart',
     title: 'Bot de WhatsApp con IA para tiendas en línea y comercios | RenBotIA',
     description:
-      'Responde existencias, precios, tallas, envíos y formas de pago por WhatsApp, Instagram y tu sitio, y toma pedidos las 24 horas.',
-    h1: 'Vende por WhatsApp e Instagram aunque estés dormido',
+      `Responde existencias, precios, tallas, envíos y formas de pago por ${CHANNELS_SHORT}, y toma pedidos las 24 horas.`,
+    h1: META_CHANNELS_LIVE ? 'Vende por WhatsApp e Instagram aunque estés dormido' : 'Vende por WhatsApp aunque estés dormido',
     lede: 'Tus clientes preguntan antes de comprar. Tu asistente con IA responde precios, tallas, envíos y formas de pago al momento, y toma el pedido.',
     pains: [
       'Las ventas se pierden porque el cliente preguntó y nadie respondió a tiempo.',
@@ -401,7 +403,7 @@ export const SOLUTIONS = [
     benefits: [
       'Responde catálogo, precios, tallas, envíos y métodos de pago con tu información.',
       'Toma pedidos y los deja organizados en tu panel para que solo confirmes.',
-      'Atiende WhatsApp, Instagram, Messenger y tu sitio desde una sola bandeja.',
+      `Atiende ${CHANNELS_LONG} desde una sola bandeja.`,
     ],
     example: {
       user: '¿Tienen la funda en negro para iPhone 16 y cuánto tarda el envío?',

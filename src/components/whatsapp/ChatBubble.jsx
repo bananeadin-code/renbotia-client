@@ -1,4 +1,5 @@
 import { Icon } from '../ui/Icon.jsx';
+import { WaText } from './WaText.jsx';
 
 /**
  * Burbuja de mensaje estilo WhatsApp. `mine` = mensaje del usuario (verde,
@@ -45,7 +46,7 @@ export function ChatBubble({ content, time, mine, images, files }) {
         ))}
         {content && (
           <p className="whitespace-pre-wrap break-words text-slate-800 dark:text-whatsapp-darkText">
-            {content}
+            <WaText text={content} />
           </p>
         )}
         {time && (

@@ -52,6 +52,9 @@ const TONES = [
 
 export default function OnboardingWizard() {
   const navigate = useNavigate();
+  useEffect(() => {
+    document.title = 'Configura tu negocio | RenBotIA';
+  }, []);
   const loadBusiness = useBusinessStore((s) => s.load);
 
   const saved = loadSaved(); // progreso previo (si abandonó a la mitad)
@@ -320,12 +323,20 @@ export default function OnboardingWizard() {
                   maxLength={60}
                 />
               )}
-              <Input
-                label="Número de WhatsApp (simulado)"
-                value={business.whatsappNumber}
-                onChange={(e) => setBusiness({ ...business, whatsappNumber: e.target.value })}
-                placeholder="+52 618 123 4567"
-              />
+              <div>
+                <Input
+                  label="WhatsApp de tu negocio"
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  value={business.whatsappNumber}
+                  onChange={(e) => setBusiness({ ...business, whatsappNumber: e.target.value })}
+                  placeholder="+52 618 123 4567"
+                />
+                <p className="mt-1 text-xs text-muted">
+                  Opcional. Conectar tu WhatsApp para que el bot conteste lo haces después, en Conexiones.
+                </p>
+              </div>
             </div>
           )}
 

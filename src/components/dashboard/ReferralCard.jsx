@@ -77,7 +77,7 @@ export function ReferralCard() {
           </span>
           <h2 className="mt-3 text-xl font-extrabold leading-tight text-white sm:text-2xl">Invita a 3 negocios y gana 1 mes de Pro gratis</h2>
           <p className="mt-1.5 max-w-xl text-sm text-white/85">
-            Cuando 3 negocios creen su cuenta con tu enlace y conecten su WhatsApp, Messenger o Instagram, activamos tu
+            Cuando 3 negocios creen su cuenta con tu enlace y conecten un canal (como su WhatsApp), activamos tu
             mes de Pro. Si ya pagas un plan, te llega como créditos que no caducan. Es un regalo único.
           </p>
 

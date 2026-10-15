@@ -18,6 +18,7 @@ import { CITIES, nearbyCities, localCopy } from '../src/content/cities.js';
 import { POSTS } from '../src/content/blog.js';
 import { LEGAL } from '../src/content/legal.js';
 import { PAGE_SEO, PRICE_SUMMARY } from '../src/content/pages.js';
+import { CHANNELS_SHORT, CHANNELS_LONG } from '../src/content/channels.js';
 import { execFileSync } from 'node:child_process';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -240,7 +241,7 @@ for (const sol of SOLUTIONS) {
 for (const city of CITIES) {
   const r = `/bot-whatsapp/${city.slug}`;
   const title = `Bot de WhatsApp con IA para negocios en ${city.name} | RenBotIA`;
-  const description = `Atiende a tus clientes de ${city.name}, ${city.state} por WhatsApp, Instagram y tu sitio las 24 horas con un asistente de IA entrenado con tu negocio. Pruébalo gratis.`;
+  const description = `Atiende a tus clientes de ${city.name}, ${city.state} por ${CHANNELS_SHORT} las 24 horas con un asistente de IA entrenado con tu negocio. Pruébalo gratis.`;
   const area = { '@type': 'City', name: city.name, containedInPlace: { '@type': 'State', name: city.state } };
   write(
     r,
@@ -253,7 +254,7 @@ for (const city of CITIES) {
       }),
       `<nav><a href="/">RenBotIA</a> › <a href="/soluciones">Soluciones</a> › ${esc(city.name)}</nav>
        <h1>Tu asistente de WhatsApp con IA en ${esc(city.name)}</h1>
-       <p>Responde al instante a tus clientes de ${esc(city.name)}, ${esc(city.state)}: precios, horarios, citas y pedidos por WhatsApp, Instagram, Messenger y tu sitio web, las 24 horas y con la información de tu negocio.</p>
+       <p>Responde al instante a tus clientes de ${esc(city.name)}, ${esc(city.state)}: precios, horarios, citas y pedidos por ${esc(CHANNELS_LONG)}, las 24 horas y con la información de tu negocio.</p>
        <h2>Para cada tipo de negocio en ${esc(city.name)}</h2>${links(SOLUTIONS.map((s) => [`/soluciones/${s.slug}/${city.slug}`, `${s.industry} en ${city.name}`]))}
        <h2>Cerca de ${esc(city.name)}</h2>${links(nearbyCities(city, 6).map((c) => [`/bot-whatsapp/${c.slug}`, c.name]))}`
     )

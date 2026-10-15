@@ -8,6 +8,7 @@ import { Icon } from '../../components/ui/Icon.jsx';
 import { Breadcrumbs } from '../../components/ui/Breadcrumbs.jsx';
 import { SOLUTIONS } from '../../content/solutions.js';
 import { getCity, nearbyCities } from '../../content/cities.js';
+import { CHANNELS_SHORT, CHANNELS_LONG } from '../../content/channels.js';
 import { useSeo, SITE_URL } from '../../lib/seo.js';
 
 /**
@@ -24,7 +25,7 @@ export default function CityHub() {
       ? `Bot de WhatsApp con IA para negocios en ${city.name} | RenBotIA`
       : 'Ciudad no encontrada | RenBotIA',
     description: city
-      ? `Atiende a tus clientes de ${city.name}, ${city.state} por WhatsApp, Instagram y tu sitio las 24 horas con un asistente de IA entrenado con tu negocio. Pruébalo gratis.`
+      ? `Atiende a tus clientes de ${city.name}, ${city.state} por ${CHANNELS_SHORT} las 24 horas con un asistente de IA entrenado con tu negocio. Pruébalo gratis.`
       : undefined,
     path,
     image: `${SITE_URL}/og-cover.png`,
@@ -77,7 +78,7 @@ export default function CityHub() {
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-muted">
             Responde al instante a tus clientes de {city.name}, {city.state}: precios, horarios, citas y pedidos por
-            WhatsApp, Instagram, Messenger y tu sitio web, las 24 horas y con la información de tu negocio.
+            {CHANNELS_LONG}, las 24 horas y con la información de tu negocio.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link to="/#pruebalo">

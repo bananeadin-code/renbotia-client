@@ -14,3 +14,9 @@ export const META_CHANNELS_ANSWER = META_CHANNELS_LIVE
 export const CHANNELS_TODAY = META_CHANNELS_LIVE
   ? 'tu propio WhatsApp, Instagram, Messenger o tu sitio web'
   : 'tu propio WhatsApp o tu sitio web (Instagram y Messenger, muy pronto)';
+
+/** Frase de canales para descripciones ("por WhatsApp y tu sitio…"). */
+export const CHANNELS_SHORT = META_CHANNELS_LIVE ? 'WhatsApp, Instagram y tu sitio' : 'WhatsApp y tu sitio web';
+export const CHANNELS_LONG = META_CHANNELS_LIVE
+  ? 'WhatsApp, Instagram, Messenger y tu sitio web'
+  : 'WhatsApp y tu sitio web (Instagram y Messenger, muy pronto)';

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useAuthStore } from '../../store/authStore.js';
 import { authApi } from '../../api/endpoints.js';
 import { Button, Input, Alert } from '../ui/index.jsx';
@@ -25,9 +25,11 @@ export function OtpForm({ email, mode, onVerified, devCode }) {
   const [resent, setResent] = useState('');
 
   const is2fa = mode === 'login_2fa';
+  const formRef = useRef(null);
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (loading) return;
     setError('');
     setLoading(true);
     try {
@@ -55,7 +57,7 @@ export function OtpForm({ email, mode, onVerified, devCode }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
       <p className="text-sm text-muted">
         {is2fa
           ? 'Por seguridad, escribe el código de 6 dígitos que enviamos a '
@@ -72,8 +74,15 @@ export function OtpForm({ email, mode, onVerified, devCode }) {
         inputMode="numeric"
         autoComplete="one-time-code"
         required
+        autoFocus
         value={code}
-        onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+        onChange={(e) => {
+          const next = e.target.value.replace(/\D/g, '').slice(0, 6);
+          setCode(next);
+          // Al completar (o pegar) los 6 dígitos se verifica solo. En 2FA no: antes
+          // puede querer marcar "Recordar este dispositivo".
+          if (!is2fa && next.length === 6 && next !== code) setTimeout(() => formRef.current?.requestSubmit(), 0);
+        }}
         placeholder="000000"
       />
       {is2fa && (

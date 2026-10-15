@@ -8,6 +8,7 @@ import { downloadFile } from '../../api/download.js';
 import { toast } from '../../store/toastStore.js';
 import { Card, Button, Badge, Spinner, Alert, Notice, Select } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
+import { WaText } from '../../components/whatsapp/WaText.jsx';
 
 const timeOf = (iso) =>
   new Date(iso).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
@@ -1134,7 +1135,7 @@ export default function Conversations() {
                             )}
                             {m.content && m.content !== '(imagen del cliente)' && !/^\(documento del cliente: .*\)$/.test(m.content) && (
                               <p className={`whitespace-pre-wrap break-words ${mine && agent ? 'text-white' : 'text-slate-800 dark:text-whatsapp-darkText'}`}>
-                                {m.content}
+                                <WaText text={m.content} />
                               </p>
                             )}
                             <span className={`mt-0.5 block text-right text-[10px] ${mine && agent ? 'text-white/70' : 'text-slate-400 dark:text-whatsapp-darkTime'}`}>
