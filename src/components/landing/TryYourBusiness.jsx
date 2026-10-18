@@ -197,7 +197,7 @@ export function TryYourBusiness() {
               </button>
             </div>
             <p className="mt-3 text-xs text-subtle">
-              Al crear tu cuenta, todo lo que aprendió ya viene cargado. Luego lo conectas a tu WhatsApp o a tu sitio web.
+              Al crear tu cuenta, todo lo que aprendió ya viene cargado. Luego lo conectas a tu WhatsApp, a tu Messenger o a tu sitio web.
             </p>
           </div>
         )}

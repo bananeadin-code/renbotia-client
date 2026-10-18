@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Icon } from '../ui/Icon.jsx';
+import { MESSENGER_LIVE, INSTAGRAM_LIVE } from '../../content/channels.js';
 
 /**
  * Portada: canales donde atiende el bot (estilo "Crea con nosotros"). Los que
@@ -28,7 +29,7 @@ const CHANNELS = [
     icon: 'messenger',
     color: 'text-[#0866FF]',
     desc: 'Mensajes de tu página de Facebook.',
-    available: false,
+    available: MESSENGER_LIVE,
   },
   {
     key: 'instagram',
@@ -36,7 +37,7 @@ const CHANNELS = [
     icon: 'instagram',
     color: 'text-[#E1306C]',
     desc: 'Mensajes directos de tu cuenta de Instagram.',
-    available: false,
+    available: INSTAGRAM_LIVE,
   },
 ];
 
@@ -86,8 +87,9 @@ export function ChannelsShowcase() {
     <section className="mx-auto w-full max-w-5xl px-4 py-20 text-center">
       <h2 className="text-4xl font-bold tracking-tight text-fg sm:text-5xl">Atiende donde ya te escriben</h2>
       <p className="mx-auto mt-3 max-w-2xl text-muted">
-        Un solo bot, entrenado una vez, responde en todos tus canales con la misma información. Messenger e Instagram llegan muy
-        pronto.
+        Un solo bot, entrenado una vez, responde en todos tus canales con la misma información.
+        {!MESSENGER_LIVE && !INSTAGRAM_LIVE && ' Messenger e Instagram llegan muy pronto.'}
+        {MESSENGER_LIVE && !INSTAGRAM_LIVE && ' Instagram llega muy pronto.'}
       </p>
       <div className="mt-10 grid gap-4 sm:grid-cols-2">
         {CHANNELS.map((c) => (

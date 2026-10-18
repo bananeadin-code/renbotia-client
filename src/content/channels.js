@@ -1,22 +1,29 @@
 /**
- * Disponibilidad de los canales de Meta en el texto público (FAQ, ciudades).
- * Cambia a `true` cuando Meta apruebe Messenger e Instagram para RenBotIA, junto
- * con FACEBOOK_MESSENGER_ENABLED / FACEBOOK_INSTAGRAM_ENABLED en Render.
+ * Disponibilidad de los canales de Meta en el texto público (FAQ, ciudades,
+ * soluciones). Cada uno se enciende cuando Meta lo aprueba, junto con su
+ * variable en Render (FACEBOOK_MESSENGER_ENABLED / FACEBOOK_INSTAGRAM_ENABLED).
+ *
+ * - Messenger: aprobado por Meta el 18 de octubre de 2026.
+ * - Instagram: pendiente de su propia revisión (instagram_manage_messages).
  */
-export const META_CHANNELS_LIVE = false;
+export const MESSENGER_LIVE = true;
+export const INSTAGRAM_LIVE = false;
 
-/** Respuesta honesta a "¿atiende Instagram/Messenger?". */
-export const META_CHANNELS_ANSWER = META_CHANNELS_LIVE
-  ? 'Sí. El mismo bot responde WhatsApp, los mensajes directos de Instagram, Messenger y el chat de tu sitio web.'
-  : 'Muy pronto: la conexión con Instagram y Messenger ya está lista y en revisión de Meta. Hoy el mismo bot atiende tu WhatsApp y el chat de tu sitio web, y en cuanto Meta lo habilite podrás sumar Instagram y Messenger sin volver a entrenarlo.';
+const live = ['WhatsApp', MESSENGER_LIVE && 'Messenger', INSTAGRAM_LIVE && 'Instagram'].filter(Boolean);
+const soon = [!MESSENGER_LIVE && 'Messenger', !INSTAGRAM_LIVE && 'Instagram'].filter(Boolean);
+
+// ['A','B','C'] + 'y' → "A, B y C"
+const list = (arr, conj) => (arr.length > 1 ? `${arr.slice(0, -1).join(', ')} ${conj} ${arr.at(-1)}` : arr[0] || '');
+const soonNote = soon.length ? ` (${list(soon, 'y')}, muy pronto)` : '';
+
+/** Respuesta honesta a "¿atiende mi Instagram?". */
+export const INSTAGRAM_ANSWER = INSTAGRAM_LIVE
+  ? `Sí. El mismo bot responde ${list([...live, 'el chat de tu sitio web'], 'y')}.`
+  : `Muy pronto: la conexión con Instagram ya está lista y en revisión de Meta. Hoy el mismo bot atiende ${list([...live, 'el chat de tu sitio web'], 'y')}, y en cuanto Meta lo habilite podrás sumar Instagram sin volver a entrenarlo.`;
 
 /** Lista de canales que se pueden conectar hoy (para frases como "conectas tu …"). */
-export const CHANNELS_TODAY = META_CHANNELS_LIVE
-  ? 'tu propio WhatsApp, Instagram, Messenger o tu sitio web'
-  : 'tu propio WhatsApp o tu sitio web (Instagram y Messenger, muy pronto)';
+export const CHANNELS_TODAY = `tu propio ${list([...live, 'tu sitio web'], 'o')}${soonNote}`;
 
-/** Frase de canales para descripciones ("por WhatsApp y tu sitio…"). */
-export const CHANNELS_SHORT = META_CHANNELS_LIVE ? 'WhatsApp, Instagram y tu sitio' : 'WhatsApp y tu sitio web';
-export const CHANNELS_LONG = META_CHANNELS_LIVE
-  ? 'WhatsApp, Instagram, Messenger y tu sitio web'
-  : 'WhatsApp y tu sitio web (Instagram y Messenger, muy pronto)';
+/** Frase de canales para descripciones ("por WhatsApp, Messenger y tu sitio…"). */
+export const CHANNELS_SHORT = list([...live, 'tu sitio web'], 'y');
+export const CHANNELS_LONG = `${list([...live, 'tu sitio web'], 'y')}${soonNote}`;

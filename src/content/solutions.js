@@ -7,7 +7,7 @@
  * Estructura por entrada: slug, industria, título/meta SEO, dolores, beneficios,
  * un ejemplo de conversación y FAQs específicas (para el schema FAQPage).
  */
-import { META_CHANNELS_ANSWER, META_CHANNELS_LIVE, CHANNELS_SHORT, CHANNELS_LONG } from './channels.js';
+import { INSTAGRAM_ANSWER, INSTAGRAM_LIVE, MESSENGER_LIVE, CHANNELS_SHORT, CHANNELS_LONG } from './channels.js';
 
 export const SOLUTIONS = [
   {
@@ -265,9 +265,9 @@ export const SOLUTIONS = [
     benefits: [
       'Responde precios, servicios, promociones y ubicación con tu forma de hablar.',
       'Agenda citas sin cruces y te deja la lista del día organizada.',
-      META_CHANNELS_LIVE
+      INSTAGRAM_LIVE
         ? 'Atiende también los mensajes directos de Instagram, donde te descubren tus clientes.'
-        : 'Atiende también el chat de tu sitio web, y muy pronto los mensajes directos de Instagram.',
+        : `Atiende también ${MESSENGER_LIVE ? 'Messenger y ' : ''}el chat de tu sitio web, y muy pronto los mensajes directos de Instagram.`,
     ],
     example: {
       user: 'Hola, ¿cuánto el corte con barba? ¿Tienes hoy en la tarde?',
@@ -276,7 +276,7 @@ export const SOLUTIONS = [
     faqs: [
       {
         q: '¿Puede atender mi Instagram?',
-        a: META_CHANNELS_ANSWER,
+        a: INSTAGRAM_ANSWER,
       },
       {
         q: '¿Cómo aprende mis precios?',
@@ -348,7 +348,7 @@ export const SOLUTIONS = [
       },
       {
         q: '¿Funciona en Instagram?',
-        a: META_CHANNELS_ANSWER,
+        a: INSTAGRAM_ANSWER,
       },
     ],
   },
@@ -393,7 +393,7 @@ export const SOLUTIONS = [
     title: 'Bot de WhatsApp con IA para tiendas en línea y comercios | RenBotIA',
     description:
       `Responde existencias, precios, tallas, envíos y formas de pago por ${CHANNELS_SHORT}, y toma pedidos las 24 horas.`,
-    h1: META_CHANNELS_LIVE ? 'Vende por WhatsApp e Instagram aunque estés dormido' : 'Vende por WhatsApp aunque estés dormido',
+    h1: INSTAGRAM_LIVE ? 'Vende por WhatsApp e Instagram aunque estés dormido' : 'Vende por WhatsApp aunque estés dormido',
     lede: 'Tus clientes preguntan antes de comprar. Tu asistente con IA responde precios, tallas, envíos y formas de pago al momento, y toma el pedido.',
     pains: [
       'Las ventas se pierden porque el cliente preguntó y nadie respondió a tiempo.',
@@ -416,7 +416,7 @@ export const SOLUTIONS = [
       },
       {
         q: '¿Se conecta con mi sitio web?',
-        a: `Sí. Pegas una línea de código en tu sitio y aparece un chat con el mismo bot, que también atiende tu WhatsApp${META_CHANNELS_LIVE ? ' e Instagram' : ''}.`,
+        a: `Sí. Pegas una línea de código en tu sitio y aparece un chat con el mismo bot, que también atiende tu WhatsApp${MESSENGER_LIVE ? ' y tu Messenger' : ''}${INSTAGRAM_LIVE ? ' e Instagram' : ''}.`,
       },
     ],
   },
