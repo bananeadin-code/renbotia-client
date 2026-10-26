@@ -200,9 +200,10 @@ export function Connections() {
       try {
         const msg = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
         if (msg?.type === 'WA_EMBEDDED_SIGNUP' && msg.data) {
+          const d = msg.data;
           sessionInfo.current = {
-            phoneNumberId: msg.data.phone_number_id || '',
-            wabaId: msg.data.waba_id || '',
+            phoneNumberId: d.phone_number_id || d.phoneNumberId || sessionInfo.current.phoneNumberId || '',
+            wabaId: d.waba_id || d.wabaId || (Array.isArray(d.waba_ids) ? d.waba_ids[0] : '') || sessionInfo.current.wabaId || '',
           };
         }
       } catch {
@@ -264,7 +265,10 @@ export function Connections() {
         config_id: data.facebook.configId,
         response_type: 'code',
         override_default_response_type: true,
-        extras: { setup: {}, featureType: '', sessionInfoVersion: '3' },
+        // Registro insertado v4 (Meta retiró v2/v3 el 15-oct-2026): el objeto va
+        // vacío a propósito; los productos (Cloud API) se definen en la
+        // configuración de Facebook Login for Business (WHATSAPP_CONFIG_ID).
+        extras: {},
       }
     );
   }
