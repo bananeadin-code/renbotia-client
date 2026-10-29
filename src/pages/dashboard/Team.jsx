@@ -53,7 +53,7 @@ export default function Team() {
   }, []);
 
   const subscription = useBusinessStore((s) => s.subscription);
-  const canInvite = limitsFor(subscription?.plan?.key).multiUser;
+  const canInvite = subscription?.teamUnlocked ?? limitsFor(subscription?.plan?.key).multiUser;
   const isOwner = data?.myRole === 'owner';
   // Gestionar el equipo: el dueño o quien tenga "Equipo: editar" (p. ej. Administrador).
   const canManage = Boolean(data?.canManageTeam);
