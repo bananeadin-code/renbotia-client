@@ -556,7 +556,7 @@ export default function Conversations() {
             <Icon name="clock" size={13} className="mt-0.5 shrink-0" />
             <span>
               Las conversaciones sin actividad por {retentionDays} días se eliminan automáticamente para liberar
-              espacio. Cualquier mensaje nuevo reinicia el conteo; exporta a CSV las que quieras conservar.
+              espacio. Cualquier mensaje nuevo reinicia el conteo; exporta a Excel las que quieras conservar.
             </span>
           </p>
         </div>
@@ -569,7 +569,7 @@ export default function Conversations() {
             onClick={async () => {
               setExporting(true);
               try {
-                await downloadFile('/conversations/export', 'conversaciones-renbotia.csv');
+                await downloadFile('/conversations/export', 'conversaciones-renbotia.xlsx');
               } catch {
                 toast.error('No se pudo exportar.');
               } finally {
@@ -578,7 +578,7 @@ export default function Conversations() {
             }}
           >
             <Icon name="download" size={16} />
-            <span className="hidden sm:inline">{exporting ? 'Exportando…' : 'Exportar CSV'}</span>
+            <span className="hidden sm:inline">{exporting ? 'Exportando…' : 'Exportar a Excel'}</span>
           </Button>
         )}
       </div>

@@ -55,10 +55,10 @@ export default function Management() {
   const [exporting, setExporting] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
-  async function exportRecordsCsv() {
+  async function exportRecordsXlsx() {
     setExporting(true);
     try {
-      await downloadFile('/management/export', 'registros-renbotia.csv');
+      await downloadFile('/management/export', 'registros-renbotia.xlsx');
     } catch {
       toast.error('No se pudo exportar.');
     } finally {
@@ -195,7 +195,7 @@ export default function Management() {
         action={
           <div className="flex shrink-0 items-center gap-2">
             {records.length > 0 && (
-              <Button variant="secondary" onClick={exportRecordsCsv} disabled={exporting}>
+              <Button variant="secondary" onClick={exportRecordsXlsx} disabled={exporting}>
                 <Icon name="download" size={16} />
                 <span className="hidden sm:inline">{exporting ? 'Exportando…' : 'Exportar'}</span>
               </Button>

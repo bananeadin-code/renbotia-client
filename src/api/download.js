@@ -2,7 +2,7 @@ import api from './axios.js';
 
 /**
  * Descarga un archivo desde un endpoint autenticado (envía el token) y dispara
- * la descarga en el navegador. Se usa para exportar CSV (conversaciones, leads).
+ * la descarga en el navegador. Se usa para exportar a Excel (conversaciones, leads).
  *
  * @param {string} url        Ruta de la API (ej. '/conversations/export').
  * @param {string} filename   Nombre sugerido del archivo.
