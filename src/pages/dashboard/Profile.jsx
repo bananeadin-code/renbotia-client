@@ -184,7 +184,7 @@ export default function Profile() {
   async function requestPasswordChange() {
     setPwMsg('');
     try {
-      await authApi.forgotPassword(user.email);
+      await authApi.requestMyPasswordReset();
       setPwMsg('Te enviamos un enlace a tu correo para elegir una nueva contraseña.');
     } catch {
       setPwMsg('No se pudo iniciar el cambio de contraseña.');

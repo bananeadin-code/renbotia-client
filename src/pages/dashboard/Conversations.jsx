@@ -398,7 +398,7 @@ export default function Conversations() {
     }
   }
 
-  async function downloadFile(file) {
+  async function downloadAttachment(file) {
     try {
       const blob = await conversationsApi.downloadFile(selectedId, file.id);
       const url = URL.createObjectURL(blob);
@@ -1121,7 +1121,7 @@ export default function Conversations() {
                                   <button
                                     key={f.id}
                                     type="button"
-                                    onClick={() => downloadFile(f)}
+                                    onClick={() => downloadAttachment(f)}
                                     className="flex w-full items-center gap-2 rounded-md border border-black/10 bg-white/70 px-2.5 py-2 text-left text-xs text-slate-700 transition hover:bg-white dark:border-white/10 dark:bg-black/20 dark:text-whatsapp-darkText"
                                   >
                                     <Icon name="file" size={16} className="shrink-0 text-red-500" />

@@ -15,6 +15,7 @@ export const authApi = {
   refresh: () => unwrap(api.post('/auth/refresh')),
   me: () => unwrap(api.get('/auth/me')),
   forgotPassword: (email, turnstileToken) => unwrap(api.post('/auth/forgot-password', { email, ...(turnstileToken ? { turnstileToken } : {}) })),
+  requestMyPasswordReset: () => unwrap(api.post('/auth/password-reset')),
   resetPassword: (body) => api.post('/auth/reset-password', body),
   // Verificación de correo (registro) y 2FA de login por código.
   verifyEmail: (body) => unwrap(api.post('/auth/verify-email', body)),
