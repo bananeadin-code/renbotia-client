@@ -9,6 +9,12 @@
  */
 import { INSTAGRAM_ANSWER, INSTAGRAM_LIVE, MESSENGER_LIVE, CHANNELS_SHORT, CHANNELS_LONG } from './channels.js';
 
+// "WhatsApp, Messenger e Instagram" según lo que ya está disponible.
+const META_LIST = (() => {
+  const l = ['WhatsApp', MESSENGER_LIVE && 'Messenger', INSTAGRAM_LIVE && 'Instagram'].filter(Boolean);
+  return l.length > 1 ? `${l.slice(0, -1).join(', ')} ${l.at(-1).startsWith('I') ? 'e' : 'y'} ${l.at(-1)}` : l[0];
+})();
+
 export const SOLUTIONS = [
   {
     slug: 'despachos-legales',
@@ -416,7 +422,7 @@ export const SOLUTIONS = [
       },
       {
         q: '¿Se conecta con mi sitio web?',
-        a: `Sí. Pegas una línea de código en tu sitio y aparece un chat con el mismo bot, que también atiende tu WhatsApp${MESSENGER_LIVE ? ' y tu Messenger' : ''}${INSTAGRAM_LIVE ? ' e Instagram' : ''}.`,
+        a: `Sí. Pegas una línea de código en tu sitio y aparece un chat con el mismo bot, que también atiende tu ${META_LIST}.`,
       },
     ],
   },

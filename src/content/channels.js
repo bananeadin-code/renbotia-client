@@ -4,10 +4,10 @@
  * variable en Render (FACEBOOK_MESSENGER_ENABLED / FACEBOOK_INSTAGRAM_ENABLED).
  *
  * - Messenger: aprobado por Meta el 18 de octubre de 2026.
- * - Instagram: pendiente de su propia revisión (instagram_manage_messages).
+ * - Instagram: aprobado por Meta el 1 de noviembre de 2026.
  */
 export const MESSENGER_LIVE = true;
-export const INSTAGRAM_LIVE = false;
+export const INSTAGRAM_LIVE = true;
 
 const live = ['WhatsApp', MESSENGER_LIVE && 'Messenger', INSTAGRAM_LIVE && 'Instagram'].filter(Boolean);
 const soon = [!MESSENGER_LIVE && 'Messenger', !INSTAGRAM_LIVE && 'Instagram'].filter(Boolean);
