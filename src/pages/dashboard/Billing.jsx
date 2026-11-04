@@ -257,9 +257,11 @@ export default function Billing() {
           <div>
             <div className="text-muted">Precio</div>
             <div className="font-medium text-fg">
-              {subscription?.plan?.priceMXN === 0
-                ? 'Gratis'
-                : `$${subscription?.plan?.priceMXN?.toLocaleString('es-MX')} MXN/mes`}
+              {subscription?.complimentary
+                ? 'Cortesía (sin cobro)'
+                : subscription?.plan?.priceMXN === 0
+                  ? 'Gratis'
+                  : `$${subscription?.plan?.priceMXN?.toLocaleString('es-MX')} MXN/mes`}
             </div>
           </div>
           <div>
