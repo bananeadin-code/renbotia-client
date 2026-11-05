@@ -222,6 +222,12 @@ function Seguimiento({ range, isAdmin, me }) {
                 <div className="mt-1">
                   <Badge color={AUTO[l.autoStage].color}>{AUTO[l.autoStage].label}</Badge>
                   {l.complimentary && <span className="ml-1 text-xs text-subtle">cortesía</span>}
+                  {l.autoStage === 'pago' && l.cycle === 'anual' && <span className="ml-1 text-xs font-medium text-fg">anual</span>}
+                  {l.lead?.orientationAt && (
+                    <span className="ml-1 text-xs text-subtle" title="Sesión de orientación realizada">
+                      · orientación hecha
+                    </span>
+                  )}
                   {isAdmin && l.revenueMXN > 0 && <span className="ml-2 text-xs font-medium text-brand-700 dark:text-brand-300">{money(l.revenueMXN)}</span>}
                 </div>
               </div>
@@ -279,6 +285,7 @@ function LeadDetail({ lead, onClose, onSaved }) {
   const [notes, setNotes] = useState([]);
   const [form, setForm] = useState({ phone: '', nextFollowUpAt: '', lostReason: '' });
   const [busy, setBusy] = useState(false);
+  const [oriented, setOriented] = useState(false);
 
   useEffect(() => {
     if (!lead) return;
@@ -289,6 +296,7 @@ function LeadDetail({ lead, onClose, onSaved }) {
       nextFollowUpAt: lead.lead?.nextFollowUpAt ? ymd(new Date(lead.lead.nextFollowUpAt)) : '',
       lostReason: lead.lead?.lostReason || '',
     });
+    setOriented(Boolean(lead.lead?.orientationAt));
   }, [lead]);
 
   if (!lead) return null;
@@ -306,6 +314,19 @@ function LeadDetail({ lead, onClose, onSaved }) {
       toast.error(err.response?.data?.message || 'No se pudo guardar la nota.');
     } finally {
       setBusy(false);
+    }
+  }
+
+  // Sesión de orientación por videollamada: al marcarla, el cliente deja de ver la invitación.
+  async function toggleOrientation(done) {
+    setOriented(done);
+    try {
+      await funnelApi.setOrientation(lead.userId, done);
+      toast.success(done ? 'Orientación marcada como realizada.' : 'Orientación marcada como pendiente.');
+      onSaved();
+    } catch (err) {
+      setOriented(!done);
+      toast.error(err.response?.data?.message || 'No se pudo guardar.');
     }
   }
 
@@ -354,7 +375,16 @@ function LeadDetail({ lead, onClose, onSaved }) {
           <Input label="Próximo seguimiento" type="date" value={form.nextFollowUpAt} onChange={(e) => setForm({ ...form, nextFollowUpAt: e.target.value })} />
           <Input label="Motivo si se perdió" value={form.lostReason} onChange={(e) => setForm({ ...form, lostReason: e.target.value })} placeholder="Precio, no tiene número…" />
         </div>
-        <div className="flex justify-end">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <label className="inline-flex min-h-[36px] cursor-pointer items-center gap-2 text-sm text-fg">
+            <input
+              type="checkbox"
+              className="h-4 w-4 accent-brand-700"
+              checked={oriented}
+              onChange={(e) => toggleOrientation(e.target.checked)}
+            />
+            Sesión de orientación realizada
+          </label>
           <Button size="sm" onClick={save} disabled={busy}>
             Guardar datos
           </Button>

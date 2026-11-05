@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { planApi, billingApi } from '../../api/endpoints.js';
 import { useBusinessStore } from '../../store/businessStore.js';
-import { PlanCards } from '../../components/PlanCards.jsx';
+import { PlanCards, CycleToggle } from '../../components/PlanCards.jsx';
 import { PaymentMethod } from '../../components/billing/PaymentMethod.jsx';
 import { CheckoutDialog } from '../../components/billing/CheckoutDialog.jsx';
 import { toast } from '../../store/toastStore.js';
@@ -17,7 +17,12 @@ import { ReferralTeaser } from '../../components/dashboard/ReferralCard.jsx';
 export default function Billing() {
   const { subscription, balance, load } = useBusinessStore();
   const [plans, setPlans] = useState([]);
+  const [pricing, setPricing] = useState(null);
   const [packs, setPacks] = useState([]);
+  // Forma de pago que se muestra en el selector de planes.
+  const [cycle, setCycle] = useState(null);
+  // Confirmación en dos pasos del reembolso de la garantía.
+  const [confirmRefund, setConfirmRefund] = useState(false);
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showChange, setShowChange] = useState(false);
@@ -39,6 +44,7 @@ export default function Billing() {
     ])
       .then(([plansData, payData, pmData, cfg]) => {
         setPlans(plansData.plans);
+        setPricing(plansData.pricing || null);
         setPacks(plansData.creditPacks);
         setPayments(payData.payments);
         setSavedCard(pmData.paymentMethod || null);
@@ -64,6 +70,23 @@ export default function Billing() {
     ? new Date(subscription.graceEndsAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'long' })
     : '';
   const money = (n) => `$${Number(n || 0).toLocaleString('es-MX')} MXN`;
+  const longDate = (d) =>
+    d ? new Date(d).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/Mexico_City' }) : '';
+
+  // Plan anual.
+  const annualActive = Boolean(subscription?.annualActive);
+  const termEndStr = longDate(subscription?.termEndsAt);
+  const nextChargeStr = longDate(subscription?.nextChargeAt);
+  const guaranteeStr = longDate(subscription?.guaranteeEndsAt);
+  const pendingCycle = subscription?.pendingCycle || '';
+  const accessUntilStr = annualActive ? termEndStr : renewalStr;
+  const shownCycle = cycle || (annualActive ? 'anual' : 'mensual');
+  const isPaidPlan = (key) => (plans.find((p) => p.key === key)?.priceMXN ?? 0) > 0;
+  const currentPlan = plans.find((p) => p.key === currentKey);
+  // Invitación a pasarse al anual: paga mensual, sin cortesía ni pagos pendientes.
+  const annualOffer =
+    paidPlansLive && !annualActive && isPaidPlan(currentKey) && !subscription?.complimentary && !pastDue && currentPlan?.annual;
+  const orientation = subscription?.orientation;
 
   async function refresh() {
     await load();
@@ -127,27 +150,40 @@ export default function Billing() {
 
   const priceOf = (key) => plans.find((p) => p.key === key)?.priceMXN ?? 0;
 
+  // Abre el pago de un plan (mensual, anual o mejora proporcional a mitad del año).
+  function openPlanCheckout(planKey, planCycle) {
+    setError('');
+    setMsg('');
+    const plan = plans.find((p) => p.key === planKey);
+    setCheckout({
+      kind: 'plan',
+      planKey,
+      cycle: planCycle,
+      itemName: `Plan ${plan?.name || ''}${planCycle === 'anual' ? ' anual' : ''}`.trim(),
+      amountMXN: planCycle === 'anual' ? plan?.annual?.priceMXN ?? 0 : plan?.priceMXN ?? 0,
+    });
+  }
+
   // Selección de plan desde el selector:
   //  - mismo plan → deshace un cambio programado.
   //  - mejora (precio mayor) → pago inmediato por Stripe y se aplica al instante.
   //  - baja (precio menor / a Free) → se programa para la próxima renovación.
+  //  - anual: con un año vigente, mejorar paga la diferencia proporcional y los
+  //    demás cambios aplican al terminar el año; sin año vigente, se paga el año.
   async function onSelectPlan(planKey) {
+    if (annualActive) {
+      if (shownCycle === 'mensual') {
+        return doAction(() => billingApi.changePlan(planKey, 'mensual'), 'Cambio programado para el fin de tu año.');
+      }
+      if (planKey !== currentKey && priceOf(planKey) > priceOf(currentKey)) return openPlanCheckout(planKey, 'anual');
+      return doAction(() => billingApi.changePlan(planKey), 'Cambio programado para el fin de tu año.');
+    }
+    if (shownCycle === 'anual' && isPaidPlan(planKey)) return openPlanCheckout(planKey, 'anual');
     if (planKey === currentKey) {
       return doAction(() => billingApi.changePlan(planKey), 'Se mantendrá tu plan actual.');
     }
     const isUpgrade = priceOf(planKey) > priceOf(currentKey);
-    if (isUpgrade) {
-      setError('');
-      setMsg('');
-      const plan = plans.find((p) => p.key === planKey);
-      setCheckout({
-        kind: 'plan',
-        planKey,
-        itemName: `Plan ${plan?.name || ''}`.trim(),
-        amountMXN: plan?.priceMXN ?? 0,
-      });
-      return;
-    }
+    if (isUpgrade) return openPlanCheckout(planKey, 'mensual');
     // Baja de plan: comportamiento tradicional (aplica en la renovación).
     return doAction(() => billingApi.changePlan(planKey), 'Cambio de plan programado.');
   }
@@ -171,11 +207,39 @@ export default function Billing() {
   const onResume = () =>
     doAction(() => billingApi.resume(), 'Renovación reactivada.');
 
-  // Etiqueta del botón por tarjeta según sea el plan actual, mejora o baja.
+  // Garantía de 30 días: reembolso completo y la cuenta pasa a Free.
+  async function onGuaranteeRefund() {
+    setConfirmRefund(false);
+    await doAction(() => billingApi.guaranteeRefund(), 'Reembolso procesado.');
+    try {
+      const payData = await billingApi.payments();
+      setPayments(payData.payments);
+    } catch {
+      /* se verá al recargar */
+    }
+  }
+
+  // Etiqueta del botón por tarjeta según el plan actual, el ciclo mostrado y si es mejora o baja.
   const ctaFor = (plan) => {
+    const up = priceOf(plan.key) > priceOf(currentKey);
+    if (annualActive) {
+      if (shownCycle === 'mensual') {
+        return plan.key === currentKey ? 'Pasar a mensual al terminar el año' : 'Programar para el fin de tu año';
+      }
+      if (plan.key === currentKey) return 'Plan actual';
+      return up ? 'Mejorar: pagas la diferencia' : 'Programar para el fin de tu año';
+    }
+    if (shownCycle === 'anual' && plan.priceMXN > 0) {
+      return plan.key === currentKey ? 'Pasar a anual' : 'Pagar anual';
+    }
     if (plan.key === currentKey) return 'Plan actual';
-    return priceOf(plan.key) > priceOf(currentKey) ? 'Mejorar ahora' : 'Programar cambio';
+    return up ? 'Mejorar ahora' : 'Programar cambio';
   };
+  // El plan actual queda inerte solo cuando la tarjeta coincide en plan Y ciclo.
+  const selectedForCycle =
+    (annualActive && shownCycle === 'anual') || (!annualActive && (shownCycle === 'mensual' || !isPaidPlan(currentKey)))
+      ? currentKey
+      : undefined;
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -211,14 +275,14 @@ export default function Billing() {
       )}
       {!pastDue && renewalAmount > 0 && !savedCard && paidPlansLive && (
         <Alert variant="warning">
-          Tu plan se renueva el <strong>{renewalStr}</strong> por {money(renewalAmount)}. Agrega una tarjeta abajo
+          Tu plan se renueva el <strong>{annualActive ? nextChargeStr : renewalStr}</strong> por {money(renewalAmount)}. Agrega una tarjeta abajo
           para no perder tus ventajas.
         </Alert>
       )}
       {status === 'cancelada' && (
         <Alert variant="warning">
           Tu plan <strong>no se renovará</strong>. Conservas acceso y tus tokens hasta el{' '}
-          <strong>{renewalStr}</strong>; después baja a Free.{' '}
+          <strong>{accessUntilStr}</strong>; después baja a Free.{' '}
           <button
             onClick={onResume}
             disabled={acting}
@@ -228,10 +292,14 @@ export default function Billing() {
           </button>
         </Alert>
       )}
-      {status !== 'cancelada' && pendingKey && (
+      {status !== 'cancelada' && (pendingKey || pendingCycle) && (
         <Alert variant="info">
-          Cambio programado a <strong>{pendingName || pendingKey}</strong> en tu próxima renovación (
-          {renewalStr}).{' '}
+          Cambio programado a{' '}
+          <strong>
+            {pendingName || currentPlan?.name || pendingKey}
+            {pendingCycle === 'mensual' ? ' mensual' : ''}
+          </strong>{' '}
+          {annualActive ? `al terminar tu año (${termEndStr})` : `en tu próxima renovación (${renewalStr})`}.{' '}
           <button
             onClick={() => onChangePlan(currentKey)}
             disabled={acting}
@@ -242,12 +310,77 @@ export default function Billing() {
         </Alert>
       )}
 
+      {/* Garantía de 30 días del plan anual */}
+      {subscription?.guaranteeEndsAt && (
+        <Alert variant="info">
+          Tu plan anual tiene <strong>garantía de 30 días</strong> hasta el <strong>{guaranteeStr}</strong>: si
+          RenBotIA no te funciona, te devolvemos todo lo que pagaste y tu cuenta pasa a Free.{' '}
+          {confirmRefund ? (
+            <span className="mt-2 flex flex-wrap items-center gap-2">
+              <span className="font-medium">¿Confirmas el reembolso? Tu plan termina al instante.</span>
+              <Button size="sm" variant="danger" onClick={onGuaranteeRefund} disabled={acting}>
+                Sí, reembolsar
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setConfirmRefund(false)} disabled={acting}>
+                No, conservar mi plan
+              </Button>
+            </span>
+          ) : (
+            <button onClick={() => setConfirmRefund(true)} className="font-semibold underline underline-offset-2">
+              Solicitar reembolso
+            </button>
+          )}
+        </Alert>
+      )}
+
+      {/* Sesión de orientación por videollamada (gratis en el lanzamiento; incluida en anual) */}
+      {orientation?.included && !orientation?.done && orientation?.bookingUrl && (
+        <Card className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <Icon name="calendarCheck" size={22} className="mt-0.5 shrink-0 text-brand-600" />
+            <div>
+              <div className="font-semibold text-fg">Sesión de orientación gratis</div>
+              <p className="text-sm text-muted">
+                Una videollamada con nuestro equipo para dejar tu bot conectado y respondiendo, y resolver tus dudas de
+                planes y configuración.
+              </p>
+            </div>
+          </div>
+          <a href={orientation.bookingUrl} target="_blank" rel="noopener noreferrer" className="shrink-0">
+            <Button size="sm">Agendar sesión</Button>
+          </a>
+        </Card>
+      )}
+
+      {/* Invitación a pasarse al anual (paga mensual) */}
+      {annualOffer && (
+        <Card className="flex flex-col gap-3 border-brand-500/40 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="font-semibold text-fg">
+              Paga anual y ahorra {money(currentPlan.annual.savingsMXN)}
+            </div>
+            <p className="text-sm text-muted">
+              {currentPlan.name} anual por {money(currentPlan.annual.priceMXN)}: pagas {currentPlan.annual.monthsPaid} meses y
+              recibes 12{pricing?.annual?.founder ? ' (precio de fundador, lo conservas mientras renueves)' : ''}. Empieza al
+              terminar tu mes ya pagado y tiene garantía de 30 días.
+            </p>
+          </div>
+          <Button size="sm" className="shrink-0" onClick={() => openPlanCheckout(currentKey, 'anual')}>
+            Pasar a anual
+          </Button>
+        </Card>
+      )}
+
       {/* Plan actual */}
       <Card>
         <div className="flex items-center justify-between">
           <div>
             <div className="text-sm text-muted">Plan actual</div>
-            <div className="text-xl font-bold text-fg">{subscription?.plan?.name || '—'}</div>
+            <div className="flex items-center gap-2 text-xl font-bold text-fg">
+              {subscription?.plan?.name || '—'}
+              {annualActive && <Badge color="green">Anual</Badge>}
+              {subscription?.founder && <Badge color="slate">Fundador</Badge>}
+            </div>
           </div>
           <Badge color={status === 'activa' ? 'green' : status === 'vencida' ? 'red' : 'amber'}>
             {status === 'vencida' ? 'pago pendiente' : status || '—'}
@@ -261,18 +394,25 @@ export default function Billing() {
                 ? 'Cortesía (sin cobro)'
                 : subscription?.plan?.priceMXN === 0
                   ? 'Gratis'
-                  : `$${subscription?.plan?.priceMXN?.toLocaleString('es-MX')} MXN/mes`}
+                  : annualActive
+                    ? `Pagado hasta el ${termEndStr}`
+                    : `$${subscription?.plan?.priceMXN?.toLocaleString('es-MX')} MXN/mes`}
             </div>
+            {annualActive && <div className="text-[11px] text-subtle">Plan anual · tus créditos se renuevan cada mes</div>}
           </div>
           <div>
-            <div className="text-muted">Renovación</div>
-            <div className="font-medium text-fg">{renewalStr}</div>
+            <div className="text-muted">{annualActive ? 'Próximo cobro' : 'Renovación'}</div>
+            <div className="font-medium text-fg">
+              {annualActive ? (renewalAmount > 0 && status !== 'cancelada' ? nextChargeStr : '—') : renewalStr}
+            </div>
             {renewalAmount > 0 && status !== 'cancelada' && (
               <div className="text-[11px] text-subtle">
                 {money(renewalAmount)}
+                {subscription?.nextChargeCycle === 'anual' ? ' por 12 meses' : ''}
                 {savedCard ? ` · ${savedCard.brand} •••• ${savedCard.last4}` : ' · sin tarjeta'}
               </div>
             )}
+            {annualActive && <div className="text-[11px] text-subtle">Créditos nuevos el {renewalStr}</div>}
           </div>
           <div>
             <div className="text-muted">Conversaciones disponibles</div>
@@ -319,22 +459,36 @@ export default function Billing() {
         <div>
           <h2 className="mb-1 font-semibold text-fg">Cambiar de plan</h2>
           <p className="mb-4 text-sm text-muted">
-            Al <strong>mejorar</strong> (a Pro o Elite) pagas ahora y las ventajas se activan al
-            instante. Al <strong>bajar</strong> de plan, el cambio aplica en tu próxima renovación (
-            {renewalStr}) y conservas tu plan actual hasta entonces.
+            {annualActive ? (
+              <>
+                Tienes un plan anual hasta el <strong>{termEndStr}</strong>. Al <strong>mejorar</strong> pagas solo la
+                diferencia por los meses que faltan y las ventajas se activan al instante. Bajar de plan o pasar a
+                mensual aplica al terminar tu año.
+              </>
+            ) : (
+              <>
+                Al <strong>mejorar</strong> (a Pro o Elite) pagas ahora y las ventajas se activan al instante. Al{' '}
+                <strong>bajar</strong> de plan, el cambio aplica en tu próxima renovación ({renewalStr}) y conservas tu
+                plan actual hasta entonces.
+              </>
+            )}
           </p>
           {loading ? (
             <div className="flex justify-center py-8">
               <Spinner className="text-brand-600" />
             </div>
           ) : (
-            <PlanCards
-              plans={plans}
-              selectedKey={currentKey}
-              onSelect={onSelectPlan}
-              ctaFor={ctaFor}
-              paidPlansLive={paidPlansLive}
-            />
+            <>
+              <CycleToggle cycle={shownCycle} onChange={setCycle} pricing={pricing} className="mb-6" />
+              <PlanCards
+                plans={plans}
+                selectedKey={selectedForCycle}
+                onSelect={onSelectPlan}
+                ctaFor={ctaFor}
+                paidPlansLive={paidPlansLive}
+                cycle={shownCycle}
+              />
+            </>
           )}
         </div>
       )}
@@ -406,13 +560,19 @@ export default function Billing() {
                     </td>
                     <td className="py-2 text-muted">{p.description}</td>
                     <td className="py-2 text-muted">
-                      {p.type === 'credits' ? 'Créditos' : p.renewal ? 'Renovación' : 'Plan'}
+                      {p.type === 'credits'
+                        ? 'Créditos'
+                        : `${p.renewal ? 'Renovación' : 'Plan'}${p.cycle === 'anual' ? ' anual' : ''}`}
                     </td>
                     <td className="py-2 tabular text-muted">
                       ${p.amountMXN?.toLocaleString('es-MX')}
                     </td>
                     <td className="py-2">
-                      <Badge color="green">Pagada</Badge>
+                      {p.status === 'refunded' ? (
+                        <Badge color="amber">Reembolsada</Badge>
+                      ) : (
+                        <Badge color="green">Pagada</Badge>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -429,6 +589,7 @@ export default function Billing() {
           onClose={() => setCheckout(null)}
           kind={checkout.kind}
           planKey={checkout.planKey}
+          cycle={checkout.cycle}
           packKey={checkout.packKey}
           itemName={checkout.itemName}
           amountMXN={checkout.amountMXN}

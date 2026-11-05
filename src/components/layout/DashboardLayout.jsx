@@ -30,6 +30,7 @@ const NAV = [
 const PAGE_TITLES = {
   '/dashboard': 'Inicio',
   '/dashboard/embudo': 'Embudo',
+  '/dashboard/campanas': 'Campañas',
   '/dashboard/entrenamiento': 'Entrenamiento',
   '/dashboard/simulador': 'Simulador',
   '/dashboard/conversaciones': 'Conversaciones',
@@ -99,6 +100,7 @@ export function DashboardLayout() {
     });
   }
   if (user?.role === 'admin' || user?.role === 'soporte') nav = [...nav, { to: '/dashboard/embudo', label: 'Embudo', icon: 'filter' }];
+  if (user?.role === 'admin' || user?.role === 'agencia') nav = [...nav, { to: '/dashboard/campanas', label: 'Campañas', icon: 'megaphone' }];
   if (user?.role === 'admin')
     nav = [
       ...nav,

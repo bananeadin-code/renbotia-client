@@ -21,6 +21,7 @@ import { track } from '../../lib/tracking.js';
  * @param {() => void} props.onClose
  * @param {'plan'|'credits'|'renewal'} props.kind
  * @param {string} [props.planKey]
+ * @param {'mensual'|'anual'} [props.cycle] Forma de pago del plan.
  * @param {string} [props.packKey]
  * @param {string} props.itemName   Nombre visible del concepto.
  * @param {number} props.amountMXN
@@ -28,27 +29,36 @@ import { track } from '../../lib/tracking.js';
  * @param {(result:any) => void} props.onSuccess
  * @param {(card:object|null) => void} [props.onCardChange]  Avisa si se guardó otra tarjeta.
  */
-export function CheckoutDialog({ open, onClose, kind, planKey, packKey, itemName, amountMXN, note, onSuccess, onCardChange }) {
+export function CheckoutDialog({ open, onClose, kind, planKey, cycle = 'mensual', packKey, itemName, amountMXN, note, onSuccess, onCardChange }) {
   const [step, setStep] = useState('loading'); // loading | card | confirm | processing
   const [card, setCard] = useState(null);
   const [error, setError] = useState('');
   const [testMode, setTestMode] = useState(false);
+  // Cotización del servidor (monto exacto: anual, fundador o mejora proporcional).
+  const [quote, setQuote] = useState(null);
 
   useEffect(() => {
     if (!open) return;
     setError('');
     setStep('loading');
-    Promise.all([billingApi.getPaymentMethod(), billingApi.config()])
-      .then(([pm, cfg]) => {
+    setQuote(null);
+    const quoteReq = kind === 'plan' ? billingApi.quote(planKey, cycle).catch((e) => ({ error: e })) : Promise.resolve(null);
+    Promise.all([billingApi.getPaymentMethod(), billingApi.config(), quoteReq])
+      .then(([pm, cfg, q]) => {
         setTestMode(String(cfg.publishableKey || '').startsWith('pk_test_'));
         setCard(pm.paymentMethod || null);
+        if (q?.error) {
+          setError(q.error.response?.data?.message || 'No pudimos calcular el monto. Intenta de nuevo.');
+        } else if (q) {
+          setQuote(q);
+        }
         setStep(pm.paymentMethod ? 'confirm' : 'card');
       })
       .catch((e) => {
         setError(e.response?.data?.message || 'No se pudo cargar tu método de pago.');
         setStep('card');
       });
-  }, [open]);
+  }, [open, kind, planKey, cycle]);
 
   function onCardSaved(result) {
     setCard(result.paymentMethod);
@@ -62,7 +72,7 @@ export function CheckoutDialog({ open, onClose, kind, planKey, packKey, itemName
     setStep('processing');
     try {
       const purchase =
-        kind === 'plan' ? { kind, planKey } : kind === 'credits' ? { kind, packKey } : { kind };
+        kind === 'plan' ? { kind, planKey, cycle } : kind === 'credits' ? { kind, packKey } : { kind };
       const data = await billingApi.createIntent(purchase);
       let status = data.status;
       // Autenticación del banco (3DS): se completa en el navegador.
@@ -79,7 +89,7 @@ export function CheckoutDialog({ open, onClose, kind, planKey, packKey, itemName
           track('purchase', {
             transaction_id: data.paymentIntentId,
             event_id: `pay_${data.paymentIntentId}`,
-            value: Number(amountMXN) || 0,
+            value: Number(data.amountMXN ?? total) || 0,
             currency: 'MXN',
             items: [{ item_id: planKey || packKey, item_name: itemName }],
           });
@@ -99,18 +109,29 @@ export function CheckoutDialog({ open, onClose, kind, planKey, packKey, itemName
     }
   }
 
-  const money = `$${Number(amountMXN).toLocaleString('es-MX')} MXN`;
+  const total = quote?.amountMXN ?? amountMXN;
+  const money = `$${Number(total).toLocaleString('es-MX')} MXN`;
   const recurring = kind === 'plan' || kind === 'renewal';
+  const annual = kind === 'plan' && cycle === 'anual';
+  const startsLater = quote?.startsAt
+    ? new Date(quote.startsAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', timeZone: 'America/Mexico_City' })
+    : '';
+  const defaultNote =
+    quote?.mode === 'annual_upgrade'
+      ? 'Pagas solo la diferencia por los meses que faltan de tu año. Tu fecha de renovación no cambia.'
+      : annual
+        ? `Cubre 12 meses${startsLater ? `, a partir del ${startsLater} (conservas tu mes ya pagado)` : ''}. Garantía de 30 días con reembolso completo.`
+        : recurring
+          ? 'Se renueva cada mes con tu tarjeta. Cancela cuando quieras.'
+          : 'Pago único';
 
   return (
     <Modal open={open} onClose={step === 'processing' ? () => {} : onClose} title="Pago seguro" size="md">
       {/* Resumen del concepto */}
       <div className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-line bg-surface2 px-4 py-3">
         <div className="min-w-0">
-          <div className="truncate text-sm font-semibold text-fg">{itemName}</div>
-          <div className="text-xs text-subtle">
-            {note || (recurring ? 'Se renueva cada mes con tu tarjeta. Cancela cuando quieras.' : 'Pago único')}
-          </div>
+          <div className="truncate text-sm font-semibold text-fg">{quote?.description || itemName}</div>
+          <div className="text-xs text-subtle">{note || defaultNote}</div>
         </div>
         <div className="shrink-0 text-right">
           <div className="text-lg font-extrabold text-brand-600">{money}</div>
@@ -174,7 +195,7 @@ export function CheckoutDialog({ open, onClose, kind, planKey, packKey, itemName
               Cambiar
             </button>
           </div>
-          <Button className="w-full" onClick={pay}>
+          <Button className="w-full" onClick={pay} disabled={kind === 'plan' && !quote}>
             Pagar {money}
           </Button>
         </div>

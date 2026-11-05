@@ -142,7 +142,7 @@ export function PaymentMethod({ packs = [], onCardChange }) {
         <h2 className="font-semibold text-fg">Método de pago y recarga automática</h2>
       </div>
       <p className="mb-4 text-sm text-muted">
-        Tu tarjeta paga tus compras y la renovación mensual de tu plan. La procesa Stripe: el sitio
+        Tu tarjeta paga tus compras y la renovación de tu plan. La procesa Stripe: el sitio
         nunca ve tus datos. También puedes programar la compra automática de créditos.
       </p>
 

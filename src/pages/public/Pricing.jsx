@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { planApi } from '../../api/endpoints.js';
 import { PublicNav, PublicFooter } from '../../components/layout/PublicNav.jsx';
-import { PlanCards } from '../../components/PlanCards.jsx';
+import { PlanCards, CycleToggle } from '../../components/PlanCards.jsx';
+import { savePlanIntent } from '../../lib/planIntent.js';
 import { SupportWidget } from '../../components/whatsapp/SupportWidget.jsx';
 import { Spinner, Button } from '../../components/ui/index.jsx';
 import { Reveal } from '../../components/ui/Reveal.jsx';
@@ -11,7 +12,9 @@ import { useSeo, SITE_URL } from '../../lib/seo.js';
 import { PAGE_SEO } from '../../content/pages.js';
 
 const GUARANTEES = [
-  { icon: 'check', text: 'Sin contratos ni permanencia' },
+  { icon: 'check', text: 'Mensual sin contratos ni permanencia' },
+  { icon: 'shieldCheck', text: 'Plan anual con garantía de 30 días' },
+  { icon: 'calendarCheck', text: 'Sesión de orientación por videollamada' },
   { icon: 'card', text: 'Pago seguro con Stripe' },
   { icon: 'bot', text: 'Prueba gratis por uso, sin límite de días' },
 ];
@@ -19,6 +22,8 @@ const GUARANTEES = [
 export default function Pricing() {
   const navigate = useNavigate();
   const [plans, setPlans] = useState([]);
+  const [pricing, setPricing] = useState(null);
+  const [cycle, setCycle] = useState('anual');
   const [loading, setLoading] = useState(true);
 
   useSeo({
@@ -29,7 +34,10 @@ export default function Pricing() {
   useEffect(() => {
     planApi
       .list()
-      .then((data) => setPlans(data.plans))
+      .then((data) => {
+        setPlans(data.plans);
+        setPricing(data.pricing || null);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -58,11 +66,19 @@ export default function Pricing() {
               <Spinner className="text-brand-600" />
             </div>
           ) : (
-            <PlanCards
-              plans={plans}
-              ctaLabel="Comenzar"
-              onSelect={(key) => navigate(`/registro?plan=${key}`)}
-            />
+            <>
+              <CycleToggle cycle={cycle} onChange={setCycle} pricing={pricing} className="mb-8" />
+              <PlanCards
+                plans={plans}
+                cycle={cycle}
+                ctaLabel="Comenzar"
+                onSelect={(key) => {
+                  // El onboarding arranca con el plan y la forma de pago elegidos.
+                  savePlanIntent(key, cycle);
+                  navigate(`/registro?plan=${key}`);
+                }}
+              />
+            </>
           )}
         </Reveal>
 

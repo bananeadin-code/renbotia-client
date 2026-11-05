@@ -141,7 +141,12 @@ export const billingApi = {
   payments: () => unwrap(api.get('/billing/payments')),
   cancel: () => unwrap(api.post('/billing/cancel')),
   resume: () => unwrap(api.post('/billing/resume')),
-  changePlan: (planKey) => unwrap(api.post('/billing/change-plan', { planKey })),
+  // cycle: 'mensual' para pasar a mensual al terminar un año vigente.
+  changePlan: (planKey, cycle) => unwrap(api.post('/billing/change-plan', cycle ? { planKey, cycle } : { planKey })),
+  // Monto exacto antes de pagar (mensual, anual o mejora proporcional).
+  quote: (planKey, cycle) => unwrap(api.get('/billing/quote', { params: { planKey, cycle } })),
+  // Garantía de 30 días del plan anual: reembolso completo y pasa a Free.
+  guaranteeRefund: () => unwrap(api.post('/billing/guarantee-refund')),
   // Tarjeta guardada (Stripe Elements) + recarga automática
   config: () => unwrap(api.get('/billing/config')),
   // Estado público de planes (sin sesión) para la página de Precios.
@@ -289,6 +294,13 @@ export const funnelApi = {
   spend: () => unwrap(api.get('/funnel/spend')),
   saveSpend: (body) => unwrap(api.put('/funnel/spend', body)),
   sendReport: () => unwrap(api.post('/funnel/report')),
+  // Agencia de marketing (y admin): cifras de campañas pagadas, sin datos personales.
+  campaigns: (params) => unwrap(api.get('/funnel/campaigns', { params })),
+  campaignSpend: () => unwrap(api.get('/funnel/campaign-spend')),
+  saveCampaignSpend: (body) => unwrap(api.put('/funnel/campaign-spend', body)),
+  offlineConversions: (params) =>
+    api.get('/funnel/offline-conversions.csv', { params, responseType: 'blob' }).then((r) => r.data),
+  setOrientation: (userId, orientationDone) => unwrap(api.patch(`/funnel/leads/${userId}`, { orientationDone })),
 };
 
 export const adminApi = {

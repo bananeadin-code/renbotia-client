@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { onboardingApi, planApi, botConfigApi } from '../../api/endpoints.js';
 import { useBusinessStore } from '../../store/businessStore.js';
 import { toast } from '../../store/toastStore.js';
-import { PlanCards } from '../../components/PlanCards.jsx';
+import { PlanCards, CycleToggle } from '../../components/PlanCards.jsx';
+import { readPlanIntent, clearPlanIntent } from '../../lib/planIntent.js';
 import { CheckoutDialog } from '../../components/billing/CheckoutDialog.jsx';
 import { Button, Input, Select, Textarea, Alert, Spinner } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
@@ -61,6 +62,7 @@ export default function OnboardingWizard() {
 
   const [step, setStep] = useState(saved?.step ?? 0);
   const [plans, setPlans] = useState([]);
+  const [pricing, setPricing] = useState(null);
   const [loadingPlans, setLoadingPlans] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -78,7 +80,10 @@ export default function OnboardingWizard() {
     });
     planApi
       .list()
-      .then((data) => setPlans(data.plans))
+      .then((data) => {
+        setPlans(data.plans);
+        setPricing(data.pricing || null);
+      })
       .finally(() => setLoadingPlans(false));
     if (saved && (saved.step > 0 || saved.business?.name)) {
       toast.info('Retomamos tu progreso donde lo dejaste.');
@@ -103,7 +108,10 @@ export default function OnboardingWizard() {
         ? { name: demo.name, industry: 'otro', industryOther: demo.sector || '', whatsappNumber: '' }
         : { name: '', industry: 'legal', industryOther: '', whatsappNumber: '' })
   );
-  const [planKey, setPlanKey] = useState(saved?.planKey ?? 'free');
+  // Plan elegido en Precios (si llegó desde ahí) o el guardado del progreso.
+  const [intent] = useState(() => readPlanIntent());
+  const [planKey, setPlanKey] = useState(saved?.planKey ?? intent?.planKey ?? 'free');
+  const [cycle, setCycle] = useState(saved?.cycle ?? intent?.cycle ?? 'mensual');
   const [bot, setBot] = useState(
     saved?.bot ??
       (demo
@@ -134,11 +142,11 @@ export default function OnboardingWizard() {
   // Persiste el progreso en el navegador ante cada cambio.
   useEffect(() => {
     try {
-      localStorage.setItem(SAVE_KEY, JSON.stringify({ step, business, planKey, bot, faqs }));
+      localStorage.setItem(SAVE_KEY, JSON.stringify({ step, business, planKey, cycle, bot, faqs }));
     } catch {
       /* sin persistencia disponible: no bloquea el onboarding */
     }
-  }, [step, business, planKey, bot, faqs]);
+  }, [step, business, planKey, cycle, bot, faqs]);
 
   const limits = limitsFor(planKey);
   const faqMax = limits.maxFaqs == null ? 5 : limits.maxFaqs; // en onboarding cap visual a 5
@@ -203,6 +211,7 @@ export default function OnboardingWizard() {
         const done = await onboardingApi.complete({ business, planKey, botConfig });
         if (done?.accessToken) setAccessToken(done.accessToken); // la sesión ahora es de dueño
         clearSaved();
+        clearPlanIntent();
         await loadBusiness();
         navigate('/dashboard', { replace: true });
         return;
@@ -216,11 +225,13 @@ export default function OnboardingWizard() {
       clearSaved();
       await loadBusiness();
       const plan = plans.find((p) => p.key === planKey);
+      clearPlanIntent();
       setCheckout({
         kind: 'plan',
         planKey,
-        itemName: `Plan ${plan?.name || ''}`.trim(),
-        amountMXN: plan?.priceMXN ?? 0,
+        cycle,
+        itemName: `Plan ${plan?.name || ''}${cycle === 'anual' ? ' anual' : ''}`.trim(),
+        amountMXN: cycle === 'anual' ? plan?.annual?.priceMXN ?? 0 : plan?.priceMXN ?? 0,
         botConfig,
       });
       setSubmitting(false);
@@ -349,11 +360,14 @@ export default function OnboardingWizard() {
                   <Spinner className="text-brand-600" />
                 </div>
               ) : (
-                <PlanCards plans={plans} selectedKey={planKey} onSelect={setPlanKey} ctaLabel="Seleccionar" />
+                <>
+                  <CycleToggle cycle={cycle} onChange={setCycle} pricing={pricing} className="mb-6" />
+                  <PlanCards plans={plans} selectedKey={planKey} onSelect={setPlanKey} ctaLabel="Seleccionar" cycle={cycle} />
+                </>
               )}
               <p className="mt-4 text-center text-xs text-subtle">
-                El plan Free se activa al instante. Los planes de pago usan Stripe en modo prueba
-                (tarjeta de test 4242 4242 4242 4242).
+                El plan Free se activa al instante. Los planes de pago se cobran con tarjeta de forma
+                segura con Stripe; primero guardas tu tarjeta y después confirmas el pago.
               </p>
             </div>
           )}
@@ -507,6 +521,7 @@ export default function OnboardingWizard() {
           onClose={onCheckoutClose}
           kind={checkout.kind}
           planKey={checkout.planKey}
+          cycle={checkout.cycle}
           itemName={checkout.itemName}
           amountMXN={checkout.amountMXN}
           onSuccess={onPaidSuccess}

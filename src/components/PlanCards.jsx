@@ -21,8 +21,9 @@ const HIGHLIGHT = 'pro'; // plan destacado
  * @param {function} [ctaFor] - etiqueta por plan (modo gestión); si se pasa, el
  *   botón del plan actual (selectedKey) queda deshabilitado.
  * @param {boolean} [paidPlansLive] - fuerza el estado; si se omite, se consulta.
+ * @param {'mensual'|'anual'} [cycle] - con 'anual' muestra el precio anual (plan.annual).
  */
-export function PlanCards({ plans, selectedKey, onSelect, ctaLabel = 'Elegir plan', ctaFor, paidPlansLive }) {
+export function PlanCards({ plans, selectedKey, onSelect, ctaLabel = 'Elegir plan', ctaFor, paidPlansLive, cycle = 'mensual' }) {
   const [fetchedLive, setFetchedLive] = useState(null);
   useEffect(() => {
     if (typeof paidPlansLive === 'boolean') return; // ya lo pasaron
@@ -70,6 +71,19 @@ export function PlanCards({ plans, selectedKey, onSelect, ctaLabel = 'Elegir pla
             <div className="mt-2">
               {plan.priceMXN === 0 ? (
                 <span className="text-3xl font-extrabold text-fg">Gratis</span>
+              ) : cycle === 'anual' && plan.annual ? (
+                <>
+                  <span className="text-3xl font-extrabold tabular text-fg">
+                    ${plan.annual.perMonthMXN.toLocaleString('es-MX')}
+                  </span>
+                  <span className="text-sm text-muted"> MXN/mes</span>
+                  <span className="block text-xs text-subtle">
+                    Pagas ${plan.annual.priceMXN.toLocaleString('es-MX')} al año · IVA incluido
+                  </span>
+                  <span className="mt-1 inline-block rounded-md bg-brand-500/10 px-2 py-0.5 text-xs font-semibold text-brand-700 dark:text-brand-300">
+                    Ahorras ${plan.annual.savingsMXN.toLocaleString('es-MX')} al año
+                  </span>
+                </>
               ) : (
                 <>
                   <span className="text-3xl font-extrabold tabular text-fg">
@@ -131,6 +145,55 @@ export function PlanCards({ plans, selectedKey, onSelect, ctaLabel = 'Elegir pla
           </div>
         );
       })}
+    </div>
+  );
+}
+
+const fmtDay = (d) =>
+  new Date(new Date(d).getTime() - 1).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', timeZone: 'America/Mexico_City' });
+
+/**
+ * Selector Mensual / Anual. Con `pricing.annual` (de GET /plans) muestra la
+ * oferta vigente: precio de fundador ("pagas 9, recibes 12") hasta su fecha, o
+ * el anual normal después.
+ */
+export function CycleToggle({ cycle, onChange, pricing, className = '' }) {
+  const a = pricing?.annual;
+  const free = a ? 12 - a.monthsPaid : 2;
+  return (
+    <div className={`flex flex-col items-center gap-2 ${className}`}>
+      <div className="inline-flex rounded-xl border border-line bg-surface p-1 text-sm" role="radiogroup" aria-label="Forma de pago">
+        {[
+          ['mensual', 'Mensual'],
+          ['anual', 'Anual'],
+        ].map(([k, label]) => (
+          <button
+            key={k}
+            type="button"
+            role="radio"
+            aria-checked={cycle === k}
+            onClick={() => onChange(k)}
+            className={`flex items-center gap-2 rounded-lg px-4 py-1.5 font-semibold transition ${
+              cycle === k ? 'bg-brand-700 text-white shadow-sm' : 'text-muted hover:text-fg'
+            }`}
+          >
+            {label}
+            {k === 'anual' && (
+              <span className={`rounded px-1.5 py-0.5 text-[11px] font-bold ${cycle === k ? 'bg-white/20 text-white' : 'bg-brand-500/10 text-brand-700 dark:text-brand-300'}`}>
+                {free} meses gratis
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+      {a && (
+        <p className="text-center text-xs text-muted">
+          {a.founder
+            ? `Precio de fundador: pagas ${a.monthsPaid} meses y recibes 12, hasta el ${fmtDay(a.founderUntil)}. Lo conservas mientras renueves.`
+            : `Pagas ${a.monthsPaid} meses y recibes 12.`}{' '}
+          Garantía de {a.guaranteeDays} días en el plan anual.
+        </p>
+      )}
     </div>
   );
 }

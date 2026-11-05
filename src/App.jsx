@@ -58,6 +58,7 @@ const Team = lazy(() => import('./pages/dashboard/Team.jsx'));
 const AdminPanel = lazy(() => import('./pages/admin/AdminPanel.jsx'));
 const SiteAssistant = lazy(() => import('./pages/dashboard/SiteAssistant.jsx'));
 const Embudo = lazy(() => import('./pages/dashboard/Embudo.jsx'));
+const Campanas = lazy(() => import('./pages/dashboard/Campanas.jsx'));
 
 function RouteFallback() {
   return (
@@ -141,6 +142,14 @@ export default function App() {
           element={
             <ProtectedRoute role={['admin', 'soporte']}>
               <Embudo />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="campanas"
+          element={
+            <ProtectedRoute role={['admin', 'agencia']}>
+              <Campanas />
             </ProtectedRoute>
           }
         />
