@@ -22,7 +22,8 @@ export function ProtectedRoute({ children, role }) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (role && user?.role !== role) {
+  const allowed = Array.isArray(role) ? role : role ? [role] : null;
+  if (allowed && !allowed.includes(user?.role)) {
     return <Navigate to="/dashboard" replace />;
   }
 

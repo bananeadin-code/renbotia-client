@@ -16,6 +16,7 @@ import { Spinner } from './components/ui/index.jsx';
 // se carga bajo demanda (code-splitting) para aligerar el bundle inicial —
 // especialmente el dashboard (recharts) y facturación (Stripe).
 import Landing from './pages/public/Landing.jsx';
+import { CookieBanner } from './components/ui/CookieBanner.jsx';
 
 const named = (p, name) => lazy(() => p().then((m) => ({ default: m[name] })));
 
@@ -56,6 +57,7 @@ const Activity = lazy(() => import('./pages/dashboard/Activity.jsx'));
 const Team = lazy(() => import('./pages/dashboard/Team.jsx'));
 const AdminPanel = lazy(() => import('./pages/admin/AdminPanel.jsx'));
 const SiteAssistant = lazy(() => import('./pages/dashboard/SiteAssistant.jsx'));
+const Embudo = lazy(() => import('./pages/dashboard/Embudo.jsx'));
 
 function RouteFallback() {
   return (
@@ -135,6 +137,14 @@ export default function App() {
         <Route path="perfil" element={<Profile />} />
         <Route path="actividad" element={<RequireAccess module="activity"><Activity /></RequireAccess>} />
         <Route
+          path="embudo"
+          element={
+            <ProtectedRoute role={['admin', 'soporte']}>
+              <Embudo />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="admin"
           element={
             <ProtectedRoute role="admin">
@@ -156,6 +166,7 @@ export default function App() {
     </Routes>
     </Suspense>
     <Toaster />
+    <CookieBanner />
     <ConfirmDialog />
     <StepUpDialog />
     </>

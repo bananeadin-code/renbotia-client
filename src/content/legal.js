@@ -10,7 +10,7 @@ export const LEGAL = {
   privacidad: {
     slug: 'privacidad',
     title: 'Aviso de Privacidad',
-    updated: '14 de octubre de 2026',
+    updated: '4 de noviembre de 2026',
     description:
       'Aviso de Privacidad de RenBotIA: qué datos recabamos, para qué, con quién los compartimos y cómo ejercer tus derechos ARCO.',
     intro:
@@ -48,7 +48,7 @@ export const LEGAL = {
       {
         h: '4. Con quién compartimos datos',
         p: [
-          'Nos apoyamos en proveedores que tratan datos por nuestra cuenta (encargados) únicamente para prestar el servicio: procesamiento de inteligencia artificial (Anthropic — Claude), pagos (Stripe), envío de correos (Resend), alojamiento y base de datos, y las plataformas de mensajería de Meta (WhatsApp Business, Facebook Messenger e Instagram) por las que tu bot recibe y envía mensajes. No vendemos tus datos personales a terceros.',
+          'Nos apoyamos en proveedores que tratan datos por nuestra cuenta (encargados) únicamente para prestar el servicio: procesamiento de inteligencia artificial (Anthropic — Claude), pagos (Stripe), envío de correos (Resend), alojamiento y base de datos, y las plataformas de mensajería de Meta (WhatsApp Business, Facebook Messenger e Instagram) por las que tu bot recibe y envía mensajes. Solo si aceptas las cookies de medición, compartimos con Meta y Google, para medir nuestras campañas de publicidad, el aviso de que te registraste, conectaste un canal o realizaste un pago, junto con tu correo en forma cifrada (hash) y un identificador; no compartimos el contenido de tus conversaciones. No vendemos tus datos personales a terceros.',
         ],
       },
       {
@@ -70,7 +70,7 @@ export const LEGAL = {
       {
         h: '7. Cookies y almacenamiento local',
         p: [
-          'Solo usamos cookies y almacenamiento local necesarios para que el servicio funcione. No usamos cookies de publicidad ni de rastreo, y no vendemos ni compartimos tu navegación con anunciantes.',
+          'Usamos cookies y almacenamiento local necesarios para que el servicio funcione. Las cookies de medición de campañas son opcionales: solo se activan si las aceptas en el aviso de cookies, y puedes cambiar tu decisión cuando quieras desde "Preferencias de cookies" al pie de cada página. No vendemos tu navegación a anunciantes.',
         ],
         ul: [
           'Cookies de sesión (propias): mantienen tu sesión iniciada de forma segura y, si lo eliges, recuerdan tu dispositivo para no pedirte el código de verificación cada vez.',
@@ -78,6 +78,7 @@ export const LEGAL = {
           'Pagos (Stripe): al pagar o guardar una tarjeta, Stripe usa cookies propias para prevenir fraudes.',
           'Inicio de sesión con Google y conexión con Meta: solo si usas “Continuar con Google” o conectas tus canales de Facebook, Instagram o WhatsApp, esos servicios pueden usar sus propias cookies conforme a sus políticas.',
           'Estadísticas de visitas: usamos Cloudflare Web Analytics, que no usa cookies ni identifica a las personas.',
+          'Medición de campañas (opcional, con tu consentimiento): Google (Tag Manager y Google Ads) y Meta (Píxel) usan cookies para saber qué anuncio te trajo y si te registraste o contrataste un plan. También guardamos de qué campaña llegaste (parámetros UTM) para medir nuestros resultados.',
         ],
         p2: [
           'Puedes borrar o bloquear las cookies desde la configuración de tu navegador; si bloqueas las de sesión no podrás iniciar sesión en el panel.',

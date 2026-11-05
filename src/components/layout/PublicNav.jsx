@@ -6,6 +6,7 @@ import { Logo } from '../ui/Logo.jsx';
 import { ThemeToggle } from '../ui/ThemeToggle.jsx';
 import { Icon } from '../ui/Icon.jsx';
 import { GOOGLE_BUSINESS_URL } from '../../lib/seo.js';
+import { reopenConsent } from '../../lib/consent.js';
 
 const NAV_LINKS = [
   { to: '/soluciones', label: 'Soluciones' },
@@ -143,12 +144,20 @@ const FOOTER_SECTIONS = [
       { to: '/privacidad', label: 'Privacidad' },
       { to: '/terminos', label: 'Términos' },
       { to: '/eliminar-datos', label: 'Eliminar datos' },
+      { action: 'cookies', label: 'Preferencias de cookies' },
     ],
   },
 ];
 
 function FooterLink({ link }) {
   const cls = 'text-sm text-muted transition hover:text-fg';
+  if (link.action === 'cookies') {
+    return (
+      <button type="button" onClick={reopenConsent} className={`${cls} text-left`}>
+        {link.label}
+      </button>
+    );
+  }
   if (link.external) {
     return (
       <a href={link.href} target="_blank" rel="noopener noreferrer" className={cls}>

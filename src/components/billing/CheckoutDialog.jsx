@@ -5,6 +5,7 @@ import { Modal } from '../ui/Modal.jsx';
 import { Button, Alert, Spinner } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
 import { CardSetup } from './CardSetup.jsx';
+import { track } from '../../lib/tracking.js';
 
 /**
  * Pago DENTRO del sitio con "tarjeta primero" (como Render): si el negocio aún
@@ -74,6 +75,15 @@ export function CheckoutDialog({ open, onClose, kind, planKey, packKey, itemName
       if (status !== 'succeeded') throw new Error('Tu banco no aprobó el cargo. Intenta con otra tarjeta.');
       try {
         const result = await billingApi.confirm({ paymentIntentId: data.paymentIntentId });
+        if (kind === 'plan' || kind === 'credits') {
+          track('purchase', {
+            transaction_id: data.paymentIntentId,
+            event_id: `pay_${data.paymentIntentId}`,
+            value: Number(amountMXN) || 0,
+            currency: 'MXN',
+            items: [{ item_id: planKey || packKey, item_name: itemName }],
+          });
+        }
         onSuccess?.(result);
       } catch (e2) {
         // Cobrado pero no entregado (red): reintentar confirm es seguro (idempotente).

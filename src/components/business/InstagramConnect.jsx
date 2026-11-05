@@ -6,6 +6,8 @@ import { toast } from '../../store/toastStore.js';
 import { confirm } from '../../store/confirmStore.js';
 import { Card, Button, Alert, Notice } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
+import { trackChannelConnected } from '../../lib/tracking.js';
+import { useBusinessStore } from '../../store/businessStore.js';
 
 /**
  * Tarjeta de Instagram en Conexiones. El dueño conecta su cuenta profesional de
@@ -69,6 +71,7 @@ export function InstagramConnect({ data, isOwner, sdkReady, onChanged }) {
             } else {
               await onChanged?.();
               toast.success(`¡Instagram conectado! Tu bot ya responde los mensajes de @${res?.username || 'tu cuenta'}.`);
+      trackChannelConnected('instagram', useBusinessStore.getState().business?._id);
             }
           } catch (err) {
             toast.error(err.response?.data?.message || 'No se pudo conectar Instagram. Intenta de nuevo.');
@@ -88,6 +91,7 @@ export function InstagramConnect({ data, isOwner, sdkReady, onChanged }) {
       setAccounts(null);
       await onChanged?.();
       toast.success(`¡Instagram conectado! Tu bot ya responde los mensajes de @${res?.username || 'tu cuenta'}.`);
+      trackChannelConnected('instagram', useBusinessStore.getState().business?._id);
     } catch (err) {
       toast.error(err.response?.data?.message || 'No se pudo conectar esa cuenta.');
       if (err.response?.data?.details?.code === 'SELECTION_EXPIRED') setAccounts(null);

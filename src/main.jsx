@@ -4,6 +4,12 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App.jsx';
 import { ErrorBoundary, reloadOnceForNewVersion } from './components/ui/ErrorBoundary.jsx';
 import './styles/index.css';
+import { captureAttribution } from './lib/attribution.js';
+import { initTracking } from './lib/tracking.js';
+
+// Origen de la visita (campaña/anuncio) y medición con consentimiento.
+captureAttribution();
+initTracking();
 
 // Vite avisa cuando no pudo precargar un archivo (versión vieja tras un deploy).
 window.addEventListener('vite:preloadError', (event) => {

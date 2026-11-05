@@ -6,6 +6,8 @@ import { toast } from '../../store/toastStore.js';
 import { confirm } from '../../store/confirmStore.js';
 import { Card, Button, Spinner, Select } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
+import { trackChannelConnected } from '../../lib/tracking.js';
+import { useBusinessStore } from '../../store/businessStore.js';
 
 /**
  * Tarjeta "Chat para tu sitio web" en Conexiones (Pro/Elite). El dueño lo activa,
@@ -40,7 +42,9 @@ export function WebWidgetCard({ isOwner, onStatus }) {
   async function save(patch, okMsg = 'Widget actualizado.') {
     setSaving(true);
     try {
+      const wasEnabled = Boolean(w?.enabled);
       const data = await widgetApi.update(patch);
+      if (patch.enabled && !wasEnabled) trackChannelConnected('web', useBusinessStore.getState().business?._id);
       setW(data);
       setForm({ color: data.color, position: data.position, greeting: data.greeting });
       toast.success(okMsg);

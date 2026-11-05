@@ -9,7 +9,7 @@ const unwrap = (p) => p.then((res) => res.data.data);
 export const authApi = {
   register: (body) => unwrap(api.post('/auth/register', body)),
   login: (body) => unwrap(api.post('/auth/login', body)),
-  google: (credential, ref) => unwrap(api.post('/auth/google', { credential, ...(ref ? { ref } : {}) })),
+  google: (credential, ref, acq) => unwrap(api.post('/auth/google', { credential, ...(ref ? { ref } : {}), ...(acq ? { acq } : {}) })),
   config: () => unwrap(api.get('/auth/config')),
   logout: () => api.post('/auth/logout'),
   refresh: () => unwrap(api.post('/auth/refresh')),
@@ -277,6 +277,18 @@ export const membersApi = {
   createRole: (body) => unwrap(api.post('/members/roles', body)),
   updateRole: (id, body) => unwrap(api.put(`/members/roles/${id}`, body)),
   deleteRole: (id) => unwrap(api.delete(`/members/roles/${id}`)),
+};
+
+// Embudo comercial / CRM (admin y equipo de soporte).
+export const funnelApi = {
+  summary: (params) => unwrap(api.get('/funnel/summary', { params })),
+  leads: (params) => unwrap(api.get('/funnel/leads', { params })),
+  staff: () => unwrap(api.get('/funnel/staff')),
+  updateLead: (userId, body) => unwrap(api.patch(`/funnel/leads/${userId}`, body)),
+  addNote: (userId, text) => unwrap(api.post(`/funnel/leads/${userId}/notes`, { text })),
+  spend: () => unwrap(api.get('/funnel/spend')),
+  saveSpend: (body) => unwrap(api.put('/funnel/spend', body)),
+  sendReport: () => unwrap(api.post('/funnel/report')),
 };
 
 export const adminApi = {

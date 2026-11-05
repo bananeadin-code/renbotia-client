@@ -29,6 +29,7 @@ const NAV = [
  */
 const PAGE_TITLES = {
   '/dashboard': 'Inicio',
+  '/dashboard/embudo': 'Embudo',
   '/dashboard/entrenamiento': 'Entrenamiento',
   '/dashboard/simulador': 'Simulador',
   '/dashboard/conversaciones': 'Conversaciones',
@@ -97,6 +98,7 @@ export function DashboardLayout() {
       return canAccess(access, role, rule[0], rule[1]);
     });
   }
+  if (user?.role === 'admin' || user?.role === 'soporte') nav = [...nav, { to: '/dashboard/embudo', label: 'Embudo', icon: 'filter' }];
   if (user?.role === 'admin')
     nav = [
       ...nav,

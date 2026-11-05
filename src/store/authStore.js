@@ -2,6 +2,9 @@ import { create } from 'zustand';
 import { authApi } from '../api/endpoints.js';
 import { setAccessToken, setActiveBusinessId } from '../api/axios.js';
 import { getReferral } from '../lib/referral.js';
+import { getAcquisition } from '../lib/attribution.js';
+import { getConsent } from '../lib/consent.js';
+import { track } from '../lib/tracking.js';
 
 /**
  * Estado de autenticación. El access token se guarda en memoria (y se inyecta
@@ -52,7 +55,11 @@ export const useAuthStore = create((set, get) => ({
   // código enviado a su correo (verifyEmail).
   async register(body) {
     // Código de referido del enlace de invitación (si llegó por uno).
-    return authApi.register({ ...body, ...(getReferral() ? { ref: getReferral() } : {}) });
+    return authApi.register({
+      ...body,
+      ...(getReferral() ? { ref: getReferral() } : {}),
+      acq: getAcquisition(getConsent()?.ads),
+    });
   },
 
   // Login: puede devolver la sesión, o un estado pendiente
@@ -67,6 +74,10 @@ export const useAuthStore = create((set, get) => ({
   async verifyEmail(email, code) {
     const data = await authApi.verifyEmail({ email, code });
     const r = get()._finish(data);
+    // Registro completo: conversión (mismo event_id que el servidor manda a Meta).
+    const u = data?.user;
+    const uid = u?._id || u?.id;
+    if (uid) track('sign_up', { method: 'email', event_id: `reg_${uid}`, user_data: { email: u.email } });
     return r.needsContext ? r : r.user;
   },
 
@@ -86,8 +97,12 @@ export const useAuthStore = create((set, get) => ({
   },
 
   async googleLogin(credential) {
-    const data = await authApi.google(credential, getReferral());
+    const data = await authApi.google(credential, getReferral(), getAcquisition(getConsent()?.ads));
     const r = get()._finish(data);
+    const gid = data?.user?._id || data?.user?.id;
+    if (data?.isNewUser && gid) {
+      track('sign_up', { method: 'google', event_id: `reg_${gid}`, user_data: { email: data.user.email } });
+    }
     return r.needsContext ? r : r.user;
   },
 

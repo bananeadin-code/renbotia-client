@@ -14,6 +14,7 @@ import { WebWidgetCard } from '../../components/business/WebWidgetCard.jsx';
 import { ChannelSettings } from '../../components/business/ChannelSettings.jsx';
 import { OwnerControlCard } from '../../components/business/OwnerControlCard.jsx';
 import { useBusinessStore } from '../../store/businessStore.js';
+import { trackChannelConnected } from '../../lib/tracking.js';
 
 /**
  * Módulo "Conexiones": un selector de canales (WhatsApp, Messenger, Instagram,
@@ -254,6 +255,7 @@ export function Connections() {
             await connectionsApi.connectWhatsApp({ code, phoneNumberId, wabaId });
             await refresh();
             toast.success('¡WhatsApp conectado! Tu bot ya puede responder en tu número.');
+            trackChannelConnected('whatsapp', useBusinessStore.getState().business?._id);
           } catch (err) {
             toast.error(err.response?.data?.message || 'No se pudo conectar. Intenta de nuevo.');
           } finally {

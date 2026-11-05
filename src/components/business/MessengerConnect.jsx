@@ -6,6 +6,8 @@ import { toast } from '../../store/toastStore.js';
 import { confirm } from '../../store/confirmStore.js';
 import { Card, Button, Alert, Notice } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
+import { trackChannelConnected } from '../../lib/tracking.js';
+import { useBusinessStore } from '../../store/businessStore.js';
 
 /**
  * Tarjeta de Facebook Messenger en Conexiones. El dueño conecta su Página de
@@ -68,6 +70,7 @@ export function MessengerConnect({ data, isOwner, sdkReady, onChanged }) {
             } else {
               await onChanged?.();
               toast.success(`¡Messenger conectado! Tu bot ya responde en "${res?.pageName || 'tu Página'}".`);
+      trackChannelConnected('messenger', useBusinessStore.getState().business?._id);
             }
           } catch (err) {
             toast.error(err.response?.data?.message || 'No se pudo conectar Messenger. Intenta de nuevo.');
@@ -87,6 +90,7 @@ export function MessengerConnect({ data, isOwner, sdkReady, onChanged }) {
       setPages(null);
       await onChanged?.();
       toast.success(`¡Messenger conectado! Tu bot ya responde en "${res?.pageName || 'tu Página'}".`);
+      trackChannelConnected('messenger', useBusinessStore.getState().business?._id);
     } catch (err) {
       toast.error(err.response?.data?.message || 'No se pudo conectar esa Página.');
       if (err.response?.data?.details?.code === 'SELECTION_EXPIRED') setPages(null);
