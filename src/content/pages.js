@@ -56,6 +56,6 @@ export const PAGE_SEO = {
  */
 export const PRICE_SUMMARY = [
   { name: 'Free', price: 0, detail: '50,000 tokens de IA al mes, sin tarjeta y sin límite de días.' },
-  { name: 'Pro', price: 429, detail: '1,000,000 de tokens de IA al mes, tono personalizable, colaboradores, chat para tu sitio web y seguimiento automático.' },
+  { name: 'Pro', price: 479, detail: '1,000,000 de tokens de IA al mes, tono personalizable, colaboradores, chat para tu sitio web y seguimiento automático.' },
   { name: 'Elite', price: 999, detail: '5,000,000 de tokens de IA al mes, gestión de citas, pedidos y prospectos, imágenes y documentos de contexto.' },
 ];
