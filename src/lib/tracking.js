@@ -8,7 +8,7 @@
  * - Cada evento lleva `event_id`, el mismo que el servidor manda a la API de
  *   Conversiones de Meta: así Meta cuenta una sola conversión.
  *
- * Eventos (dataLayer): sign_up · channel_connected · begin_checkout · purchase.
+ * Eventos (dataLayer): sign_up · channel_connected · purchase.
  */
 import { getConsent, onConsentChange } from './consent.js';
 
