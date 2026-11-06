@@ -121,9 +121,11 @@ export function CheckoutDialog({ open, onClose, kind, planKey, cycle = 'mensual'
       ? 'Pagas solo la diferencia por los meses que faltan de tu año. Tu fecha de renovación no cambia.'
       : annual
         ? `Cubre 12 meses${startsLater ? `, a partir del ${startsLater} (conservas tu mes ya pagado)` : ''}. Garantía de 30 días con reembolso completo.`
-        : recurring
-          ? 'Se renueva cada mes con tu tarjeta. Cancela cuando quieras.'
-          : 'Pago único';
+        : quote?.creditMXN > 0
+          ? `Descontamos $${Number(quote.creditMXN).toLocaleString('es-MX')} por los días que no usaste de tu plan actual. Tu nuevo mes empieza hoy y se renueva cada mes.`
+          : recurring
+            ? 'Se renueva cada mes con tu tarjeta. Cancela cuando quieras.'
+            : 'Pago único';
 
   return (
     <Modal open={open} onClose={step === 'processing' ? () => {} : onClose} title="Pago seguro" size="md">

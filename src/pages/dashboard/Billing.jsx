@@ -235,6 +235,26 @@ export default function Billing() {
     if (plan.key === currentKey) return 'Plan actual';
     return up ? 'Mejorar ahora' : 'Programar cambio';
   };
+  // Mejora mensual: además de "Mejorar ahora", se puede programar para la renovación
+  // (sigue con su plan hasta que terminen sus días y ahí se cobra el nuevo).
+  const secondaryFor = (plan) => {
+    const canSchedule =
+      !annualActive &&
+      shownCycle === 'mensual' &&
+      isPaidPlan(currentKey) &&
+      !subscription?.complimentary &&
+      status !== 'vencida' &&
+      plan.key !== currentKey &&
+      priceOf(plan.key) > priceOf(currentKey);
+    if (!canSchedule) return null;
+    if (pendingKey === plan.key) return { label: `Programado para el ${renewalStr}`, disabled: true, onClick: () => {} };
+    return {
+      label: `Cambiar en mi renovación (${renewalStr})`,
+      disabled: acting,
+      onClick: () => doAction(() => billingApi.changePlan(plan.key), 'Cambio programado para tu renovación.'),
+    };
+  };
+
   // El plan actual queda inerte solo cuando la tarjeta coincide en plan Y ciclo.
   const selectedForCycle =
     (annualActive && shownCycle === 'anual') || (!annualActive && (shownCycle === 'mensual' || !isPaidPlan(currentKey)))
@@ -467,9 +487,10 @@ export default function Billing() {
               </>
             ) : (
               <>
-                Al <strong>mejorar</strong> (a Pro o Elite) pagas ahora y las ventajas se activan al instante. Al{' '}
-                <strong>bajar</strong> de plan, el cambio aplica en tu próxima renovación ({renewalStr}) y conservas tu
-                plan actual hasta entonces.
+                Al <strong>mejorar</strong> puedes hacerlo <strong>ahora</strong> (las ventajas se activan al instante y
+                descontamos los días que no usaste de tu plan actual) o <strong>en tu renovación</strong> ({renewalStr}).
+                Al <strong>bajar</strong> de plan, el cambio aplica en tu próxima renovación y conservas tu plan actual
+                hasta entonces.
               </>
             )}
           </p>
@@ -485,6 +506,7 @@ export default function Billing() {
                 selectedKey={selectedForCycle}
                 onSelect={onSelectPlan}
                 ctaFor={ctaFor}
+                secondaryFor={secondaryFor}
                 paidPlansLive={paidPlansLive}
                 cycle={shownCycle}
               />

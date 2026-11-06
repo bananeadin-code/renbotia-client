@@ -22,8 +22,9 @@ const HIGHLIGHT = 'pro'; // plan destacado
  *   botón del plan actual (selectedKey) queda deshabilitado.
  * @param {boolean} [paidPlansLive] - fuerza el estado; si se omite, se consulta.
  * @param {'mensual'|'anual'} [cycle] - con 'anual' muestra el precio anual (plan.annual).
+ * @param {function} [secondaryFor] - acción secundaria por plan: ({ label, onClick, disabled }) o null.
  */
-export function PlanCards({ plans, selectedKey, onSelect, ctaLabel = 'Elegir plan', ctaFor, paidPlansLive, cycle = 'mensual' }) {
+export function PlanCards({ plans, selectedKey, onSelect, ctaLabel = 'Elegir plan', ctaFor, paidPlansLive, cycle = 'mensual', secondaryFor }) {
   const [fetchedLive, setFetchedLive] = useState(null);
   useEffect(() => {
     if (typeof paidPlansLive === 'boolean') return; // ya lo pasaron
@@ -116,15 +117,25 @@ export function PlanCards({ plans, selectedKey, onSelect, ctaLabel = 'Elegir pla
               onSelect &&
               (ctaFor ? (
                 // Modo gestión: etiqueta por plan; el plan actual queda inerte.
-                <Button
-                  className="mt-6 w-full"
-                  variant={selected ? 'secondary' : highlighted ? 'primary' : 'secondary'}
-                  disabled={selected}
-                  onClick={() => onSelect(plan.key)}
-                >
-                  {selected && <Icon name="check" size={16} />}
-                  {ctaFor(plan)}
-                </Button>
+                <>
+                  <Button
+                    className="mt-6 w-full"
+                    variant={selected ? 'secondary' : highlighted ? 'primary' : 'secondary'}
+                    disabled={selected}
+                    onClick={() => onSelect(plan.key)}
+                  >
+                    {selected && <Icon name="check" size={16} />}
+                    {ctaFor(plan)}
+                  </Button>
+                  {(() => {
+                    const alt = secondaryFor?.(plan);
+                    return alt ? (
+                      <Button className="mt-2 w-full" variant="ghost" size="sm" disabled={alt.disabled} onClick={alt.onClick}>
+                        {alt.label}
+                      </Button>
+                    ) : null;
+                  })()}
+                </>
               ) : (
                 <Button
                   className="mt-6 w-full"
