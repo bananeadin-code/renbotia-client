@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { revealInView } from '../../lib/reveal.js';
 import { useSearchParams } from 'react-router-dom';
 import { PublicNav, PublicFooter } from '../../components/layout/PublicNav.jsx';
 import { Card, Button, Input, Textarea, Select, Alert } from '../../components/ui/index.jsx';
@@ -34,6 +35,11 @@ export default function Contact() {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
+  // Tras enviar (o si hay error), la pantalla va al resultado.
+  const resultRef = useRef(null);
+  useEffect(() => {
+    if (sent || error) setTimeout(() => revealInView(resultRef.current), 60);
+  }, [sent, error]);
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -68,6 +74,7 @@ export default function Contact() {
         </Reveal>
 
         <Reveal className="mt-8">
+          <div ref={resultRef} />
           {sent ? (
             <Card className="text-center">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-500/10 text-brand-600">

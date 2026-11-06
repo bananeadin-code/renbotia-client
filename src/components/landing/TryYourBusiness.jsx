@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { useRevealOnChange } from '../../lib/reveal.js';
 import { Link } from 'react-router-dom';
 import { demoApi } from '../../api/endpoints.js';
 import { DemoChat } from '../whatsapp/DemoChat.jsx';
@@ -35,6 +36,8 @@ export function TryYourBusiness() {
   const [step, setStep] = useState(0);
   const [error, setError] = useState('');
   const [result, setResult] = useState(null); // { profile, token }
+  const resultRef = useRef(null);
+  useRevealOnChange(result?.token, resultRef);
 
   // Mensajes de progreso mientras se arma el bot (tarda unos segundos).
   useEffect(() => {
@@ -159,7 +162,7 @@ export function TryYourBusiness() {
             </form>
           </>
         ) : (
-          <div className="animate-fade-up">
+          <div ref={resultRef} className="animate-fade-up">
             <p className="mt-4 max-w-md text-muted">
               Lo entrenamos con lo que encontramos de tu negocio. Escríbele como si fueras un cliente. En tu cuenta lo
               afinas con tus propias respuestas.

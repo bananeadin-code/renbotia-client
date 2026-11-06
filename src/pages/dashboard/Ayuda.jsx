@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { useRevealOnChange } from '../../lib/reveal.js';
 import { Link } from 'react-router-dom';
 import { supportApi } from '../../api/endpoints.js';
 import { useBusinessStore } from '../../store/businessStore.js';
@@ -75,6 +76,8 @@ export default function Ayuda() {
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState('');
+  const sentRef = useRef(null);
+  useRevealOnChange(sent, sentRef);
 
   async function send(e) {
     e.preventDefault();
@@ -128,7 +131,7 @@ export default function Ayuda() {
           no tienes que repetirlos.
         </p>
         {sent ? (
-          <div className="mt-4 flex items-start gap-2 rounded-xl bg-brand-500/[0.07] px-3.5 py-3 text-sm text-fg">
+          <div ref={sentRef} className="mt-4 flex items-start gap-2 rounded-xl bg-brand-500/[0.07] px-3.5 py-3 text-sm text-fg">
             <Icon name="checkCircle" size={18} className="mt-0.5 shrink-0 text-brand-600" />
             <span>
               {sent}{' '}

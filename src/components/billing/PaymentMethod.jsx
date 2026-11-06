@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { useRevealOnChange } from '../../lib/reveal.js';
 import { billingApi } from '../../api/endpoints.js';
 import { CardSetup } from './CardSetup.jsx';
 import { confirm } from '../../store/confirmStore.js';
@@ -20,6 +21,8 @@ export function PaymentMethod({ packs = [], onCardChange }) {
   const [card, setCard] = useState(null);
   const [autoRecharge, setAutoRecharge] = useState({ enabled: false, packKey: '', threshold: 0 });
   const [adding, setAdding] = useState(false);
+  const addRef = useRef(null);
+  useRevealOnChange(adding, addRef);
   const [error, setError] = useState('');
   const [msg, setMsg] = useState('');
   const [savingAR, setSavingAR] = useState(false);
@@ -159,7 +162,7 @@ export function PaymentMethod({ packs = [], onCardChange }) {
 
       {/* Tarjeta */}
       {adding ? (
-        <div className="rounded-lg border border-line p-4">
+        <div ref={addRef} className="rounded-lg border border-line p-4">
           {card && (
             <p className="mb-3 text-xs text-muted">La tarjeta nueva reemplazará a la {card.brand} •••• {card.last4}.</p>
           )}

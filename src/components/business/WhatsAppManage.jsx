@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { useRevealOnChange } from '../../lib/reveal.js';
 import { connectionsApi } from '../../api/endpoints.js';
 import { toast } from '../../store/toastStore.js';
 import { Card, Button, Input, Select, Alert, Spinner } from '../ui/index.jsx';
@@ -116,6 +117,8 @@ export function WhatsAppManage({ isOwner }) {
   const [templates, setTemplates] = useState([]);
   const [tplReason, setTplReason] = useState(null);
   const [showCreate, setShowCreate] = useState(false);
+  const createRef = useRef(null);
+  useRevealOnChange(showCreate, createRef);
   const [tpl, setTpl] = useState({ name: '', category: 'UTILITY', bodyText: '', buttons: '' });
   const [creatingTpl, setCreatingTpl] = useState(false);
 
@@ -362,7 +365,7 @@ export function WhatsAppManage({ isOwner }) {
         </div>
 
         {isOwner && showCreate && (
-          <form onSubmit={createTpl} className="mt-4 space-y-3 rounded-xl border border-line bg-surface2/40 p-4">
+          <form ref={createRef} onSubmit={createTpl} className="mt-4 space-y-3 rounded-xl border border-line bg-surface2/40 p-4">
             <div className="flex flex-wrap gap-2">
               <span className="text-xs text-subtle">Sugeridas:</span>
               {TEMPLATE_PRESETS.map((p) => (

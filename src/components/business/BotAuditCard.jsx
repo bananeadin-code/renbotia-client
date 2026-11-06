@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { revealInView } from '../../lib/reveal.js';
 import { Link } from 'react-router-dom';
 import { botConfigApi } from '../../api/endpoints.js';
 import { toast } from '../../store/toastStore.js';
@@ -19,6 +20,13 @@ export function BotAuditCard() {
   const [audit, setAudit] = useState(undefined);
   const [running, setRunning] = useState(false);
   const [open, setOpen] = useState(null);
+  const resultsRef = useRef(null);
+  const listRef = useRef(null);
+  // Al abrir el detalle de una prueba, que se vea completo.
+  useEffect(() => {
+    if (!open) return;
+    setTimeout(() => revealInView(listRef.current?.querySelector('[data-open-detail]'), { minVisible: 200 }), 60);
+  }, [open]);
 
   useEffect(() => {
     if (!canView) return;
@@ -35,6 +43,8 @@ export function BotAuditCard() {
     try {
       const { audit: a } = await botConfigApi.runAudit();
       setAudit(a);
+      // Al terminar, la pantalla va a los resultados.
+      setTimeout(() => revealInView(resultsRef.current, { minVisible: 200 }), 60);
       toast.success(a.passed === a.total ? 'Tu bot pasó todas las pruebas.' : `Tu bot pasó ${a.passed} de ${a.total}. Revisa las sugerencias.`);
     } catch (err) {
       toast.error(err.response?.data?.message || 'No se pudo correr la prueba.');
@@ -74,14 +84,14 @@ export function BotAuditCard() {
       {audit === undefined ? null : !audit ? (
         <p className="mt-4 text-sm text-subtle">Aún no has probado tu bot. Tarda medio minuto.</p>
       ) : (
-        <div className="mt-4">
+        <div ref={resultsRef} className="mt-4">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <p className={`text-sm font-semibold ${all ? 'text-brand-700 dark:text-brand-300' : 'text-amber-700 dark:text-amber-300'}`}>
               {all ? 'Pasó todas las pruebas' : `Pasó ${audit.passed} de ${audit.total}`}
             </p>
             <span className="text-xs text-subtle">{fmt(audit.at)}</span>
           </div>
-          <ul className="mt-2 divide-y divide-line rounded-xl border border-line">
+          <ul ref={listRef} className="mt-2 divide-y divide-line rounded-xl border border-line">
             {audit.results.map((r) => (
               <li key={r.id}>
                 <button
@@ -104,7 +114,7 @@ export function BotAuditCard() {
                   <Icon name="chevronRight" size={15} className={`mt-0.5 shrink-0 text-subtle transition-transform ${open === r.id ? 'rotate-90' : ''}`} />
                 </button>
                 {open === r.id && (
-                  <div className="space-y-2 px-3 pb-3 pl-10 text-sm">
+                  <div data-open-detail className="space-y-2 px-3 pb-3 pl-10 text-sm">
                     <p className="text-muted">
                       <span className="font-medium text-fg">Cliente:</span> {r.message}
                     </p>

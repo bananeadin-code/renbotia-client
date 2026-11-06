@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { revealInView, useRevealOnChange } from '../../lib/reveal.js';
 import { useNavigate } from 'react-router-dom';
 import { planApi, billingApi } from '../../api/endpoints.js';
 import { useBusinessStore } from '../../store/businessStore.js';
@@ -28,9 +29,13 @@ export default function Billing() {
   const [confirmRefund, setConfirmRefund] = useState(false);
   // Encuesta al cancelar.
   const [cancelOpen, setCancelOpen] = useState(false);
+  // La pantalla va sola al selector de planes al abrirlo y a los avisos al terminar una acción.
+  const changeRef = useRef(null);
+  const alertsRef = useRef(null);
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showChange, setShowChange] = useState(false);
+  useRevealOnChange(showChange, changeRef);
   const [acting, setActing] = useState(false);
   const [error, setError] = useState('');
   const [msg, setMsg] = useState('');
@@ -75,6 +80,9 @@ export default function Billing() {
     ? new Date(subscription.graceEndsAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'long' })
     : '';
   const money = (n) => `$${Number(n || 0).toLocaleString('es-MX')} MXN`;
+  useEffect(() => {
+    if (msg || error) setTimeout(() => revealInView(alertsRef.current), 60);
+  }, [msg, error]);
   const longDate = (d) =>
     d ? new Date(d).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/Mexico_City' }) : '';
 
@@ -283,8 +291,10 @@ export default function Billing() {
       {/* Regalo de referidos (solo si aún no se reclama) */}
       <ReferralTeaser />
 
-      {msg && <Alert variant="success">{msg}</Alert>}
-      {error && <Alert variant="error">{error}</Alert>}
+      <div ref={alertsRef} className="space-y-3 empty:hidden">
+        {msg && <Alert variant="success">{msg}</Alert>}
+        {error && <Alert variant="error">{error}</Alert>}
+      </div>
 
       {/* Avisos de estado del plan */}
       {pastDue && renewalAmount > 0 && (
@@ -469,7 +479,7 @@ export default function Billing() {
 
       {/* Selector de cambio de plan */}
       {showChange && (
-        <div>
+        <div ref={changeRef}>
           <h2 className="mb-1 font-semibold text-fg">Cambiar de plan</h2>
           <p className="mb-4 text-sm text-muted">
             {annualActive ? (

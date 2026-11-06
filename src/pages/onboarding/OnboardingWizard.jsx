@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { revealInView } from '../../lib/reveal.js';
 import { setAccessToken } from '../../api/axios.js';
 import { useNavigate } from 'react-router-dom';
 import { onboardingApi, planApi, botConfigApi } from '../../api/endpoints.js';
@@ -61,11 +62,24 @@ export default function OnboardingWizard() {
   const saved = loadSaved(); // progreso previo (si abandonó a la mitad)
 
   const [step, setStep] = useState(saved?.step ?? 0);
+  const cardRef = useRef(null);
+  const firstStep = useRef(true);
+  // Al cambiar de paso (no al cargar), la pantalla vuelve al inicio de la tarjeta.
+  useEffect(() => {
+    if (firstStep.current) {
+      firstStep.current = false;
+      return;
+    }
+    setTimeout(() => revealInView(cardRef.current, { minVisible: 10000 }), 60);
+  }, [step]);
   const [plans, setPlans] = useState([]);
   const [pricing, setPricing] = useState(null);
   const [loadingPlans, setLoadingPlans] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  useEffect(() => {
+    if (error) setTimeout(() => revealInView(cardRef.current), 60);
+  }, [error]);
   // Pago embebido del plan (modal), en vez de redirigir a Stripe.
   const [checkout, setCheckout] = useState(null);
 
@@ -293,7 +307,7 @@ export default function OnboardingWizard() {
           ))}
         </div>
 
-        <div className="mt-8 rounded-xl border border-line bg-surface p-6 shadow-card sm:p-8">
+        <div ref={cardRef} className="mt-8 rounded-xl border border-line bg-surface p-6 shadow-card sm:p-8">
           {error && (
             <div className="mb-4">
               <Alert variant="error">{error}</Alert>

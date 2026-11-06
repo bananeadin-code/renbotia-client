@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { useRevealOnChange } from '../../lib/reveal.js';
 import { useNavigate } from 'react-router-dom';
 import { authApi } from '../../api/endpoints.js';
 import { useAuthStore } from '../../store/authStore.js';
@@ -194,6 +195,8 @@ export default function Profile() {
   // Eliminar cuenta (irreversible). Reautentica con contraseña; si la cuenta es
   // de Google (sin contraseña), el backend acepta la palabra "ELIMINAR".
   const [delOpen, setDelOpen] = useState(false);
+  const delRef = useRef(null);
+  useRevealOnChange(delOpen, delRef);
   const [delPassword, setDelPassword] = useState('');
   const [delConfirm, setDelConfirm] = useState('');
   const [deleting, setDeleting] = useState(false);
@@ -492,6 +495,7 @@ export default function Profile() {
           </Button>
         ) : (
           <form
+            ref={delRef}
             onSubmit={handleDeleteAccount}
             className="space-y-3 rounded-lg border border-red-500/30 bg-red-500/5 p-4"
           >

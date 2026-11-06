@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { useRevealOnChange } from '../../lib/reveal.js';
 import { membersApi } from '../../api/endpoints.js';
 import { toast } from '../../store/toastStore.js';
 import { confirm } from '../../store/confirmStore.js';
@@ -93,6 +94,8 @@ export function TeamSecurityCard({ requireTeam2fa, onChange }) {
  */
 export function MemberSessions({ member }) {
   const [open, setOpen] = useState(false);
+  const openRef = useRef(null);
+  useRevealOnChange(open, openRef);
   const [sessions, setSessions] = useState(null);
   const [busy, setBusy] = useState(false);
 
@@ -138,7 +141,7 @@ export function MemberSessions({ member }) {
         <Icon name="chevronRight" size={12} className={`transition-transform ${open ? 'rotate-90' : ''}`} />
       </button>
       {open && (
-        <div className="mt-2 rounded-lg border border-line bg-surface2 p-3">
+        <div ref={openRef} className="mt-2 rounded-lg border border-line bg-surface2 p-3">
           {sessions === null ? (
             <div className="flex justify-center py-2">
               <Spinner className="text-brand-600" />

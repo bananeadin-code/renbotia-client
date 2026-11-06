@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { useRevealOnChange } from '../../lib/reveal.js';
 import { PlanCta } from '../ui/PlanCta.jsx';
 import { Link } from 'react-router-dom';
 import { widgetApi } from '../../api/endpoints.js';
@@ -327,6 +328,8 @@ function WidgetOptions({ w, isOwner, saving, onSave }) {
   });
   const [o, setO] = useState(() => fromW(w));
   const [open, setOpen] = useState(false);
+  const openRef = useRef(null);
+  useRevealOnChange(open, openRef);
   useEffect(() => setO(fromW(w)), [w]);
 
   const domains = o.domainsText
@@ -372,7 +375,7 @@ function WidgetOptions({ w, isOwner, saving, onSave }) {
       </button>
 
       {open && (
-        <div className="space-y-5 border-t border-line px-3 pb-4 pt-4 animate-fade-up">
+        <div ref={openRef} className="space-y-5 border-t border-line px-3 pb-4 pt-4 animate-fade-up">
           {/* Preguntas sugeridas */}
           <div>
             <p className="text-sm font-medium text-fg">Preguntas sugeridas</p>
