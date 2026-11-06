@@ -20,6 +20,30 @@ export function revealInView(el, { offset = 80, minVisible = 140 } = {}) {
 }
 
 /**
+ * Tras agregar un elemento a una lista: lleva la pantalla al último elemento
+ * marcado con `data-list-item` dentro de `container`, pone el cursor en su primer
+ * campo y lo resalta un momento, para que quede claro dónde apareció.
+ */
+export function revealNewItem(container, { focus = true, highlight = true } = {}) {
+  setTimeout(() => {
+    const items = container?.querySelectorAll('[data-list-item]');
+    const el = items?.[items.length - 1];
+    if (!el) return;
+    revealInView(el, { minVisible: 160 });
+    if (focus) {
+      el.querySelector('input:not([type=hidden]):not([type=file]):not([type=checkbox]):not(:disabled), textarea:not(:disabled)')?.focus({
+        preventScroll: true,
+      });
+    }
+    if (highlight) {
+      const cls = ['ring-2', 'ring-brand-500/60'];
+      el.classList.add(...cls);
+      setTimeout(() => el.classList.remove(...cls), 1600);
+    }
+  }, 60);
+}
+
+/**
  * Hook: cuando `active` pasa a verdadero (o cambia de valor), lleva la pantalla al
  * elemento de `ref`. Espera a que el contenido se pinte antes de medir.
  */

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { revealInView } from '../../lib/reveal.js';
+import { revealInView, revealNewItem } from '../../lib/reveal.js';
 import { setAccessToken } from '../../api/axios.js';
 import { useNavigate } from 'react-router-dom';
 import { onboardingApi, planApi, botConfigApi } from '../../api/endpoints.js';
@@ -188,8 +188,11 @@ export default function OnboardingWizard() {
     toast.success('Listo. Revisa lo que se cargó; puedes ajustarlo después en Entrenamiento.');
   }
 
+  const faqsListRef = useRef(null);
   function addFaq() {
-    if (faqs.length < faqMax) setFaqs([...faqs, { question: '', answer: '' }]);
+    if (faqs.length >= faqMax) return;
+    setFaqs([...faqs, { question: '', answer: '' }]);
+    revealNewItem(faqsListRef.current);
   }
   function removeFaq(i) {
     setFaqs(faqs.filter((_, idx) => idx !== i));
@@ -457,9 +460,9 @@ export default function OnboardingWizard() {
                     Agregar
                   </Button>
                 </div>
-                <div className="space-y-3">
+                <div ref={faqsListRef} className="space-y-3">
                   {faqs.slice(0, faqMax).map((faq, i) => (
-                    <div key={i} className="rounded-lg border border-line p-3">
+                    <div key={i} data-list-item className="rounded-lg border border-line p-3 transition-shadow">
                       <div className="mb-2 flex items-center justify-between">
                         <span className="text-xs font-medium text-muted">FAQ {i + 1}</span>
                         {faqs.length > 1 && (

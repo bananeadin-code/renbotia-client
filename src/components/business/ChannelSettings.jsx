@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { revealNewItem } from '../../lib/reveal.js';
 import { connectionsApi } from '../../api/endpoints.js';
 import { toast } from '../../store/toastStore.js';
 import { Card, Button } from '../ui/index.jsx';
@@ -25,6 +26,7 @@ export function ChannelSettings({ channel, settings, isOwner, onChanged }) {
   const paused = Boolean(settings?.paused);
 
   const [questions, setQuestions] = useState(settings?.iceBreakers || []);
+  const questionsRef = useRef(null);
   const [greeting, setGreeting] = useState(settings?.greeting || '');
   const [saving, setSaving] = useState('');
 
@@ -104,9 +106,9 @@ export function ChannelSettings({ channel, settings, isOwner, onChanged }) {
             <p className="mt-0.5 text-xs text-muted">
               Botones que el cliente ve al abrir el chat por primera vez. Al tocar uno, el bot responde esa pregunta.
             </p>
-            <div className="mt-3 space-y-2">
+            <div ref={questionsRef} className="mt-3 space-y-2">
               {questions.map((q, i) => (
-                <div key={i} className="flex items-center gap-2">
+                <div key={i} data-list-item className="flex items-center gap-2 rounded-lg transition-shadow">
                   <input
                     value={q}
                     maxLength={80}
@@ -131,7 +133,10 @@ export function ChannelSettings({ channel, settings, isOwner, onChanged }) {
               {isOwner && questions.length < MAX_QUESTIONS && (
                 <button
                   type="button"
-                  onClick={() => setQuestions((prev) => [...prev, ''])}
+                  onClick={() => {
+                    setQuestions((prev) => [...prev, '']);
+                    revealNewItem(questionsRef.current);
+                  }}
                   className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium text-brand-600 transition hover:bg-brand-500/10"
                 >
                   <Icon name="plus" size={15} /> Agregar pregunta

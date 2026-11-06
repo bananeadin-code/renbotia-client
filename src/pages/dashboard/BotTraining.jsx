@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { revealNewItem } from '../../lib/reveal.js';
 import { useAccess } from '../../router/RequirePermission.jsx';
 import { PlanCta } from '../../components/ui/PlanCta.jsx';
 import { useNavigate, Link } from 'react-router-dom';
@@ -7,6 +8,7 @@ import { useBusinessStore } from '../../store/businessStore.js';
 import { toast } from '../../store/toastStore.js';
 import { confirm } from '../../store/confirmStore.js';
 import { Card, Button, Input, Textarea, Select, Alert, Spinner, Badge, Notice } from '../../components/ui/index.jsx';
+import { Modal } from '../../components/ui/Modal.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { limitsFor } from '../../lib/planLimits.js';
 import { extractTextFromFile } from '../../lib/extractText.js';
@@ -257,8 +259,28 @@ export default function BotTraining() {
       faqs: prev.faqs.map((f, idx) => (idx === i ? { ...f, [field]: value } : f)),
     }));
   }
+  // Nueva pregunta frecuente: se escribe en una ventana y al confirmar se agrega
+  // al final de la lista, la pantalla va a ella y se resalta.
+  const [faqDraft, setFaqDraft] = useState(null);
+  const faqListRef = useRef(null);
+  const imagesRef = useRef(null);
+  const quickRepliesRef = useRef(null);
   function addFaq() {
-    setCfg((prev) => ({ ...prev, faqs: [...prev.faqs, { question: '', answer: '' }] }));
+    setFaqDraft({ question: '', answer: '' });
+  }
+  function confirmFaq(e) {
+    e?.preventDefault();
+    const q = faqDraft.question.trim();
+    const a = faqDraft.answer.trim();
+    if (!q || !a) return;
+    setCfg((prev) => {
+      // Si solo hay una pregunta vacía (la de inicio), se reemplaza en lugar de dejarla en blanco.
+      const base = prev.faqs.filter((f) => f.question.trim() || f.answer.trim());
+      return { ...prev, faqs: [...base, { question: q, answer: a }] };
+    });
+    setFaqDraft(null);
+    revealNewItem(faqListRef.current, { focus: false });
+    toast.success('Pregunta agregada. Guarda los cambios para que tu bot la use.');
   }
   function removeFaq(i) {
     setCfg((prev) => ({ ...prev, faqs: prev.faqs.filter((_, idx) => idx !== i) }));
@@ -271,6 +293,7 @@ export default function BotTraining() {
   }
   function addImage() {
     setCfg((prev) => ({ ...prev, images: [...prev.images, { label: '', url: '', context: '' }] }));
+    revealNewItem(imagesRef.current);
   }
   function removeImage(i) {
     setCfg((prev) => ({ ...prev, images: prev.images.filter((_, idx) => idx !== i) }));
@@ -357,6 +380,7 @@ export default function BotTraining() {
   }
   function addQuickReply() {
     setCfg((prev) => ({ ...prev, quickReplies: [...(prev.quickReplies || []), ''] }));
+    revealNewItem(quickRepliesRef.current);
   }
   function removeQuickReply(i) {
     setCfg((prev) => ({ ...prev, quickReplies: prev.quickReplies.filter((_, idx) => idx !== i) }));
@@ -925,9 +949,9 @@ export default function BotTraining() {
         {faqsAtLimit && (
           <UpgradeNote>Alcanzaste el máximo de FAQs de tu plan. Para más:</UpgradeNote>
         )}
-        <div className="space-y-3">
+        <div ref={faqListRef} className="space-y-3">
           {cfg.faqs.map((faq, i) => (
-            <div key={i} className="rounded-lg border border-line p-3">
+            <div key={i} data-list-item className="rounded-lg border border-line p-3 transition-shadow">
               <div className="mb-2 flex items-center justify-between">
                 <span className="text-xs font-medium text-muted">Pregunta {i + 1}</span>
                 {cfg.faqs.length > 1 && (
@@ -960,14 +984,14 @@ export default function BotTraining() {
             nombre y una imagen (sube un archivo o pega una URL). {cfg.images.length}/
             {limits.maxImages}.
           </p>
-          <div className="space-y-3">
+          <div ref={imagesRef} className="space-y-3">
             {cfg.images.length === 0 && (
               <p className="rounded-lg border border-dashed border-line p-4 text-center text-sm text-subtle">
                 Aún no agregas imágenes. Ej. menú, catálogo, ubicación en mapa.
               </p>
             )}
             {cfg.images.map((img, i) => (
-              <div key={i} className="rounded-lg border border-line p-3">
+              <div key={i} data-list-item className="rounded-lg border border-line p-3 transition-shadow">
                 <div className="mb-2 flex items-center justify-between">
                   <span className="text-xs font-medium text-muted">Imagen {i + 1}</span>
                   <button onClick={() => removeImage(i)} className="text-xs text-red-500 hover:underline">
@@ -1230,14 +1254,14 @@ Solo un seguimiento por conversación mientras el cliente no conteste. No se env
           Frases guardadas que tú o tu equipo insertan con un clic al responder de forma manual en
           Conversaciones. El bot no las usa.
         </p>
-        <div className="space-y-2">
+        <div ref={quickRepliesRef} className="space-y-2">
           {(cfg.quickReplies || []).filter((q) => q !== undefined).length === 0 && (
             <p className="rounded-lg border border-dashed border-line p-4 text-center text-sm text-subtle">
               Sin respuestas rápidas. Ej. “En un momento te atiende un asesor.”
             </p>
           )}
           {(cfg.quickReplies || []).map((q, i) => (
-            <div key={i} className="flex items-start gap-2">
+            <div key={i} data-list-item className="flex items-start gap-2 rounded-lg transition-shadow">
               <div className="min-w-0 flex-1">
                 <Textarea
                   rows={2}
@@ -1256,6 +1280,39 @@ Solo un seguimiento por conversación mientras el cliente no conteste. No se env
           ))}
         </div>
       </Card>
+
+      {/* Nueva pregunta frecuente */}
+      <Modal open={Boolean(faqDraft)} onClose={() => setFaqDraft(null)} title="Nueva pregunta frecuente" size="md">
+        {faqDraft && (
+          <form onSubmit={confirmFaq} className="space-y-3">
+            <Input
+              label="Pregunta"
+              autoFocus
+              maxLength={300}
+              value={faqDraft.question}
+              onChange={(e) => setFaqDraft({ ...faqDraft, question: e.target.value })}
+              placeholder="Ej. ¿Tienen estacionamiento?"
+            />
+            <Textarea
+              label="Respuesta"
+              rows={4}
+              maxLength={2000}
+              value={faqDraft.answer}
+              onChange={(e) => setFaqDraft({ ...faqDraft, answer: e.target.value })}
+              placeholder="Ej. Sí, contamos con estacionamiento gratuito para clientes."
+            />
+            <p className="text-xs text-subtle">Escribe la respuesta como quieres que el bot la diga a tus clientes.</p>
+            <div className="flex justify-end gap-2">
+              <Button type="button" variant="ghost" size="sm" onClick={() => setFaqDraft(null)}>
+                Cancelar
+              </Button>
+              <Button type="submit" size="sm" disabled={!faqDraft.question.trim() || !faqDraft.answer.trim()}>
+                <Icon name="plus" size={15} /> Agregar pregunta
+              </Button>
+            </div>
+          </form>
+        )}
+      </Modal>
 
       {/* Espaciador: da despeje para que la barra fija no tape el final del
           contenido (Imágenes del bot y demás) al hacer scroll. */}

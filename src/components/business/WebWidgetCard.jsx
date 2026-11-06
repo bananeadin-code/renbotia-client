@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useRevealOnChange } from '../../lib/reveal.js';
+import { useRevealOnChange, revealNewItem } from '../../lib/reveal.js';
 import { PlanCta } from '../ui/PlanCta.jsx';
 import { Link } from 'react-router-dom';
 import { widgetApi } from '../../api/endpoints.js';
@@ -327,6 +327,7 @@ function WidgetOptions({ w, isOwner, saving, onSave }) {
     domainsText: (x.allowedDomains || []).join('\n'),
   });
   const [o, setO] = useState(() => fromW(w));
+  const suggestionsRef = useRef(null);
   const [open, setOpen] = useState(false);
   const openRef = useRef(null);
   useRevealOnChange(open, openRef);
@@ -380,9 +381,9 @@ function WidgetOptions({ w, isOwner, saving, onSave }) {
           <div>
             <p className="text-sm font-medium text-fg">Preguntas sugeridas</p>
             <p className="mt-0.5 text-xs text-muted">Botones dentro del chat para que el visitante empiece con un toque.</p>
-            <div className="mt-2 space-y-2">
+            <div ref={suggestionsRef} className="mt-2 space-y-2">
               {o.suggestions.map((q, i) => (
-                <div key={i} className="flex items-center gap-2">
+                <div key={i} data-list-item className="flex items-center gap-2 rounded-lg transition-shadow">
                   <input
                     value={q}
                     maxLength={60}
@@ -409,7 +410,10 @@ function WidgetOptions({ w, isOwner, saving, onSave }) {
               {isOwner && o.suggestions.length < 4 && (
                 <button
                   type="button"
-                  onClick={() => setO((x) => ({ ...x, suggestions: [...x.suggestions, ''] }))}
+                  onClick={() => {
+                    setO((x) => ({ ...x, suggestions: [...x.suggestions, ''] }));
+                    revealNewItem(suggestionsRef.current);
+                  }}
                   className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium text-brand-600 transition hover:bg-brand-500/10"
                 >
                   <Icon name="plus" size={15} /> Agregar pregunta

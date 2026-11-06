@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { revealNewItem } from '../../lib/reveal.js';
 import { siteAssistantApi } from '../../api/endpoints.js';
 import { toast } from '../../store/toastStore.js';
 import { Card, Button, Input, Select, Textarea, Alert, Spinner } from '../../components/ui/index.jsx';
@@ -39,19 +40,34 @@ export default function SiteAssistant() {
   // Sugerencias rápidas (chips)
   const replies = cfg?.quickReplies || [];
   const setReply = (i, v) => set('quickReplies', replies.map((r, idx) => (idx === i ? v : r)));
-  const addReply = () => replies.length < 6 && set('quickReplies', [...replies, '']);
+  const repliesRef = useRef(null);
+  const servicesRef = useRef(null);
+  const faqsRef = useRef(null);
+  const addReply = () => {
+    if (replies.length >= 6) return;
+    set('quickReplies', [...replies, '']);
+    revealNewItem(repliesRef.current);
+  };
   const removeReply = (i) => set('quickReplies', replies.filter((_, idx) => idx !== i));
 
   // Servicios
   const services = cfg?.businessInfo?.services || [];
   const setService = (i, v) => setInfo('services', services.map((s, idx) => (idx === i ? v : s)));
-  const addService = () => services.length < 12 && setInfo('services', [...services, '']);
+  const addService = () => {
+    if (services.length >= 12) return;
+    setInfo('services', [...services, '']);
+    revealNewItem(servicesRef.current);
+  };
   const removeService = (i) => setInfo('services', services.filter((_, idx) => idx !== i));
 
   // FAQs
   const faqs = cfg?.faqs || [];
   const setFaq = (i, k, v) => set('faqs', faqs.map((f, idx) => (idx === i ? { ...f, [k]: v } : f)));
-  const addFaq = () => faqs.length < 20 && set('faqs', [...faqs, { question: '', answer: '' }]);
+  const addFaq = () => {
+    if (faqs.length >= 20) return;
+    set('faqs', [...faqs, { question: '', answer: '' }]);
+    revealNewItem(faqsRef.current);
+  };
   const removeFaq = (i) => set('faqs', faqs.filter((_, idx) => idx !== i));
 
   async function save() {
@@ -158,9 +174,9 @@ export default function SiteAssistant() {
               <Icon name="plus" size={16} /> Agregar
             </Button>
           </div>
-          <div className="space-y-2">
+          <div ref={repliesRef} className="space-y-2">
             {replies.map((r, i) => (
-              <div key={i} className="flex items-center gap-2">
+              <div key={i} data-list-item className="flex items-center gap-2 rounded-lg transition-shadow">
                 <Input value={r} maxLength={80} onChange={(e) => setReply(i, e.target.value)} placeholder="Ej. ¿Cuánto cuesta?" />
                 <button onClick={() => removeReply(i)} className="text-xs text-red-500 hover:underline">
                   Quitar
@@ -192,9 +208,9 @@ export default function SiteAssistant() {
               <Icon name="plus" size={16} /> Agregar
             </Button>
           </div>
-          <div className="space-y-2">
+          <div ref={servicesRef} className="space-y-2">
             {services.map((s, i) => (
-              <div key={i} className="flex items-center gap-2">
+              <div key={i} data-list-item className="flex items-center gap-2 rounded-lg transition-shadow">
                 <Input value={s} maxLength={160} onChange={(e) => setService(i, e.target.value)} />
                 <button onClick={() => removeService(i)} className="text-xs text-red-500 hover:underline">
                   Quitar
@@ -213,8 +229,9 @@ export default function SiteAssistant() {
             <Icon name="plus" size={16} /> Agregar
           </Button>
         </div>
+        <div ref={faqsRef} className="space-y-3">
         {faqs.map((f, i) => (
-          <div key={i} className="space-y-2 rounded-lg border border-line p-3">
+          <div key={i} data-list-item className="space-y-2 rounded-lg border border-line p-3 transition-shadow">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-muted">Pregunta {i + 1}</span>
               <button onClick={() => removeFaq(i)} className="text-xs text-red-500 hover:underline">
@@ -225,6 +242,7 @@ export default function SiteAssistant() {
             <Textarea rows={2} maxLength={1000} value={f.answer} placeholder="Respuesta" onChange={(e) => setFaq(i, 'answer', e.target.value)} />
           </div>
         ))}
+        </div>
       </Card>
 
       {/* Guía / instrucciones */}
