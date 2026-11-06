@@ -20,6 +20,7 @@ import { OnboardingChecklist } from '../../components/dashboard/OnboardingCheckl
 import { ImpactCard } from '../../components/dashboard/ImpactCard.jsx';
 import { ReferralCard } from '../../components/dashboard/ReferralCard.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
+import { BookingButton } from '../../components/support/BookingButton.jsx';
 import { fmtConversations } from '../../lib/usage.js';
 
 
@@ -82,6 +83,24 @@ export default function Dashboard() {
 
   const botReady = business?.status === 'activo';
 
+  // Aviso de orientación: se puede cerrar con la X (se recuerda por negocio en este navegador).
+  const orientKey = `rb_orient_hide_${business?._id || business?.id || 'x'}`;
+  const [orientDismissed, setOrientDismissed] = useState(false);
+  let orientHidden = orientDismissed;
+  try {
+    orientHidden = orientHidden || localStorage.getItem(orientKey) === '1';
+  } catch {
+    /* sin almacenamiento */
+  }
+  function hideOrient() {
+    setOrientDismissed(true);
+    try {
+      localStorage.setItem(orientKey, '1');
+    } catch {
+      /* sin almacenamiento: solo se oculta en esta visita */
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -111,9 +130,17 @@ export default function Dashboard() {
         const hasChannel = Boolean(
           business?.whatsappPhoneNumberId || business?.facebookPageId || business?.instagramAccountId || business?.widget?.enabled
         );
-        if (!o?.included || o.done || !o.bookingUrl || hasChannel) return null;
+        if (!o?.included || o.done || !o.bookingUrl || hasChannel || orientHidden) return null;
         return (
-          <Card className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <Card className="relative flex flex-col gap-3 pr-10 sm:flex-row sm:items-center sm:justify-between">
+            <button
+              type="button"
+              onClick={hideOrient}
+              aria-label="Cerrar aviso"
+              className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-lg text-subtle transition hover:bg-surface2 hover:text-fg"
+            >
+              <Icon name="x" size={16} />
+            </button>
             <div className="flex items-start gap-3">
               <Icon name="calendarCheck" size={20} className="mt-0.5 shrink-0 text-brand-600" />
               <p className="text-sm text-muted">
@@ -127,9 +154,7 @@ export default function Dashboard() {
                   Ayuda
                 </Button>
               </Link>
-              <a href={o.bookingUrl} target="_blank" rel="noopener noreferrer">
-                <Button size="sm">Agendar</Button>
-              </a>
+              <BookingButton url={o.bookingUrl} label="Agendar" />
             </div>
           </Card>
         );

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useBusinessStore } from '../../store/businessStore.js';
 import { Card } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
+import { BookingButton } from '../support/BookingButton.jsx';
 
 // Requisitos que evitan que el usuario se atore a mitad de la conexión (el punto
 // de mayor abandono). Se confirman antes de abrir el modal de Meta.
@@ -165,14 +166,7 @@ export function ConnectionHelp() {
             : 'Escríbenos y te ayudamos a conectar tu número sin complicaciones.'}
         </p>
         {canBook ? (
-          <a
-            href={orientation.bookingUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 rounded-lg bg-brand-700 px-3 py-2 text-sm font-semibold text-white transition hover:bg-brand-800"
-          >
-            Agendar videollamada
-          </a>
+          <BookingButton url={orientation.bookingUrl} label="Agendar videollamada" className="shrink-0" />
         ) : (
           <Link
             to="/dashboard/ayuda"

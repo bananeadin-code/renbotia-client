@@ -8,6 +8,7 @@ import { toast } from '../../store/toastStore.js';
 import { Button, Card, Select, Textarea } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { CONNECTION_FAQ } from '../../components/business/ConnectionAssistant.jsx';
+import { BookingButton } from '../../components/support/BookingButton.jsx';
 
 /**
  * Ayuda: un solo lugar para pedir apoyo dentro del panel.
@@ -115,11 +116,7 @@ export default function Ayuda() {
               </p>
             </div>
           </div>
-          {!orientation.done && (
-            <a href={orientation.bookingUrl} target="_blank" rel="noopener noreferrer" className="shrink-0">
-              <Button size="sm">Agendar sesión</Button>
-            </a>
-          )}
+          {!orientation.done && <BookingButton url={orientation.bookingUrl} label="Agendar sesión" className="shrink-0" />}
         </Card>
       )}
 
