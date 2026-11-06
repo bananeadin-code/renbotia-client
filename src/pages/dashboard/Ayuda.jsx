@@ -15,7 +15,7 @@ import { CONNECTION_FAQ } from '../../components/business/ConnectionAssistant.js
  *  - Preguntas frecuentes (las de conexión son las mismas de Conexiones).
  */
 
-const TOPICS = ['Conexión de WhatsApp', 'Entrenamiento del bot', 'Facturación', 'Ventas y planes', 'Otro'];
+const TOPICS = ['Conexión de WhatsApp', 'Entrenamiento del bot', 'Otra sesión de orientación', 'Facturación', 'Ventas y planes', 'Otro'];
 
 const GENERAL_FAQ = [
   {
@@ -68,7 +68,7 @@ function Faq({ items }) {
 }
 
 export default function Ayuda() {
-  const { subscription, role } = useBusinessStore();
+  const { subscription } = useBusinessStore();
   const user = useAuthStore((s) => s.user);
   const orientation = subscription?.orientation;
   const [topic, setTopic] = useState(TOPICS[0]);
@@ -107,27 +107,16 @@ export default function Ayuda() {
               <div className="font-semibold text-fg">Sesión de orientación por videollamada</div>
               <p className="text-sm text-muted">
                 {orientation.done
-                  ? 'Ya tuviste tu sesión. Si necesitas otra o te surgió una duda, escríbenos abajo.'
-                  : orientation.included
-                    ? 'Gratis. Nuestro equipo te ayuda a conectar tu WhatsApp, entrenar tu bot y elegir tu plan.'
-                    : 'Incluida en el plan anual. Si tienes una duda puntual, escríbenos abajo.'}
+                  ? 'Ya tuviste tu sesión (es una por negocio). Si necesitas otra, pídela con el formulario de abajo y te contactamos.'
+                  : 'Gratis, una por negocio. Nuestro equipo te ayuda a conectar tu WhatsApp, entrenar tu bot y resolver tus dudas de planes.'}
               </p>
             </div>
           </div>
-          {!orientation.done &&
-            (orientation.included ? (
-              <a href={orientation.bookingUrl} target="_blank" rel="noopener noreferrer" className="shrink-0">
-                <Button size="sm">Agendar sesión</Button>
-              </a>
-            ) : (
-              role === 'owner' && (
-                <Link to="/dashboard/facturacion" className="shrink-0">
-                  <Button size="sm" variant="secondary">
-                    Ver plan anual
-                  </Button>
-                </Link>
-              )
-            ))}
+          {!orientation.done && (
+            <a href={orientation.bookingUrl} target="_blank" rel="noopener noreferrer" className="shrink-0">
+              <Button size="sm">Agendar sesión</Button>
+            </a>
+          )}
         </Card>
       )}
 

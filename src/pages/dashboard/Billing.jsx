@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { planApi, billingApi } from '../../api/endpoints.js';
 import { useBusinessStore } from '../../store/businessStore.js';
 import { PlanCards, CycleToggle } from '../../components/PlanCards.jsx';
@@ -17,6 +18,7 @@ import { ReferralTeaser } from '../../components/dashboard/ReferralCard.jsx';
  */
 export default function Billing() {
   const { subscription, balance, load } = useBusinessStore();
+  const navigate = useNavigate();
   const [plans, setPlans] = useState([]);
   const [pricing, setPricing] = useState(null);
   const [packs, setPacks] = useState([]);
@@ -606,6 +608,11 @@ export default function Billing() {
         annualActive={annualActive}
         accessUntil={accessUntilStr}
         bookingUrl={orientation?.bookingUrl}
+        orientationDone={Boolean(orientation?.done)}
+        onHelp={() => {
+          setCancelOpen(false);
+          navigate('/dashboard/ayuda');
+        }}
         onDowngrade={async (key) => {
           await doAction(() => billingApi.changePlan(key), 'Cambio programado para tu renovación.');
           setCancelOpen(false);

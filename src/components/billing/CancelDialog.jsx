@@ -30,11 +30,13 @@ const money = (n) => `$${Number(n || 0).toLocaleString('es-MX')}`;
  * @param {boolean} props.annualActive
  * @param {string} props.accessUntil     Fecha hasta la que conserva su plan.
  * @param {string} [props.bookingUrl]
+ * @param {boolean} [props.orientationDone]  Ya tuvo su sesión (una por negocio).
+ * @param {() => void} [props.onHelp]        Ir a Ayuda (escribir al equipo).
  * @param {(planKey:string) => void} props.onDowngrade
  * @param {() => void} props.onAnnual
  * @param {boolean} [props.busy]
  */
-export function CancelDialog({ open, onClose, onConfirm, currentKey, currentPlan, annualActive, accessUntil, bookingUrl, onDowngrade, onAnnual, busy }) {
+export function CancelDialog({ open, onClose, onConfirm, currentKey, currentPlan, annualActive, accessUntil, bookingUrl, orientationDone, onHelp, onDowngrade, onAnnual, busy }) {
   const [step, setStep] = useState('reason');
   const [reason, setReason] = useState('');
   const [comment, setComment] = useState('');
@@ -69,7 +71,15 @@ export function CancelDialog({ open, onClose, onConfirm, currentKey, currentPlan
       });
     }
   }
-  if (['no_pude_conectar', 'no_lo_uso', 'falta_funcion'].includes(reason) && bookingUrl) {
+  if (['no_pude_conectar', 'no_lo_uso', 'falta_funcion'].includes(reason) && orientationDone && onHelp) {
+    offers.push({
+      icon: 'message',
+      title: 'Escríbenos y te ayudamos',
+      text: 'Cuéntanos qué pasó: revisamos tu caso y, si hace falta, agendamos otra videollamada contigo.',
+      cta: 'Ir a Ayuda',
+      onClick: onHelp,
+    });
+  } else if (['no_pude_conectar', 'no_lo_uso', 'falta_funcion'].includes(reason) && bookingUrl) {
     offers.push({
       icon: 'calendarCheck',
       title: 'Te ayudamos gratis por videollamada',
