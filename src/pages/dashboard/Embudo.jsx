@@ -5,6 +5,7 @@ import { toast } from '../../store/toastStore.js';
 import { Button, Card, Input, Select, Spinner, Textarea, Badge } from '../../components/ui/index.jsx';
 import { Modal } from '../../components/ui/Modal.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
+import { CANCEL_REASONS } from '../../components/billing/CancelDialog.jsx';
 
 /**
  * Embudo comercial: de dónde llegan los registros, en qué paso van y cuánto
@@ -223,6 +224,16 @@ function Seguimiento({ range, isAdmin, me }) {
                   <Badge color={AUTO[l.autoStage].color}>{AUTO[l.autoStage].label}</Badge>
                   {l.complimentary && <span className="ml-1 text-xs text-subtle">cortesía</span>}
                   {l.autoStage === 'pago' && l.cycle === 'anual' && <span className="ml-1 text-xs font-medium text-fg">anual</span>}
+                  {l.canceled && (
+                    <span className="ml-1 text-xs font-medium text-red-700 dark:text-red-300" title={l.canceled.reason ? CANCEL_REASONS[l.canceled.reason] : ''}>
+                      · canceló{l.canceled.reason ? `: ${CANCEL_REASONS[l.canceled.reason] || l.canceled.reason}` : ''}
+                    </span>
+                  )}
+                  {l.autoStage === 'pago' && !l.complimentary && (!l.lastActivityAt || Date.now() - new Date(l.lastActivityAt) > 7 * 864e5) && (
+                    <span className="ml-1 text-xs font-medium text-amber-700 dark:text-amber-300" title="Paga pero no ha tenido conversaciones reales en 7 días">
+                      · sin conversaciones 7+ días
+                    </span>
+                  )}
                   {l.lead?.orientationAt && (
                     <span className="ml-1 text-xs text-subtle" title="Sesión de orientación realizada">
                       · orientación hecha

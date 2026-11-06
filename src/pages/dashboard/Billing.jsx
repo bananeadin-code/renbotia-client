@@ -4,6 +4,7 @@ import { useBusinessStore } from '../../store/businessStore.js';
 import { PlanCards, CycleToggle } from '../../components/PlanCards.jsx';
 import { PaymentMethod } from '../../components/billing/PaymentMethod.jsx';
 import { CheckoutDialog } from '../../components/billing/CheckoutDialog.jsx';
+import { CancelDialog } from '../../components/billing/CancelDialog.jsx';
 import { toast } from '../../store/toastStore.js';
 import { Card, Button, Badge, Alert, Spinner } from '../../components/ui/index.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
@@ -23,6 +24,8 @@ export default function Billing() {
   const [cycle, setCycle] = useState(null);
   // Confirmación en dos pasos del reembolso de la garantía.
   const [confirmRefund, setConfirmRefund] = useState(false);
+  // Encuesta al cancelar.
+  const [cancelOpen, setCancelOpen] = useState(false);
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showChange, setShowChange] = useState(false);
@@ -202,8 +205,15 @@ export default function Billing() {
 
   const onChangePlan = (planKey) =>
     doAction(() => billingApi.changePlan(planKey), 'Cambio de plan programado.');
-  const onCancel = () =>
-    doAction(() => billingApi.cancel(), 'Renovación cancelada.');
+  const onCancel = () => {
+    setError('');
+    setMsg('');
+    setCancelOpen(true);
+  };
+  async function confirmCancel(reason, comment) {
+    await doAction(() => billingApi.cancel({ reason, comment }), 'Renovación cancelada.');
+    setCancelOpen(false);
+  }
   const onResume = () =>
     doAction(() => billingApi.resume(), 'Renovación reactivada.');
 
@@ -605,6 +615,26 @@ export default function Billing() {
       </Card>
 
       {/* Pago embebido (plan o créditos), sin salir del sitio */}
+      <CancelDialog
+        open={cancelOpen}
+        onClose={() => setCancelOpen(false)}
+        onConfirm={confirmCancel}
+        busy={acting}
+        currentKey={currentKey}
+        currentPlan={currentPlan}
+        annualActive={annualActive}
+        accessUntil={accessUntilStr}
+        bookingUrl={orientation?.bookingUrl}
+        onDowngrade={async (key) => {
+          await doAction(() => billingApi.changePlan(key), 'Cambio programado para tu renovación.');
+          setCancelOpen(false);
+        }}
+        onAnnual={() => {
+          setCancelOpen(false);
+          openPlanCheckout(currentKey, 'anual');
+        }}
+      />
+
       {checkout && (
         <CheckoutDialog
           open={Boolean(checkout)}

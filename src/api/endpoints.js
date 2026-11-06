@@ -139,7 +139,8 @@ export const billingApi = {
   createIntent: (body) => unwrap(api.post('/billing/intent', body)),
   confirm: (body) => unwrap(api.post('/billing/confirm', body)),
   payments: () => unwrap(api.get('/billing/payments')),
-  cancel: () => unwrap(api.post('/billing/cancel')),
+  // Cancelar con encuesta: { reason, comment } (ver CancelDialog).
+  cancel: (body) => unwrap(api.post('/billing/cancel', body || {})),
   resume: () => unwrap(api.post('/billing/resume')),
   // cycle: 'mensual' para pasar a mensual al terminar un año vigente.
   changePlan: (planKey, cycle) => unwrap(api.post('/billing/change-plan', cycle ? { planKey, cycle } : { planKey })),
