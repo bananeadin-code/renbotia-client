@@ -59,6 +59,7 @@ const AdminPanel = lazy(() => import('./pages/admin/AdminPanel.jsx'));
 const SiteAssistant = lazy(() => import('./pages/dashboard/SiteAssistant.jsx'));
 const Embudo = lazy(() => import('./pages/dashboard/Embudo.jsx'));
 const Campanas = lazy(() => import('./pages/dashboard/Campanas.jsx'));
+const Ayuda = lazy(() => import('./pages/dashboard/Ayuda.jsx'));
 
 function RouteFallback() {
   return (
@@ -136,6 +137,7 @@ export default function App() {
         <Route path="facturacion" element={<RequireOwner><Billing /></RequireOwner>} />
         <Route path="equipo" element={<RequireAccess module="team"><Team /></RequireAccess>} />
         <Route path="perfil" element={<Profile />} />
+        <Route path="ayuda" element={<Ayuda />} />
         <Route path="actividad" element={<RequireAccess module="activity"><Activity /></RequireAccess>} />
         <Route
           path="embudo"

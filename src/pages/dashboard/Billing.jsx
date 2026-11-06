@@ -363,25 +363,6 @@ export default function Billing() {
         </Alert>
       )}
 
-      {/* Sesión de orientación por videollamada (gratis en el lanzamiento; incluida en anual) */}
-      {orientation?.included && !orientation?.done && orientation?.bookingUrl && (
-        <Card className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-3">
-            <Icon name="calendarCheck" size={22} className="mt-0.5 shrink-0 text-brand-600" />
-            <div>
-              <div className="font-semibold text-fg">Sesión de orientación gratis</div>
-              <p className="text-sm text-muted">
-                Una videollamada con nuestro equipo para dejar tu bot conectado y respondiendo, y resolver tus dudas de
-                planes y configuración.
-              </p>
-            </div>
-          </div>
-          <a href={orientation.bookingUrl} target="_blank" rel="noopener noreferrer" className="shrink-0">
-            <Button size="sm">Agendar sesión</Button>
-          </a>
-        </Card>
-      )}
-
       {/* Invitación a pasarse al anual (paga mensual) */}
       {annualOffer && (
         <Card className="flex flex-col gap-3 border-brand-500/40 sm:flex-row sm:items-center sm:justify-between">

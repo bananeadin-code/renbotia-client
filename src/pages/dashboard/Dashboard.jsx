@@ -105,6 +105,36 @@ export default function Dashboard() {
       {/* Primeros pasos (solo cuentas nuevas / incompletas) */}
       <OnboardingChecklist />
 
+      {/* Orientación gratis: solo mientras no conecta un canal y no la ha tenido. */}
+      {(() => {
+        const o = subscription?.orientation;
+        const hasChannel = Boolean(
+          business?.whatsappPhoneNumberId || business?.facebookPageId || business?.instagramAccountId || business?.widget?.enabled
+        );
+        if (!o?.included || o.done || !o.bookingUrl || hasChannel) return null;
+        return (
+          <Card className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <Icon name="calendarCheck" size={20} className="mt-0.5 shrink-0 text-brand-600" />
+              <p className="text-sm text-muted">
+                <span className="font-semibold text-fg">¿Lo configuramos contigo?</span> Agenda una videollamada gratis y dejamos tu
+                bot conectado y respondiendo.
+              </p>
+            </div>
+            <div className="flex shrink-0 gap-2">
+              <Link to="/dashboard/ayuda">
+                <Button size="sm" variant="ghost">
+                  Ayuda
+                </Button>
+              </Link>
+              <a href={o.bookingUrl} target="_blank" rel="noopener noreferrer">
+                <Button size="sm">Agendar</Button>
+              </a>
+            </div>
+          </Card>
+        );
+      })()}
+
       {/* Regalo único: invita a 3 negocios y gana 1 mes de Pro. Es PERSONAL y se
           aplica al negocio propio: solo se muestra entrando como dueño (en un
           proyecto donde colaboras no aplica). */}

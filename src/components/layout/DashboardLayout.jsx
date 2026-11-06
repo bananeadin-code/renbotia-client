@@ -21,6 +21,7 @@ const NAV = [
   { to: '/dashboard/facturacion', label: 'Facturación', icon: 'card' },
   { to: '/dashboard/equipo', label: 'Equipo', icon: 'users' },
   { to: '/dashboard/actividad', label: 'Actividad', icon: 'clipboard' },
+  { to: '/dashboard/ayuda', label: 'Ayuda', icon: 'message' },
 ];
 
 /**
@@ -31,6 +32,7 @@ const PAGE_TITLES = {
   '/dashboard': 'Inicio',
   '/dashboard/embudo': 'Embudo',
   '/dashboard/campanas': 'Campañas',
+  '/dashboard/ayuda': 'Ayuda',
   '/dashboard/entrenamiento': 'Entrenamiento',
   '/dashboard/simulador': 'Simulador',
   '/dashboard/conversaciones': 'Conversaciones',

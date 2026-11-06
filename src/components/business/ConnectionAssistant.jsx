@@ -27,6 +27,7 @@ const CHECKLIST = [
 // Atascos frecuentes (los que vimos en la práctica) con su solución, para que el
 // usuario no se rinda ante un error de Meta.
 const BLOCKERS = [
+  // (también se muestran en Ayuda: CONNECTION_FAQ)
   {
     q: 'No me llega el código de verificación',
     a: 'Espera 1–2 minutos y prueba la opción de llamada. Si el número es nuevo, a veces tarda en activarse; intenta de nuevo más tarde. Evita pedir muchos códigos seguidos: Meta limita los intentos.',
@@ -44,6 +45,8 @@ const BLOCKERS = [
     a: 'No pasa nada: no se conectó nada a medias. Vuelve a pulsar “Conectar WhatsApp” y repite el proceso con calma.',
   },
 ];
+
+export const CONNECTION_FAQ = BLOCKERS;
 
 /**
  * Checklist "Antes de conectar": va DENTRO de la tarjeta de WhatsApp, encima del
@@ -130,6 +133,9 @@ export function ConnectionChecklist({ onReadyChange }) {
  * comunes y una vía de contacto directa para no perder a un interesado.
  */
 export function ConnectionHelp() {
+  // Videollamada si la tiene incluida y no la ha tenido; si no, mensaje desde Ayuda.
+  const orientation = useBusinessStore((s) => s.subscription?.orientation);
+  const canBook = orientation?.included && !orientation?.done && orientation?.bookingUrl;
   return (
     <Card className="space-y-5">
       <div>
@@ -153,15 +159,28 @@ export function ConnectionHelp() {
 
       <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-brand-400/30 bg-brand-500/[0.05] p-3">
         <p className="text-sm text-muted">
-          <span className="font-medium text-fg">¿Prefieres que lo hagamos contigo?</span> Te ayudamos
-          a conectar tu número sin complicaciones.
+          <span className="font-medium text-fg">¿Prefieres que lo hagamos contigo?</span>{' '}
+          {canBook
+            ? 'Agenda una videollamada gratis y conectamos tu número juntos.'
+            : 'Escríbenos y te ayudamos a conectar tu número sin complicaciones.'}
         </p>
-        <Link
-          to="/contacto?motivo=conexion"
-          className="shrink-0 rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-brand-700"
-        >
-          Pedir ayuda
-        </Link>
+        {canBook ? (
+          <a
+            href={orientation.bookingUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 rounded-lg bg-brand-700 px-3 py-2 text-sm font-semibold text-white transition hover:bg-brand-800"
+          >
+            Agendar videollamada
+          </a>
+        ) : (
+          <Link
+            to="/dashboard/ayuda"
+            className="shrink-0 rounded-lg bg-brand-700 px-3 py-2 text-sm font-semibold text-white transition hover:bg-brand-800"
+          >
+            Pedir ayuda
+          </Link>
+        )}
       </div>
     </Card>
   );

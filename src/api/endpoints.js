@@ -114,6 +114,11 @@ export const demoApi = {
   profile: (body) => unwrap(api.post('/demo/profile', body)),
 };
 
+// Ayuda del panel: mensaje al equipo con los datos de la cuenta.
+export const supportApi = {
+  message: (body) => unwrap(api.post('/support/message', body)),
+};
+
 export const contactApi = {
   // Formulario de contacto público (envía a tu buzón vía Resend en el backend).
   submit: (body) => unwrap(api.post('/contact', body)),
