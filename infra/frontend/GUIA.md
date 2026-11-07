@@ -106,8 +106,16 @@ protege a todo lo demás.
    $env:AWS_PROFILE = "renbotia"   # esta ventana de PowerShell usa ese perfil
    aws sts get-caller-identity     # debe mostrar tu cuenta y tu usuario, no "root"
    ```
-   Las credenciales se **renuevan solas cada 15 minutos** y la sesión dura **hasta 12 horas**. Cuando
-   caduca, la terminal te lo dice: vuelve a correr `aws login --profile renbotia`.
+   `$env:AWS_PROFILE` solo dura en **esa** ventana. Para no escribirlo cada vez, déjalo fijo para tu
+   usuario de Windows (una sola vez; aplica desde la siguiente ventana que abras):
+   ```powershell
+   [Environment]::SetEnvironmentVariable("AWS_PROFILE", "renbotia", "User")
+   ```
+   Para quitarlo algún día: el mismo comando con `$null` en lugar de `"renbotia"`.
+
+   Las credenciales se **renuevan solas cada 15 minutos** y la sesión dura **hasta 12 horas**. El
+   perfil se queda guardado; lo que caduca son sus credenciales. Cuando caduca, la terminal te lo dice:
+   vuelve a correr `aws login --profile renbotia`.
 
    Si después de entrar ves un error de permisos, el usuario necesita la política administrada
    `SignInLocalDevelopmentAccess` (un usuario con `AdministratorAccess` ya la cubre).
@@ -147,7 +155,9 @@ máquina); no tiene que ver con estas credenciales.
 2. **Desactiva** las llaves viejas: consola → *IAM* → *Users* → tu usuario → *Security credentials* →
    *Access keys* → **Deactivate**. (Desactivar se puede revertir; borrar no.)
 3. Comprueba que el perfil nuevo sigue funcionando (`aws sts get-caller-identity --profile renbotia`).
-   El perfil `default` dejará de funcionar: es lo esperado, era el de las llaves.
+   El perfil `default` dejará de funcionar (`InvalidClientTokenId`): es lo esperado, era el de las
+   llaves. Si ves ese error en una ventana nueva, es que no tiene el perfil `renbotia` puesto (ver
+   punto 3 del paso 2 para dejarlo fijo).
 4. Si en unos días nada se rompe, **borra** las llaves en IAM y el archivo `.aws\credentials`.
 
 > **Por qué AdministratorAccess y no algo más pequeño:** Terraform aquí crea recursos de S3, CloudFront,
@@ -405,6 +415,8 @@ Si tu computadora se pierde, pierdes `terraform.tfstate` y Terraform ya no sabe 
 
 | Síntoma | Causa y solución |
 | ------- | ---------------- |
+| `InvalidClientTokenId` en la terminal o en `terraform` | La ventana no tiene el perfil `renbotia` y usó las llaves viejas desactivadas. `$env:AWS_PROFILE = "renbotia"` (o déjalo fijo, paso 2). |
+| La terminal dice que la sesión expiró o pide volver a entrar | Pasaron las 12 h de la sesión. `aws login --profile renbotia`. |
 | Error XML `AccessDenied` al abrir una página | El archivo no existe en S3 (¿falló la subida?) o la ruta no la conoce el enrutador. Corre de nuevo el workflow. |
 | `CNAMEAlreadyExists` al hacer `apply` con `attach_domain = true` | Otra distribución de CloudFront (de cualquier cuenta) ya usa `renbotia.com`. Revisa *CloudFront → Distributions* en tu cuenta. |
 | El certificado se queda en *Pending validation* | Los CNAME de validación tienen el proxy de Cloudflare **encendido**, o el nombre quedó duplicado (`...renbotia.com.renbotia.com`). |
