@@ -32,7 +32,7 @@ provider "aws" {
   region = "us-east-1"
 
   # ¿En qué cuenta construye? En la de las credenciales con las que corres
-  # Terraform (perfil de AWS SSO, paso 2 de la guía). Este candado hace que se
+  # Terraform (perfil "renbotia" de `aws login`, paso 2 de la guía). Este candado hace que se
   # NIEGUE a trabajar si esas credenciales son de otra cuenta.
   allowed_account_ids = [var.aws_account_id]
 

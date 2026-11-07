@@ -88,29 +88,36 @@ protege a todo lo demás.
 1. **MFA en el usuario raíz** (el correo con el que abriste la cuenta):
    menú de tu cuenta (arriba a la derecha) → *Security credentials* → *Assign MFA device*.
    Usa una app de autenticación o una llave física. Si el raíz tiene *Access keys*, **bórralas**.
-2. **No uses el usuario raíz para trabajar.** Crea tu usuario de trabajo con **IAM Identity Center**:
-   1. Busca *IAM Identity Center* → *Enable* (región `us-east-1`).
-   2. *Users* → *Add user* → tu nombre y correo. Activa MFA para él (*Settings → Authentication*).
-   3. *Permission sets* → *Create* → *Predefined* → `AdministratorAccess`, duración de sesión 4 h.
-   4. *AWS accounts* → selecciona tu cuenta → *Assign users* → tu usuario + ese permission set.
-   5. Guarda la *AWS access portal URL* que aparece en el panel (algo como `https://d-xxxx.awsapps.com/start`).
-3. **Conecta la terminal con credenciales temporales** (no llaves permanentes). En PowerShell:
+2. **No uses el usuario raíz para trabajar.** Usa un **usuario de IAM** con contraseña y **MFA**
+   (por ejemplo, en un grupo `Admin` con la política `AdministratorAccess`). Con ese usuario entras a
+   la consola y, en el punto 3, también a la terminal.
+3. **Conecta la terminal con credenciales temporales** (no llaves permanentes) usando `aws login`.
+   Requiere AWS CLI **2.32 o más nuevo** (`aws --version`). En PowerShell:
    ```powershell
-   aws configure sso
-   # SSO session name: renbotia
-   # SSO start URL: (la access portal URL del paso anterior)
-   # SSO region: us-east-1
-   # (se abre el navegador; autoriza)
-   # Default client Region: us-east-1   ·   Output format: json   ·   Profile name: renbotia
+   aws login --profile renbotia
+   # Region: us-east-1 (si la pregunta)
+   # Se abre el navegador: entras con tu usuario de IAM, contraseña y MFA (Authy) → apruebas
    ```
+   Esto crea el **perfil** `renbotia` en `C:\Users\TU-USUARIO\.aws\config`. Un perfil es solo un
+   nombre para un juego de credenciales; puedes tener varios (uno por cuenta o proyecto).
+
    Cada vez que trabajes:
    ```powershell
-   aws sso login --profile renbotia
-   $env:AWS_PROFILE = "renbotia"
-   aws sts get-caller-identity   # debe mostrar tu usuario, no "root"
+   $env:AWS_PROFILE = "renbotia"   # esta ventana de PowerShell usa ese perfil
+   aws sts get-caller-identity     # debe mostrar tu cuenta y tu usuario, no "root"
    ```
-   Con el perfil SSO, el `Arn` se ve como `arn:aws:sts::TU-CUENTA:assumed-role/AWSReservedSSO_AdministratorAccess_.../tu-usuario`.
-   Cuando las credenciales caducan (unas horas), la terminal te lo dice: vuelve a correr `aws sso login --profile renbotia`.
+   Las credenciales se **renuevan solas cada 15 minutos** y la sesión dura **hasta 12 horas**. Cuando
+   caduca, la terminal te lo dice: vuelve a correr `aws login --profile renbotia`.
+
+   Si después de entrar ves un error de permisos, el usuario necesita la política administrada
+   `SignInLocalDevelopmentAccess` (un usuario con `AdministratorAccess` ya la cubre).
+
+> **¿Y IAM Identity Center?** Es la otra forma de tener credenciales temporales, pensada para
+> **varias cuentas y varias personas**. Para activarlo, AWS crea una **organización (AWS Organizations)**,
+> y eso **convierte una cuenta de plan gratuito en plan de pago por uso y hace caducar los créditos
+> gratuitos al instante**. Para una sola cuenta y una sola persona, `aws login` da el mismo beneficio
+> sin ese costo. Identity Center tiene sentido el día que separes cuentas (producción / pruebas) o
+> sumes equipo; entonces elige *Instancia de organización* en `us-east-1`.
 
 ### 2.1 Si tu terminal ya tenía acceso (usuario de IAM con llaves)
 
@@ -124,22 +131,24 @@ aws configure list            # Type "shared-credentials-file" → llaves guarda
 
 **Diferencia entre las dos formas de entrar desde la terminal:**
 
-| | Usuario de IAM con llaves | IAM Identity Center (SSO) |
+| | Llaves de acceso (`aws configure`) | `aws login` |
 | --- | --- | --- |
-| Qué guarda tu PC | Llaves que **nunca caducan** | Credenciales **temporales** (unas horas) |
-| Para usarlas | Nada: siempre están activas | `aws sso login`: navegador + contraseña + MFA (Authy) |
-| Si alguien las copia | Entra indefinidamente, **sin MFA** | Le sirven solo hasta que caducan; no puede renovarlas sin tu contraseña y MFA |
+| Qué guarda tu PC | Llaves que **nunca caducan** (`.aws\credentials`) | Credenciales **temporales**: se renuevan cada 15 min, la sesión dura hasta 12 h |
+| Para usarlas | Nada: siempre están activas | `aws login`: navegador + contraseña + MFA (Authy) |
+| Si alguien las copia | Entra indefinidamente, **sin MFA** | Le sirven solo minutos; no puede renovarlas sin tu contraseña y MFA |
 
-Las dos dan acceso a la **misma cuenta**. El SSH a una instancia EC2 es otra cosa (un par de llaves `.pem`
-para entrar a esa máquina); no tiene que ver con estas credenciales.
+Las dos usan el **mismo usuario de IAM** y entran a la **misma cuenta**; solo cambia cómo se demuestra
+quién eres. El SSH a una instancia EC2 es otra cosa (un par de llaves `.pem` para entrar a esa
+máquina); no tiene que ver con estas credenciales.
 
-**Qué hacer:** crea el perfil SSO (pasos anteriores), compruébalo con `aws sts get-caller-identity --profile renbotia`
-y después **desactiva** las llaves viejas: consola → *IAM* → *Users* → tu usuario → *Security credentials* →
-*Access keys* → **Deactivate**. Si en unos días nada se rompe, bórralas y elimina el archivo `.aws\credentials`.
-Puedes seguir entrando a la **consola** con ese usuario de IAM y su contraseña + MFA.
-
-> Los usuarios de Identity Center **no aparecen** en `aws iam list-users`: los administra otro servicio.
-> Los ves en la consola, en *IAM Identity Center → Users*.
+**Qué hacer:**
+1. Crea el perfil con `aws login --profile renbotia` (punto 3) y compruébalo con
+   `aws sts get-caller-identity --profile renbotia`.
+2. **Desactiva** las llaves viejas: consola → *IAM* → *Users* → tu usuario → *Security credentials* →
+   *Access keys* → **Deactivate**. (Desactivar se puede revertir; borrar no.)
+3. Comprueba que el perfil nuevo sigue funcionando (`aws sts get-caller-identity --profile renbotia`).
+   El perfil `default` dejará de funcionar: es lo esperado, era el de las llaves.
+4. Si en unos días nada se rompe, **borra** las llaves en IAM y el archivo `.aws\credentials`.
 
 > **Por qué AdministratorAccess y no algo más pequeño:** Terraform aquí crea recursos de S3, CloudFront,
 > ACM, IAM (el rol de GitHub) y Budgets. Para una sola persona administradora es aceptable, porque las
@@ -353,8 +362,9 @@ Si tu computadora se pierde, pierdes `terraform.tfstate` y Terraform ya no sabe 
 
 ### IAM (quién puede hacer qué)
 - **Usuario raíz**: solo con MFA y sin llaves de acceso. No se usa en el día a día.
-- **Tú (Identity Center)**: credenciales temporales que expiran (4 h) y MFA. Nada de llaves
-  permanentes en tu computadora (`~/.aws/credentials` debe quedar vacío).
+- **Tú (usuario de IAM con `aws login`)**: contraseña + MFA para entrar; la terminal recibe
+  credenciales temporales (15 min, sesión de hasta 12 h). Nada de llaves permanentes en tu
+  computadora (`.aws\credentials` debe quedar vacío o no existir).
 - **GitHub Actions (rol `renbotia-frontend-deploy`)**: principio de **mínimo privilegio**:
   - Solo lo puede usar el repo `bananeadin-code/renbotia-client` desde la rama `main`
     (condición `sub` del OIDC). Un fork o una rama de pruebas no puede desplegar.
@@ -428,5 +438,7 @@ Si tu computadora se pierde, pierdes `terraform.tfstate` y Terraform ya no sabe 
 - **ACM**: servicio de certificados SSL de AWS (gratis para CloudFront).
 - **IAM**: quién puede hacer qué en AWS. **Rol**: permisos que se "toman prestados" temporalmente.
 - **OIDC**: forma de que GitHub demuestre su identidad a AWS sin compartir contraseñas ni llaves.
-- **Identity Center (SSO)**: usuarios de trabajo con credenciales temporales y MFA.
+- **Perfil de AWS**: nombre para un juego de credenciales en `.aws\config` (aquí, `renbotia`). Se elige con `--profile` o `$env:AWS_PROFILE`.
+- **`aws login`**: entra a la terminal con tu usuario de la consola (contraseña + MFA) y entrega credenciales temporales.
+- **Identity Center (SSO)**: usuarios de trabajo para varias cuentas y personas; requiere AWS Organizations.
 - **Estado de Terraform**: el registro de qué recursos administra Terraform y sus IDs.
