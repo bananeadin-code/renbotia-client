@@ -109,11 +109,20 @@ resource "aws_cloudfront_response_headers_policy" "widget_js" {
   name    = "renbotia-widget-js"
   comment = "widget.js accesible desde cualquier sitio"
 
-  custom_headers_config {
-    items {
-      header   = "Access-Control-Allow-Origin"
-      value    = "*"
-      override = true
+  # CloudFront no permite poner Access-Control-Allow-Origin como encabezado
+  # personalizado: los encabezados CORS van en su propio bloque.
+  cors_config {
+    access_control_allow_credentials = false
+    origin_override                  = true
+
+    access_control_allow_origins {
+      items = ["*"]
+    }
+    access_control_allow_methods {
+      items = ["GET", "HEAD"]
+    }
+    access_control_allow_headers {
+      items = ["*"]
     }
   }
 

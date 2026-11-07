@@ -426,6 +426,8 @@ Si tu computadora se pierde, pierdes `terraform.tfstate` y Terraform ya no sabe 
 | ------- | ---------------- |
 | `InvalidClientTokenId` en la terminal o en `terraform` | La ventana no tiene el perfil `renbotia` y usó las llaves viejas desactivadas. `$env:AWS_PROFILE = "renbotia"` (o déjalo fijo, paso 2). |
 | La terminal dice que la sesión expiró o pide volver a entrar | Pasaron las 12 h de la sesión. `aws login --profile renbotia`. |
+| `apply` falla a la mitad | Lo que alcanzó a crearse queda en el estado; no se pierde ni se duplica. Corrige el `.tf`, corre `terraform plan -out frontend.tfplan` (un plan **nuevo**: el anterior ya no sirve) y `terraform apply frontend.tfplan`. Solo crea lo que falta. |
+| `Error: Saved plan is stale` | El estado cambió desde que guardaste el plan. Genera uno nuevo con `terraform plan -out frontend.tfplan`. |
 | Error XML `AccessDenied` al abrir una página | El archivo no existe en S3 (¿falló la subida?) o la ruta no la conoce el enrutador. Corre de nuevo el workflow. |
 | `CNAMEAlreadyExists` al hacer `apply` con `attach_domain = true` | Otra distribución de CloudFront (de cualquier cuenta) ya usa `renbotia.com`. Revisa *CloudFront → Distributions* en tu cuenta. |
 | El certificado se queda en *Pending validation* | Los CNAME de validación tienen el proxy de Cloudflare **encendido**, o el nombre quedó duplicado (`...renbotia.com.renbotia.com`). |
