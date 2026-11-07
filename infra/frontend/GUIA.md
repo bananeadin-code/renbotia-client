@@ -124,11 +124,17 @@ En PowerShell, desde la carpeta del cliente (`renbotia-client`):
 ```powershell
 cd infra\frontend
 copy terraform.tfvars.example terraform.tfvars
-notepad terraform.tfvars      # pon tu correo en budget_email; deja attach_domain = false
+aws sts get-caller-identity   # copia el número de "Account" (12 dígitos)
+notepad terraform.tfvars      # pon ese número en aws_account_id y tu correo en budget_email; deja attach_domain = false
 node ..\..\scripts\gen-edge-router.mjs   # genera edge-router.js (Terraform lo necesita)
 terraform init
 terraform validate
 ```
+
+**¿Cómo sabe Terraform en qué cuenta construir?** Por las credenciales con las que lo corres: el perfil
+`renbotia` del paso 2 (`$env:AWS_PROFILE = "renbotia"`). La región está fija en `versions.tf`
+(`us-east-1`). Además, `aws_account_id` es un candado: si por error tuvieras activas las credenciales
+de otra cuenta, Terraform se niega a trabajar en lugar de construir ahí.
 
 Si ya habías creado antes el proveedor OIDC de GitHub en esta cuenta (IAM → *Identity providers* →
 `token.actions.githubusercontent.com`), pon `create_github_oidc_provider = false`.

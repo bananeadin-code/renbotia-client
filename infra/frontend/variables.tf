@@ -3,6 +3,16 @@
 # en terraform.tfvars (copia terraform.tfvars.example).
 # ─────────────────────────────────────────────────────────────────────────────
 
+variable "aws_account_id" {
+  description = "Número de tu cuenta de AWS (12 dígitos). Terraform solo construye en esta cuenta. Lo ves con: aws sts get-caller-identity"
+  type        = string
+
+  validation {
+    condition     = can(regex("^[0-9]{12}$", var.aws_account_id))
+    error_message = "El número de cuenta de AWS son 12 dígitos, sin guiones."
+  }
+}
+
 variable "domain" {
   description = "Dominio principal del sitio."
   type        = string

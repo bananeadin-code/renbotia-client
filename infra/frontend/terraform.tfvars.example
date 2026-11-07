@@ -1,5 +1,9 @@
 # Copia este archivo como terraform.tfvars (ese NO se sube a git) y ajusta los valores.
 
+# Tu número de cuenta de AWS (12 dígitos, el "Account" de: aws sts get-caller-identity).
+# Terraform se niega a construir en cualquier otra cuenta.
+aws_account_id = "123456789012"
+
 budget_email     = "tu-correo@ejemplo.com"
 budget_limit_usd = 5
 
