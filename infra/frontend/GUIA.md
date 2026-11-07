@@ -328,10 +328,12 @@ Route 53 "sin la firma esperada" y **dejarían de resolver tu dominio** (sitio, 
 1. Squarespace → `renbotia.com` → *DNS* → **DNSSEC** → desactivar.
 2. Comprueba que el registro DS desapareció del registro de `.com`:
    ```powershell
-   Resolve-DnsName renbotia.com -Type DS -Server 8.8.8.8 -DnsOnly
+   # Pregunta directo al servidor de ".com" (sin caché de por medio):
+   Resolve-DnsName renbotia.com -Type DS -Server a.gtld-servers.net -DnsOnly
    ```
-   Mientras aparezca una fila con tipo `DS`, todavía no. Cuando ya no aparezca, **espera 24 horas
-   más** (los resolutores lo guardan en caché) antes del siguiente paso.
+   Mientras la primera fila sea `renbotia.com  DS`, todavía no. Cuando ya no aparezca, **espera
+   24 horas más**: ese registro tiene un TTL de 86,400 segundos (24 h), así que es lo que los
+   resolutores de internet pueden tenerlo guardado en caché.
 
 ### 7.4 Cambiar los servidores de nombres
 
