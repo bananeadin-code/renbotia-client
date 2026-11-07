@@ -1,7 +1,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Certificado SSL (ACM) para renbotia.com y www.renbotia.com. Es gratis.
-# AWS lo emite cuando demuestras que el dominio es tuyo: te da unos registros
-# CNAME que agregas en Cloudflare (salen en `terraform output acm_validation_records`).
+# AWS lo emite cuando demuestras que el dominio es tuyo con unos registros CNAME.
+# Terraform los crea solo en Route 53 (dns.tf → aws_route53_record.acm_validation).
 # ─────────────────────────────────────────────────────────────────────────────
 
 resource "aws_acm_certificate" "site" {
@@ -15,12 +15,13 @@ resource "aws_acm_certificate" "site" {
   }
 }
 
-# Espera a que AWS confirme los registros de Cloudflare y emita el certificado.
-# Solo se usa cuando attach_domain = true (paso 7 de la guía), para que el primer
-# `terraform apply` no se quede esperando.
+# Espera a que AWS vea esos registros y emita el certificado. Solo se usa cuando
+# attach_domain = true: antes de cambiar los servidores de nombres en Squarespace,
+# nadie en internet ve todavía la zona de Route 53 y se quedaría esperando.
 resource "aws_acm_certificate_validation" "site" {
-  count           = var.attach_domain ? 1 : 0
-  certificate_arn = aws_acm_certificate.site.arn
+  count                   = var.attach_domain ? 1 : 0
+  certificate_arn         = aws_acm_certificate.site.arn
+  validation_record_fqdns = [for r in aws_route53_record.acm_validation : r.fqdn]
 
   timeouts {
     create = "30m"

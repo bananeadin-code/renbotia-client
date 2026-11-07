@@ -30,6 +30,10 @@ locals {
   ])
 
   permissions_policy = "camera=(), microphone=(), geolocation=(), payment=(self \"https://js.stripe.com\")"
+
+  # Encabezados que S3 agrega y que solo revelan detalles internos (qué servidor,
+  # cifrado y versión del archivo). CloudFront los quita antes de responder.
+  hidden_headers = ["Server", "x-amz-server-side-encryption", "x-amz-version-id"]
 }
 
 # Política general (todo el sitio y el panel).
@@ -68,6 +72,15 @@ resource "aws_cloudfront_response_headers_policy" "site" {
       override = true
     }
   }
+
+  remove_headers_config {
+    dynamic "items" {
+      for_each = local.hidden_headers
+      content {
+        header = items.value
+      }
+    }
+  }
 }
 
 # Chat embebido /w/...: igual, pero se puede incrustar en otros sitios (sin X-Frame-Options).
@@ -102,6 +115,15 @@ resource "aws_cloudfront_response_headers_policy" "widget_page" {
       override = true
     }
   }
+
+  remove_headers_config {
+    dynamic "items" {
+      for_each = local.hidden_headers
+      content {
+        header = items.value
+      }
+    }
+  }
 }
 
 # widget.js: el script que los clientes pegan en su sitio. Se puede cargar desde cualquier dominio.
@@ -129,6 +151,15 @@ resource "aws_cloudfront_response_headers_policy" "widget_js" {
   security_headers_config {
     content_type_options {
       override = true
+    }
+  }
+
+  remove_headers_config {
+    dynamic "items" {
+      for_each = local.hidden_headers
+      content {
+        header = items.value
+      }
     }
   }
 }

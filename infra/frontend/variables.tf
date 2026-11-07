@@ -72,6 +72,17 @@ variable "budget_limit_usd" {
   default     = 5
 }
 
+variable "site_target" {
+  description = "A dónde apunta el DNS de renbotia.com y www: \"vercel\" (como hoy) o \"aws\" (CloudFront). Cambiarlo es el corte; regresarlo es el rollback."
+  type        = string
+  default     = "vercel"
+
+  validation {
+    condition     = contains(["vercel", "aws"], var.site_target)
+    error_message = "site_target solo puede ser \"vercel\" o \"aws\"."
+  }
+}
+
 variable "attach_domain" {
   description = "false: la distribución funciona solo con su dominio *.cloudfront.net (pruebas). true: se le asigna renbotia.com (requiere el certificado validado)."
   type        = bool

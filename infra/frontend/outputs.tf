@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# Salidas: datos que necesitas después (para Cloudflare y para GitHub).
+# Salidas: datos que necesitas después (para Squarespace y para GitHub).
 # Se ven con `terraform output` (o `terraform output -raw nombre`).
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -14,7 +14,7 @@ output "distribution_id" {
 }
 
 output "cloudfront_domain" {
-  description = "Dominio de CloudFront (dxxxx.cloudfront.net): para probar y para el CNAME en Cloudflare."
+  description = "Dominio de CloudFront (dxxxx.cloudfront.net): para probar antes del corte."
   value       = aws_cloudfront_distribution.site.domain_name
 }
 
@@ -28,8 +28,18 @@ output "router_function_name" {
   value       = aws_cloudfront_function.router.name
 }
 
+output "name_servers" {
+  description = "Los 4 servidores de nombres de Route 53: van en Squarespace → DNS → Servidores de nombres de dominio."
+  value       = aws_route53_zone.main.name_servers
+}
+
+output "zone_id" {
+  description = "ID de la zona de Route 53 de renbotia.com."
+  value       = aws_route53_zone.main.zone_id
+}
+
 output "acm_validation_records" {
-  description = "Registros CNAME para validar el certificado: agrégalos en Cloudflare con el proxy APAGADO (nube gris)."
+  description = "Registros CNAME para validar el certificado (Terraform ya los crea en Route 53; solo informativo)."
   value = [
     for o in aws_acm_certificate.site.domain_validation_options : {
       dominio = o.domain_name
