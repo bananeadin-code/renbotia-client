@@ -201,9 +201,15 @@ Debe decir **`Plan: 18 to add, 0 to change, 0 to destroy`** (todo con `+`). Revi
 aparezcan: el bucket, la distribución de CloudFront, la función `renbotia-edge-router`, las tres
 políticas de encabezados, el certificado, el rol `renbotia-frontend-deploy` y el presupuesto.
 
+Para aplicar **exactamente** lo que revisaste, guarda el plan en un archivo y aplica ese archivo:
+
 ```powershell
-terraform apply      # escribe: yes
+terraform plan -out frontend.tfplan    # mismo plan, guardado (el archivo no se sube a git)
+terraform apply frontend.tfplan        # aplica ese plan tal cual; no vuelve a preguntar "yes"
 ```
+
+(También funciona `terraform apply` a secas: vuelve a calcular el plan, te lo muestra y pide `yes`.
+La diferencia es que lo que apruebas podría no ser idéntico a lo que revisaste antes.)
 
 CloudFront tarda **5 a 15 minutos** en crearse; es normal. Al terminar:
 
@@ -211,8 +217,11 @@ CloudFront tarda **5 a 15 minutos** en crearse; es normal. Al terminar:
 terraform output
 ```
 
-Anota `cloudfront_domain` (algo como `d1abcd2efgh3.cloudfront.net`). AWS te enviará un correo para
-**confirmar la suscripción** a la alerta de presupuesto: confírmalo.
+Anota `cloudfront_domain` (algo como `d1abcd2efgh3.cloudfront.net`). La alerta de presupuesto llega
+directo a tu correo; no hay que confirmar ninguna suscripción. Puedes verla en *Billing → Budgets*.
+
+El certificado aparecerá como *Pending validation*: es normal, se valida en el paso 7. Mientras
+`attach_domain = false`, Terraform no espera esa validación.
 
 Ve a la consola y míralo: *CloudFront → Distributions*, *S3 → Buckets*, *CloudFront → Functions*.
 Así relacionas lo que escribiste en código con lo que existe.
