@@ -387,6 +387,9 @@ Si tu computadora se pierde, pierdes `terraform.tfstate` y Terraform ya no sabe 
 - **GitHub Actions (rol `renbotia-frontend-deploy`)**: principio de **mínimo privilegio**:
   - Solo lo puede usar el repo `bananeadin-code/renbotia-client` desde la rama `main`
     (condición `sub` del OIDC). Un fork o una rama de pruebas no puede desplegar.
+  - GitHub identifica al repo con su nombre **y su ID numérico inmutable**
+    (`repo:bananeadin-code@246899438/renbotia-client@1336321738:ref:refs/heads/main`). Si alguien
+    creara otro repo con el mismo nombre (por ejemplo, tras borrar este), su ID sería distinto y AWS lo rechazaría.
   - Solo puede: subir/borrar archivos en **este** bucket, limpiar caché de **esta** distribución y
     actualizar **este** enrutador. No puede crear servidores, ver otros buckets ni tocar IAM.
   - Sin llaves guardadas en GitHub: cada despliegue recibe credenciales que duran minutos.
@@ -431,7 +434,7 @@ Si tu computadora se pierde, pierdes `terraform.tfstate` y Terraform ya no sabe 
 | Error XML `AccessDenied` al abrir una página | El archivo no existe en S3 (¿falló la subida?) o la ruta no la conoce el enrutador. Corre de nuevo el workflow. |
 | `CNAMEAlreadyExists` al hacer `apply` con `attach_domain = true` | Otra distribución de CloudFront (de cualquier cuenta) ya usa `renbotia.com`. Revisa *CloudFront → Distributions* en tu cuenta. |
 | El certificado se queda en *Pending validation* | Los CNAME de validación tienen el proxy de Cloudflare **encendido**, o el nombre quedó duplicado (`...renbotia.com.renbotia.com`). |
-| GitHub: `Not authorized to perform sts:AssumeRoleWithWebIdentity` | Corriste el workflow desde otra rama, o `github_repository` no coincide con el repo. |
+| GitHub: `Not authorized to perform sts:AssumeRoleWithWebIdentity` | La identidad que presentó GitHub no coincide con la que acepta el rol: otra rama, otro repo, o los IDs (`github_owner_id`, `github_repository_id`). Para ver **qué identidad mandó** GitHub: consola → *CloudTrail* → *Event history* → filtro *Event name* = `AssumeRoleWithWebIdentity` → abre el evento con error → `userIdentity.userName` (algo como `repo:usuario@123/repo@456:ref:refs/heads/main`). Compárala con la condición `sub` del rol (*IAM → Roles → renbotia-frontend-deploy → Trust relationships*). |
 | GitHub: `PreconditionFailed` al actualizar el enrutador | Alguien lo editó en la consola al mismo tiempo. Vuelve a correr el workflow. |
 | En la consola del navegador: "Refused to load … Content Security Policy" | Un servicio nuevo no está en la CSP. Agrégalo en `headers.tf` → `terraform apply`. La CSP no puede pasar de 1,783 caracteres. |
 | Cambié algo y sigo viendo lo viejo | Caché del navegador (Ctrl+F5) o la invalidación aún corre (1 a 3 min). |

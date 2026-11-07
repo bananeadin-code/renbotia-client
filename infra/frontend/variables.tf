@@ -37,6 +37,18 @@ variable "github_repository" {
   default     = "bananeadin-code/renbotia-client"
 }
 
+variable "github_owner_id" {
+  description = "ID numérico (inmutable) del dueño del repo en GitHub. Lo ves en: https://api.github.com/users/USUARIO (campo id)."
+  type        = string
+  default     = "246899438"
+}
+
+variable "github_repository_id" {
+  description = "ID numérico (inmutable) del repo en GitHub. Lo ves en: https://api.github.com/repos/USUARIO/REPO (campo id)."
+  type        = string
+  default     = "1336321738"
+}
+
 variable "github_branch" {
   description = "Rama que puede desplegar a producción."
   type        = string

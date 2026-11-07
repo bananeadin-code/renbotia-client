@@ -19,6 +19,14 @@ data "aws_iam_openid_connect_provider" "github" {
 
 locals {
   github_oidc_arn = var.create_github_oidc_provider ? aws_iam_openid_connect_provider.github[0].arn : data.aws_iam_openid_connect_provider.github[0].arn
+
+  # GitHub identifica al repo con nombre + ID inmutable:
+  #   repo:USUARIO@ID_USUARIO/REPO@ID_REPO:ref:refs/heads/RAMA
+  # Los IDs no cambian aunque renombres el repo, y nadie más puede reutilizarlos
+  # (si borraras el repo y otra persona creara uno con el mismo nombre, su ID sería otro).
+  github_owner = split("/", var.github_repository)[0]
+  github_repo  = split("/", var.github_repository)[1]
+  github_sub   = "repo:${local.github_owner}@${var.github_owner_id}/${local.github_repo}@${var.github_repository_id}:ref:refs/heads/${var.github_branch}"
 }
 
 # Quién puede usar el rol: solo GitHub Actions del repo y la rama indicados.
@@ -40,7 +48,7 @@ data "aws_iam_policy_document" "deploy_trust" {
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_repository}:ref:refs/heads/${var.github_branch}"]
+      values   = [local.github_sub]
     }
   }
 }
