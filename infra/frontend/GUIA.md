@@ -109,6 +109,37 @@ protege a todo lo demás.
    $env:AWS_PROFILE = "renbotia"
    aws sts get-caller-identity   # debe mostrar tu usuario, no "root"
    ```
+   Con el perfil SSO, el `Arn` se ve como `arn:aws:sts::TU-CUENTA:assumed-role/AWSReservedSSO_AdministratorAccess_.../tu-usuario`.
+   Cuando las credenciales caducan (unas horas), la terminal te lo dice: vuelve a correr `aws sso login --profile renbotia`.
+
+### 2.1 Si tu terminal ya tenía acceso (usuario de IAM con llaves)
+
+Si antes corriste `aws configure` con las *access keys* de un usuario de IAM (por ejemplo, en prácticas con
+EC2), tu terminal ya entra a la cuenta. Compruébalo:
+
+```powershell
+aws sts get-caller-identity   # "Arn": "...:user/tu-usuario"  → usuario de IAM
+aws configure list            # Type "shared-credentials-file" → llaves guardadas en C:\Users\TU-USUARIO\.aws\credentials
+```
+
+**Diferencia entre las dos formas de entrar desde la terminal:**
+
+| | Usuario de IAM con llaves | IAM Identity Center (SSO) |
+| --- | --- | --- |
+| Qué guarda tu PC | Llaves que **nunca caducan** | Credenciales **temporales** (unas horas) |
+| Para usarlas | Nada: siempre están activas | `aws sso login`: navegador + contraseña + MFA (Authy) |
+| Si alguien las copia | Entra indefinidamente, **sin MFA** | Le sirven solo hasta que caducan; no puede renovarlas sin tu contraseña y MFA |
+
+Las dos dan acceso a la **misma cuenta**. El SSH a una instancia EC2 es otra cosa (un par de llaves `.pem`
+para entrar a esa máquina); no tiene que ver con estas credenciales.
+
+**Qué hacer:** crea el perfil SSO (pasos anteriores), compruébalo con `aws sts get-caller-identity --profile renbotia`
+y después **desactiva** las llaves viejas: consola → *IAM* → *Users* → tu usuario → *Security credentials* →
+*Access keys* → **Deactivate**. Si en unos días nada se rompe, bórralas y elimina el archivo `.aws\credentials`.
+Puedes seguir entrando a la **consola** con ese usuario de IAM y su contraseña + MFA.
+
+> Los usuarios de Identity Center **no aparecen** en `aws iam list-users`: los administra otro servicio.
+> Los ves en la consola, en *IAM Identity Center → Users*.
 
 > **Por qué AdministratorAccess y no algo más pequeño:** Terraform aquí crea recursos de S3, CloudFront,
 > ACM, IAM (el rol de GitHub) y Budgets. Para una sola persona administradora es aceptable, porque las
