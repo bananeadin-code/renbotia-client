@@ -1,0 +1,19 @@
+# Copia este archivo como terraform.tfvars (ese NO se sube a git) y ajusta los valores.
+
+budget_email     = "tu-correo@ejemplo.com"
+budget_limit_usd = 5
+
+# Pon false si tu cuenta de AWS YA tiene el proveedor OIDC de GitHub
+# (IAM → Proveedores de identidad → token.actions.githubusercontent.com).
+create_github_oidc_provider = true
+
+# false mientras pruebas con el dominio *.cloudfront.net (pasos 4 a 6 de la guía).
+# true cuando el certificado esté validado en Cloudflare (paso 7).
+attach_domain = false
+
+# Estos ya traen el valor correcto; cámbialos solo si algo es distinto.
+# domain            = "renbotia.com"
+# redirect_domains  = ["www.renbotia.com"]
+# render_origin     = "renbotia-server.onrender.com"
+# github_repository = "bananeadin-code/renbotia-client"
+# github_branch     = "main"

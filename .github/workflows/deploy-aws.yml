@@ -1,0 +1,96 @@
+# Publica el sitio en AWS (S3 + CloudFront). Guía: infra/frontend/GUIA.md
+#
+# Por ahora SOLO corre a mano (Actions → "Desplegar sitio en AWS" → Run workflow),
+# para probar sin tocar Vercel. En el paso 10 de la guía se activa "push" a main.
+name: Desplegar sitio en AWS
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: [main]
+
+# id-token: write permite pedirle a AWS credenciales temporales (OIDC), sin llaves guardadas.
+permissions:
+  id-token: write
+  contents: read
+
+# Nunca dos despliegues a la vez (el segundo espera al primero).
+concurrency:
+  group: deploy-aws
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: us-east-1
+  BUCKET: ${{ vars.AWS_S3_BUCKET }}
+  DISTRIBUTION_ID: ${{ vars.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
+  FUNCTION_NAME: ${{ vars.AWS_CF_FUNCTION_NAME }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # el sitemap usa la fecha del último cambio de cada contenido
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar (app + páginas para Google + sitemap)
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_GTM_ID: ${{ vars.VITE_GTM_ID }}
+
+      - name: Generar el enrutador de CloudFront
+        run: node scripts/gen-edge-router.mjs
+
+      - name: Credenciales temporales de AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # 1) Archivos con hash en el nombre (nunca cambian): caché de 1 año.
+      #    No se borran los viejos: quien tenga la versión anterior abierta los sigue necesitando.
+      - name: Subir assets (caché largo)
+        run: aws s3 sync dist/assets "s3://$BUCKET/assets" --cache-control "public,max-age=31536000,immutable" --only-show-errors
+
+      # 2) El script del widget: caché corto (los clientes lo tienen pegado en sus sitios).
+      - name: Subir widget.js (caché 5 min)
+        run: aws s3 cp dist/widget.js "s3://$BUCKET/widget.js" --cache-control "public,max-age=300,must-revalidate" --content-type "application/javascript; charset=utf-8" --only-show-errors
+
+      # 3) HTML y demás: siempre se revalidan; se borra lo que ya no existe.
+      - name: Subir páginas
+        run: >
+          aws s3 sync dist "s3://$BUCKET"
+          --exclude "assets/*" --exclude "widget.js"
+          --cache-control "public,max-age=0,must-revalidate"
+          --delete --only-show-errors
+
+      # 4) Enrutador: solo se publica si cambió (páginas para Google nuevas o eliminadas).
+      - name: Actualizar el enrutador si cambió
+        run: |
+          aws cloudfront get-function --name "$FUNCTION_NAME" --stage LIVE /tmp/live.js > /dev/null
+          if cmp -s /tmp/live.js infra/frontend/edge-router.js; then
+            echo "Enrutador sin cambios."
+          else
+            ETAG=$(aws cloudfront describe-function --name "$FUNCTION_NAME" --query ETag --output text)
+            NEW=$(aws cloudfront update-function --name "$FUNCTION_NAME" --if-match "$ETAG" \
+              --function-config '{"Comment":"Enrutador RenBotIA","Runtime":"cloudfront-js-2.0"}' \
+              --function-code fileb://infra/frontend/edge-router.js --query ETag --output text)
+            aws cloudfront publish-function --name "$FUNCTION_NAME" --if-match "$NEW" > /dev/null
+            echo "Enrutador actualizado y publicado."
+          fi
+
+      # 5) Que CloudFront deje de servir lo anterior (las primeras 1,000 rutas al mes son gratis; "/*" cuenta como 1).
+      - name: Limpiar caché de CloudFront
+        run: aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*" --query Invalidation.Id --output text
