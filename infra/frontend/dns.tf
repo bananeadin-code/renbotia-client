@@ -111,14 +111,42 @@ resource "aws_route53_record" "apex_ipv6" {
   }
 }
 
-# www.renbotia.com: CNAME en los dos casos (así el cambio es solo de valor, sin
-# borrar y crear). El enrutador de CloudFront lo redirige a renbotia.com.
+# www.renbotia.com: registro A en los dos casos, igual que el dominio principal.
+# El enrutador de CloudFront (o Vercel) lo redirige a renbotia.com.
+#
+# Por qué NO un CNAME hacia Vercel: un CNAME "hereda" las reglas CAA del destino
+# (qué autoridades pueden emitir certificados). El host de Vercel solo permite a
+# Let's Encrypt, GlobalSign, Sectigo y Google, así que AWS no podía emitir el
+# certificado para www (CAA_ERROR). Con un registro A, www no hereda nada.
 resource "aws_route53_record" "www" {
   zone_id = aws_route53_zone.main.zone_id
   name    = "www.${var.domain}"
-  type    = "CNAME"
-  ttl     = 300
-  records = [local.site_on_aws ? aws_cloudfront_distribution.site.domain_name : "72de1f8df8c26032.vercel-dns-017.com"]
+  type    = "A"
+
+  ttl     = local.site_on_aws ? null : 300
+  records = local.site_on_aws ? null : ["216.198.79.1"] # la misma IP de Vercel que el dominio principal
+
+  dynamic "alias" {
+    for_each = local.site_on_aws ? [1] : []
+    content {
+      name                   = aws_cloudfront_distribution.site.domain_name
+      zone_id                = aws_cloudfront_distribution.site.hosted_zone_id
+      evaluate_target_health = false
+    }
+  }
+}
+
+resource "aws_route53_record" "www_ipv6" {
+  count   = local.site_on_aws ? 1 : 0
+  zone_id = aws_route53_zone.main.zone_id
+  name    = "www.${var.domain}"
+  type    = "AAAA"
+
+  alias {
+    name                   = aws_cloudfront_distribution.site.domain_name
+    zone_id                = aws_cloudfront_distribution.site.hosted_zone_id
+    evaluate_target_health = false
+  }
 }
 
 # ── Validación del certificado (ACM) ─────────────────────────────────────────

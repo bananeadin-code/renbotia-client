@@ -31,7 +31,7 @@ $revisar = @(
   @("renbotia.com", "A"),
   @("renbotia.com", "MX"),
   @("renbotia.com", "TXT"),
-  @("www.renbotia.com", "CNAME"),
+  @("www.renbotia.com", "A"),
   @("api.renbotia.com", "CNAME"),
   @("send.renbotia.com", "MX"),
   @("send.renbotia.com", "TXT"),
