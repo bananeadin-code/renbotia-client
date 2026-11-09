@@ -21,8 +21,32 @@ data "aws_cloudfront_cache_policy" "optimized" {
 data "aws_cloudfront_cache_policy" "disabled" {
   name = "Managed-CachingDisabled"
 }
-data "aws_cloudfront_cache_policy" "use_origin_headers" {
-  name = "UseOriginCacheControlHeaders-QueryStrings"
+# Imágenes del bot (/api/media/*): respeta el Cache-Control que manda Render.
+# Es propia y no la administrada "UseOriginCacheControlHeaders-QueryStrings"
+# porque esa mete el encabezado Host en la llave de caché, y todo lo que está en
+# la llave se reenvía al origen: Render recibía "Host: renbotia.com", un dominio
+# que no tiene registrado, y respondía 403 (CloudFront lo mostraba como 502).
+resource "aws_cloudfront_cache_policy" "media" {
+  name        = "renbotia-media"
+  comment     = "Imagenes del bot: cache segun Render, sin Host"
+  min_ttl     = 0
+  default_ttl = 0        # si Render no manda Cache-Control, no se guarda
+  max_ttl     = 31536000 # 1 año como máximo
+
+  parameters_in_cache_key_and_forwarded_to_origin {
+    enable_accept_encoding_gzip   = true
+    enable_accept_encoding_brotli = true
+
+    query_strings_config {
+      query_string_behavior = "all"
+    }
+    headers_config {
+      header_behavior = "none"
+    }
+    cookies_config {
+      cookie_behavior = "none"
+    }
+  }
 }
 data "aws_cloudfront_origin_request_policy" "all_viewer_except_host" {
   name = "Managed-AllViewerExceptHostHeader"
@@ -98,7 +122,7 @@ resource "aws_cloudfront_distribution" "site" {
     allowed_methods          = ["GET", "HEAD", "OPTIONS"]
     cached_methods           = ["GET", "HEAD"]
     compress                 = true
-    cache_policy_id          = data.aws_cloudfront_cache_policy.use_origin_headers.id
+    cache_policy_id          = aws_cloudfront_cache_policy.media.id
     origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer_except_host.id
   }
 
