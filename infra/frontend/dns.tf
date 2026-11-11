@@ -49,6 +49,13 @@ locals {
     }
     send_mx  = { name = "send", type = "MX", records = ["10 feedback-smtp.us-east-1.amazonses.com"] }
     send_spf = { name = "send", type = "TXT", records = ["v=spf1 include:amazonses.com ~all"] }
+
+    # DMARC: qué hacer con correos que dicen venir de @renbotia.com y no lo
+    # demuestran (ni SPF ni DKIM). Etapa 1 = p=none: no bloquea nada, solo manda
+    # reportes diarios a servicios@. Cuando los reportes muestren que todo lo
+    # legítimo pasa (Resend y respuestas desde Gmail vía SMTP de Resend), subir a
+    # p=quarantine y después a p=reject.
+    dmarc = { name = "_dmarc", type = "TXT", records = ["v=DMARC1; p=none; rua=mailto:servicios@renbotia.com"] }
   }
 
   site_on_aws = var.site_target == "aws"

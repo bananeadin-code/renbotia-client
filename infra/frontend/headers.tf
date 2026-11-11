@@ -2,15 +2,16 @@
 # Encabezados de seguridad (lo que vercel.json ponía en "headers").
 # Copiados tal cual de vercel.json. Si agregas un servicio externo (otro script,
 # otra API), actualiza la CSP aquí y corre `terraform apply`.
-# Límite de CloudFront: la CSP no puede pasar de 1,783 caracteres (hoy ~1,490).
+# Límite de CloudFront: la CSP no puede pasar de 1,783 caracteres (hoy ~1,550).
+# tagmanager.google.com: lo usa la Vista previa de GTM (Tag Assistant) de la agencia.
 # ─────────────────────────────────────────────────────────────────────────────
 
 locals {
   csp_sources = {
     img     = "img-src 'self' data: blob: https:"
     font    = "font-src 'self' https://fonts.gstatic.com data:"
-    style   = "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com"
-    script  = "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.googletagmanager.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://www.google.com https://js.stripe.com https://challenges.cloudflare.com https://static.cloudflareinsights.com https://accounts.google.com https://connect.facebook.net"
+    style   = "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://tagmanager.google.com https://accounts.google.com"
+    script  = "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://tagmanager.google.com https://*.googletagmanager.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://www.google.com https://js.stripe.com https://challenges.cloudflare.com https://static.cloudflareinsights.com https://accounts.google.com https://connect.facebook.net"
     connect = "connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://*.doubleclick.net https://www.google.com https://www.google.com.mx https://connect.facebook.net https://api.renbotia.com https://api.stripe.com https://accounts.google.com https://cloudflareinsights.com https://static.cloudflareinsights.com https://graph.facebook.com https://www.facebook.com https://web.facebook.com"
     frame   = "frame-src https://challenges.cloudflare.com https://www.googletagmanager.com https://td.doubleclick.net https://*.doubleclick.net https://js.stripe.com https://hooks.stripe.com https://m.stripe.network https://accounts.google.com https://www.facebook.com https://web.facebook.com"
   }
