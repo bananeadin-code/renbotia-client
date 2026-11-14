@@ -1,13 +1,13 @@
 # Publica el sitio en AWS (S3 + CloudFront). Guía: infra/frontend/GUIA.md
 #
-# Por ahora SOLO corre a mano (Actions → "Desplegar sitio en AWS" → Run workflow),
-# para probar sin tocar Vercel. En el paso 10 de la guía se activa "push" a main.
+# Corre en cada push a main (renbotia.com vive en AWS desde 2026-11-13) y también a mano
+# (Actions → "Desplegar sitio en AWS" → Run workflow).
 name: Desplegar sitio en AWS
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches: [main]
+  push:
+    branches: [main]
 
 # id-token: write permite pedirle a AWS credenciales temporales (OIDC), sin llaves guardadas.
 permissions:
