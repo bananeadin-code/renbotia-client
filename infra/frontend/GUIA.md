@@ -395,17 +395,25 @@ Truco profesional: hacer que **solo tu computadora** vea `renbotia.com` en AWS.
 
 ## 9. El cambio: apuntar renbotia.com a AWS
 
-Antes: el `VITE_GTM_ID` de Dinametra ya debe estar en las variables de GitHub y desplegado (si no,
-el sitio en AWS sale sin medición). No lances ni modifiques campañas ese día.
+Antes: el `VITE_GTM_ID` ya debe estar en las variables de GitHub **y** en Vercel, desplegado en
+ambos, y el contenedor de GTM debe tener al menos una versión publicada (si no, `gtm.js` responde 404
+y el sitio sale sin medición). No lances ni modifiques campañas ese día.
+
+**Cargar el ID de GTM (una sola vez):**
+1. GitHub → repo `renbotia-client` → *Settings → Secrets and variables → Actions → Variables* →
+   `VITE_GTM_ID` = `GTM-XXXXXXX` → *Actions → Desplegar sitio en AWS → Run workflow*.
+2. Vercel → proyecto → *Settings → Environment Variables* → `VITE_GTM_ID` (Production) → *Deployments →
+   ⋯ → Redeploy* (las variables `VITE_*` se incrustan al compilar; sin redeploy no aplican).
+3. Verificar: abre renbotia.com en incógnito, acepta cookies, F12 → *Network* → filtra `gtm.js`:
+   debe responder **200** con tu ID. Si rechazas cookies **no** debe cargar (así está diseñado).
 
 1. Cambia una línea:
    ```powershell
    notepad terraform.tfvars      # site_target = "aws"
    terraform plan -out frontend.tfplan
    ```
-   El plan debe mostrar: `~` el registro A de `renbotia.com` (de la IP de Vercel a un ALIAS de
-   CloudFront), `+` un registro AAAA (IPv6) y `~` el CNAME de `www` (de Vercel a CloudFront).
-   Nada más.
+   El plan debe mostrar: `~` los registros A de `renbotia.com` y `www` (de la IP de Vercel a un
+   ALIAS de CloudFront) y `+` dos registros AAAA (IPv6, apex y `www`). Nada más.
 2. `terraform apply frontend.tfplan`
 3. En 5 a 10 minutos (TTL de 5 min): `curl.exe -sI https://renbotia.com` debe mostrar `via: ... (CloudFront)`
    y `x-cache`, y `curl.exe -sI https://www.renbotia.com` un `301` hacia `https://renbotia.com/`.
