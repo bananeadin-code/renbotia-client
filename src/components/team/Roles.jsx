@@ -31,7 +31,7 @@ export function AccessSummary({ access }) {
         <span
           key={m}
           className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium ${
-            l === 'edit' ? 'bg-brand-500/10 text-brand-700 dark:text-brand-300' : 'bg-surface2 text-muted'
+            l === 'edit' ? 'bg-brand-500/10 text-brand-700 dark:text-brand-400' : 'bg-surface2 text-muted'
           }`}
           title={`${MODULE_INFO[m]?.[0] || m}: ${LEVEL_LABEL[l]}`}
         >
@@ -186,7 +186,7 @@ export function AccessEditor({ open, onClose, title, withName = false, initial, 
                   aria-pressed={on}
                   onClick={() => toggleChannel(c)}
                   className={`inline-flex min-h-[40px] items-center gap-1.5 rounded-md border px-3 py-1 text-sm font-medium transition sm:min-h-0 sm:text-xs ${
-                    on ? 'border-brand-500 bg-brand-500/10 text-brand-700 dark:text-brand-300' : 'border-line text-muted hover:text-fg'
+                    on ? 'border-brand-500 bg-brand-500/10 text-brand-700 dark:text-brand-400' : 'border-line text-muted hover:text-fg'
                   }`}
                 >
                   <Icon name={on ? 'check' : 'plus'} size={14} /> {CHANNEL_LABEL[c]}

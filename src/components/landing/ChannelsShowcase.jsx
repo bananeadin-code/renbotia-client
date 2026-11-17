@@ -51,7 +51,7 @@ function ChannelCard({ c }) {
         <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <span className="text-lg font-semibold text-fg">{c.name}</span>
           {c.available ? (
-            <span className="rounded-md bg-brand-500/10 px-2 py-0.5 text-[11px] font-semibold text-brand-700 dark:text-brand-300">
+            <span className="rounded-md bg-brand-500/10 px-2 py-0.5 text-[11px] font-semibold text-brand-700 dark:text-brand-400">
               Disponible
             </span>
           ) : (

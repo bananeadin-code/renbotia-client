@@ -204,7 +204,7 @@ export default function Solution() {
                 Empezar gratis <Icon name="arrowRight" size={18} />
               </Button>
             </Link>
-            <Link to="/#pruebalo" className="text-sm font-medium text-brand-700 hover:underline dark:text-brand-300">
+            <Link to="/#pruebalo" className="text-sm font-medium text-brand-700 hover:underline dark:text-brand-400">
               O pruébalo con tu sitio, sin registrarte
             </Link>
           </div>
@@ -228,7 +228,7 @@ export default function Solution() {
             {city && (
               <Link
                 to={`/soluciones/${sol.slug}`}
-                className="rounded-md px-3 py-1.5 text-sm font-medium text-brand-700 hover:underline dark:text-brand-300"
+                className="rounded-md px-3 py-1.5 text-sm font-medium text-brand-700 hover:underline dark:text-brand-400"
               >
                 Todo México
               </Link>

@@ -76,12 +76,12 @@ export default function Landing() {
       <PublicNav />
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-brand-500/[0.06] via-canvas to-canvas">
+      <section className="relative overflow-hidden bg-gradient-to-b from-brand-500/[0.06] via-canvas to-canvas dark:bg-none">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-grid" />
         <AuroraBackground />
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:py-24 lg:grid-cols-2">
           <div className="animate-fade-up">
-            <span className="mb-5 inline-flex items-center gap-1.5 rounded-md border border-brand-500/30 bg-brand-500/10 px-3 py-1 text-xs font-semibold text-brand-700 dark:text-brand-300">
+            <span className="mb-5 inline-flex items-center gap-1.5 rounded-md border border-brand-500/30 bg-brand-500/10 px-3 py-1 text-xs font-semibold text-brand-700 dark:text-brand-400">
               <Icon name="sparkles" size={14} />
               Atención por WhatsApp con IA
             </span>
@@ -156,12 +156,12 @@ export default function Landing() {
               <Reveal key={f.title} delay={i * 80} className={wide ? 'lg:col-span-2' : 'lg:col-span-1'}>
                 <SpotlightCard
                   className={`group h-full p-6 ${
-                    wide ? 'bg-gradient-to-br from-brand-500/[0.09] via-surface to-surface' : ''
+                    wide ? 'bg-gradient-to-br from-brand-500/[0.09] via-surface to-surface dark:bg-none' : ''
                   }`}
                 >
                   <div className="relative z-[2] flex h-full flex-col">
                     <div
-                      className={`flex items-center justify-center rounded-xl bg-brand-500/10 text-brand-600 ring-1 ring-inset ring-brand-500/20 dark:text-brand-300 ${
+                      className={`flex items-center justify-center rounded-xl bg-brand-500/10 text-brand-600 ring-1 ring-inset ring-brand-500/20 dark:text-brand-400 ${
                         wide ? 'h-12 w-12' : 'h-11 w-11'
                       }`}
                     >

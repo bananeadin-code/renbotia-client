@@ -24,7 +24,7 @@ const GENERAL_FAQ = [
     q: '¿Puedo probar mi bot antes de conectarlo?',
     a: (
       <>
-        Sí. En <Link to="/dashboard/simulador" className="font-medium text-brand-700 underline dark:text-brand-300">Simulador</Link> escribes
+        Sí. En <Link to="/dashboard/simulador" className="font-medium text-brand-700 underline dark:text-brand-400">Simulador</Link> escribes
         como si fueras un cliente y ves cómo responde. Lo que ajustes en Entrenamiento se refleja al momento.
       </>
     ),
@@ -41,7 +41,7 @@ const GENERAL_FAQ = [
     q: '¿Cómo cambio o cancelo mi plan?',
     a: (
       <>
-        Desde <Link to="/dashboard/facturacion" className="font-medium text-brand-700 underline dark:text-brand-300">Facturación</Link>. Al
+        Desde <Link to="/dashboard/facturacion" className="font-medium text-brand-700 underline dark:text-brand-400">Facturación</Link>. Al
         mejorar puedes hacerlo al momento o en tu renovación; si cancelas, conservas tu plan hasta el final del periodo
         pagado y tu bot se queda guardado.
       </>
@@ -132,7 +132,7 @@ export default function Ayuda() {
             <Icon name="checkCircle" size={18} className="mt-0.5 shrink-0 text-brand-600" />
             <span>
               {sent}{' '}
-              <button type="button" onClick={() => setSent('')} className="font-medium text-brand-700 underline dark:text-brand-300">
+              <button type="button" onClick={() => setSent('')} className="font-medium text-brand-700 underline dark:text-brand-400">
                 Enviar otro mensaje
               </button>
             </span>

@@ -226,7 +226,7 @@ export function DashboardLayout() {
               está en la lista de la barra). */}
           <div className="mb-4 overflow-hidden rounded-lg border border-line bg-surface2">
             <div className="flex items-center gap-3 px-3 py-2.5">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-500/15 text-sm font-bold text-brand-700 dark:text-brand-300">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-500/15 text-sm font-bold text-brand-700 dark:text-brand-400">
                 {business?.photo ? (
                   <img src={business.photo} alt="" className="h-full w-full object-cover" />
                 ) : (
@@ -245,7 +245,7 @@ export function DashboardLayout() {
               className={({ isActive }) =>
                 `flex items-center gap-2 border-t border-line px-3 py-2 text-xs font-semibold transition ${
                   isActive
-                    ? 'bg-brand-500/10 text-brand-700 dark:text-brand-300'
+                    ? 'bg-brand-500/10 text-brand-700 dark:text-brand-400'
                     : 'text-muted hover:bg-surface hover:text-fg'
                 }`
               }
@@ -269,7 +269,7 @@ export function DashboardLayout() {
                 className={({ isActive }) =>
                   `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${
                     isActive
-                      ? 'bg-brand-500/10 text-brand-700 dark:text-brand-300'
+                      ? 'bg-brand-500/10 text-brand-700 dark:text-brand-400'
                       : 'text-muted hover:bg-surface2 hover:text-fg'
                   }`
                 }

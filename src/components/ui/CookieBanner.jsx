@@ -59,7 +59,7 @@ export function CookieBanner() {
       <p className="text-sm text-muted">
         Usamos cookies necesarias para que el sitio funcione y, si aceptas, cookies para medir nuestras campañas en Meta y
         Google. No vendemos tus datos.{' '}
-        <Link to="/privacidad" className="font-medium text-brand-700 underline-offset-2 hover:underline dark:text-brand-300">
+        <Link to="/privacidad" className="font-medium text-brand-700 underline-offset-2 hover:underline dark:text-brand-400">
           Aviso de privacidad
         </Link>
       </p>

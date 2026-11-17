@@ -86,7 +86,7 @@ export function BotAuditCard() {
       ) : (
         <div ref={resultsRef} className="mt-4">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <p className={`text-sm font-semibold ${all ? 'text-brand-700 dark:text-brand-300' : 'text-amber-700 dark:text-amber-300'}`}>
+            <p className={`text-sm font-semibold ${all ? 'text-brand-700 dark:text-brand-400' : 'text-amber-700 dark:text-amber-300'}`}>
               {all ? 'Pasó todas las pruebas' : `Pasó ${audit.passed} de ${audit.total}`}
             </p>
             <span className="text-xs text-subtle">{fmt(audit.at)}</span>

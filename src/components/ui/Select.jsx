@@ -255,7 +255,7 @@ export function Select({
               big ? 'min-h-[48px] px-3 py-3 text-[15px]' : 'px-2.5 py-2 text-sm',
               o.disabled && 'cursor-not-allowed opacity-50',
               i === active && !o.disabled ? 'bg-surface2' : '',
-              selected ? 'text-brand-700 dark:text-brand-300' : 'text-fg'
+              selected ? 'text-brand-700 dark:text-brand-400' : 'text-fg'
             )}
           >
             <span className="min-w-0 flex-1">

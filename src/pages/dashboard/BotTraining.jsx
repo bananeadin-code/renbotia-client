@@ -564,14 +564,14 @@ export default function BotTraining() {
 
       {/* Plantillas de arranque por giro (descartable; útil al crear la cuenta) */}
       {showTemplates && (
-        <Card className="border-brand-400/30 bg-gradient-to-br from-brand-500/[0.07] to-transparent">
+        <Card className="border-brand-400/30 bg-gradient-to-br from-brand-500/[0.07] to-transparent dark:bg-none">
           <div className="flex items-center gap-2.5">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-fg text-canvas shadow-card">
               <Icon name="academic" size={18} />
             </span>
             <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
               <h2 className="font-semibold text-fg">Plantillas de arranque</h2>
-              <span className="rounded-md bg-brand-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-600 dark:text-brand-300">
+              <span className="rounded-md bg-brand-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-600 dark:text-brand-400">
                 Recomendado
               </span>
             </div>
@@ -634,7 +634,7 @@ export default function BotTraining() {
       )}
 
       {/* Entrénalo con lo que ya tienes: chats de WhatsApp, sitio o texto */}
-      <Card className="border-brand-400/30 bg-gradient-to-br from-brand-500/[0.06] to-transparent">
+      <Card className="border-brand-400/30 bg-gradient-to-br from-brand-500/[0.06] to-transparent dark:bg-none">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-fg text-canvas shadow-card">
             <Icon name="sparkles" size={21} />
@@ -1038,7 +1038,7 @@ export default function BotTraining() {
                       />
                     </div>
                     {img.url.startsWith('data:') && (
-                      <p className="flex items-center gap-1 text-xs text-brand-700 dark:text-brand-300">
+                      <p className="flex items-center gap-1 text-xs text-brand-700 dark:text-brand-400">
                         <Icon name="check" size={13} /> Archivo cargado
                         <button
                           onClick={() => updateImage(i, 'url', '')}

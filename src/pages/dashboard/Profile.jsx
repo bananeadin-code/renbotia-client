@@ -336,7 +336,7 @@ export default function Profile() {
         <fieldset disabled={!canProfile} className="min-w-0 disabled:opacity-70">
         {/* Foto / avatar del negocio (reemplaza la inicial en el panel) */}
         <div className="mb-5 flex items-center gap-4">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-brand-500/15 text-xl font-bold text-brand-700 dark:text-brand-300">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-brand-500/15 text-xl font-bold text-brand-700 dark:text-brand-400">
             {business?.photo ? (
               <img src={business.photo} alt="Foto del negocio" className="h-full w-full object-cover" />
             ) : (

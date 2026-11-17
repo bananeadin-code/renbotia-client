@@ -127,7 +127,7 @@ export default function Simulator() {
       {balance && (
         <div className="flex items-center justify-between rounded-lg bg-surface2 px-4 py-2 text-sm">
           <span className="text-muted">Tokens disponibles</span>
-          <span className={`font-semibold ${balance.available < 1000 ? 'text-red-600' : 'text-brand-700 dark:text-brand-300'}`}>
+          <span className={`font-semibold ${balance.available < 1000 ? 'text-red-600' : 'text-brand-700 dark:text-brand-400'}`}>
             {balance.available.toLocaleString('es-MX')}
           </span>
         </div>
@@ -140,10 +140,10 @@ export default function Simulator() {
         <div className="flex items-start gap-2.5 rounded-lg border border-brand-500/25 bg-brand-500/10 px-4 py-3 text-sm">
           <Icon name="calendarCheck" size={18} className="mt-px shrink-0 text-brand-600" />
           <div className="min-w-0 flex-1">
-            <p className="font-medium text-brand-700 dark:text-brand-300">
+            <p className="font-medium text-brand-700 dark:text-brand-400">
               El bot registró {captured.length} {captured.length === 1 ? 'elemento' : 'elementos'} en Gestión
             </p>
-            <ul className="mt-0.5 text-brand-700/90 dark:text-brand-300/90">
+            <ul className="mt-0.5 text-brand-700/90 dark:text-brand-400/90">
               {captured.slice(-3).map((r, i) => (
                 <li key={i} className="truncate">• {r.summary || r.type}</li>
               ))}
@@ -162,7 +162,7 @@ export default function Simulator() {
         <div ref={scrollRef} className="wa-chat-bg h-[55vh] space-y-2 overflow-y-auto p-4">
           {messages.length === 0 && !limitReached && (
             <div className="mt-10 flex flex-col items-center text-center text-sm text-slate-600 dark:text-slate-300">
-              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-brand-600 shadow-sm dark:bg-whatsapp-darkBubbleIn dark:text-brand-300">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-brand-600 shadow-sm dark:bg-whatsapp-darkBubbleIn dark:text-brand-400">
                 <Icon name="sparkles" size={22} />
               </span>
               <p className="mt-3 max-w-xs rounded-lg bg-white/80 px-4 py-3 shadow-sm dark:bg-whatsapp-darkBubbleIn/80">

@@ -719,7 +719,7 @@ export default function Conversations() {
                     <span className="inline-flex items-center gap-1 rounded-md bg-surface2 px-2 py-0.5 text-[10px] font-medium text-muted">
                       <Icon name="user" size={10} /> {c.startedBy?.name || 'Prueba anterior'}
                     </span>
-                    <span className="inline-flex items-center gap-1 rounded-md bg-brand-500/10 px-2 py-0.5 text-[10px] font-medium text-brand-700 dark:text-brand-300">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-brand-500/10 px-2 py-0.5 text-[10px] font-medium text-brand-700 dark:text-brand-400">
                       <Icon name="zap" size={10} /> {(c.tokens || 0).toLocaleString('es-MX')} tokens
                     </span>
                     <span className="inline-flex items-center gap-1 rounded-md bg-surface2 px-2 py-0.5 text-[10px] font-medium text-muted">
@@ -769,7 +769,7 @@ export default function Conversations() {
                     </span>
                   )}
                   {c.capturedRecordType && (
-                    <span className="inline-flex items-center gap-1 rounded-md bg-brand-500/15 px-2 py-0.5 text-[10px] font-semibold text-brand-700 dark:text-brand-300">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-brand-500/15 px-2 py-0.5 text-[10px] font-semibold text-brand-700 dark:text-brand-400">
                       <Icon name="clipboard" size={11} /> {RECORD_LABEL[c.capturedRecordType] || 'Registro'}
                     </span>
                   )}

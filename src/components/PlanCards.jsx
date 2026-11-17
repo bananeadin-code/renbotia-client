@@ -81,7 +81,7 @@ export function PlanCards({ plans, selectedKey, onSelect, ctaLabel = 'Elegir pla
                   <span className="block text-xs text-subtle">
                     Pagas ${plan.annual.priceMXN.toLocaleString('es-MX')} al año · IVA incluido
                   </span>
-                  <span className="mt-1 inline-block rounded-md bg-brand-500/10 px-2 py-0.5 text-xs font-semibold text-brand-700 dark:text-brand-300">
+                  <span className="mt-1 inline-block rounded-md bg-brand-500/10 px-2 py-0.5 text-xs font-semibold text-brand-700 dark:text-brand-400">
                     Ahorras ${plan.annual.savingsMXN.toLocaleString('es-MX')} al año
                   </span>
                 </>
@@ -190,7 +190,7 @@ export function CycleToggle({ cycle, onChange, pricing, className = '' }) {
           >
             {label}
             {k === 'anual' && (
-              <span className={`rounded px-1.5 py-0.5 text-[11px] font-bold ${cycle === k ? 'bg-white/20 text-white' : 'bg-brand-500/10 text-brand-700 dark:text-brand-300'}`}>
+              <span className={`rounded px-1.5 py-0.5 text-[11px] font-bold ${cycle === k ? 'bg-white/20 text-white' : 'bg-brand-500/10 text-brand-700 dark:text-brand-400'}`}>
                 {free} meses gratis
               </span>
             )}

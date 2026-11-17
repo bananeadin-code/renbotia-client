@@ -119,7 +119,7 @@ export function AvailabilityConfig({ config, onSaved }) {
                   onClick={() => toggleType(t)}
                   className={`flex flex-col items-center gap-1.5 rounded-xl border px-3 py-3 text-sm font-medium transition ${
                     active
-                      ? 'border-brand-500 bg-brand-500/10 text-brand-700 dark:text-brand-300'
+                      ? 'border-brand-500 bg-brand-500/10 text-brand-700 dark:text-brand-400'
                       : 'border-line text-muted hover:bg-surface2'
                   }`}
                 >

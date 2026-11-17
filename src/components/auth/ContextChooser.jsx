@@ -56,7 +56,7 @@ export function ContextChooser({ onDone }) {
     >
       <span
         className={`flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg text-sm font-bold ${
-          c.kind === 'owner' ? 'bg-brand-500/15 text-brand-700 dark:text-brand-300' : 'bg-sky-500/15 text-sky-700 dark:text-sky-300'
+          c.kind === 'owner' ? 'bg-brand-500/15 text-brand-700 dark:text-brand-400' : 'bg-sky-500/15 text-sky-700 dark:text-sky-300'
         }`}
       >
         {c.photo ? <img src={c.photo} alt="" className="h-full w-full object-cover" /> : c.name?.charAt(0).toUpperCase()}

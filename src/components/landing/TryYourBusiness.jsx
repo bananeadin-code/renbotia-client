@@ -78,7 +78,7 @@ export function TryYourBusiness() {
   return (
     <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-20 lg:grid-cols-2">
       <Reveal>
-        <span className="inline-flex items-center gap-1.5 rounded-md bg-brand-500/10 px-3 py-1 text-xs font-semibold text-brand-700 dark:text-brand-300">
+        <span className="inline-flex items-center gap-1.5 rounded-md bg-brand-500/10 px-3 py-1 text-xs font-semibold text-brand-700 dark:text-brand-400">
           <Icon name="sparkles" size={13} /> Sin registrarte · 30 segundos
         </span>
         <h2 className="mt-4 text-4xl font-bold tracking-tight text-fg sm:text-5xl">

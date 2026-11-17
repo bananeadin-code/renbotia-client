@@ -32,7 +32,7 @@ export function WaitlistButton({ planKey, planName }) {
 
   if (done) {
     return (
-      <div className="mt-6 rounded-lg border border-brand-500/30 bg-brand-500/10 px-3 py-2.5 text-center text-sm font-medium text-brand-700 dark:text-brand-300">
+      <div className="mt-6 rounded-lg border border-brand-500/30 bg-brand-500/10 px-3 py-2.5 text-center text-sm font-medium text-brand-700 dark:text-brand-400">
         ¡Listo! Te avisamos cuando {planName || 'este plan'} esté disponible.
       </div>
     );
