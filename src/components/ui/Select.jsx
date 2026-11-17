@@ -273,6 +273,10 @@ export function Select({
     });
   };
 
+  // Dentro de un modal (<dialog> nativo) el menú se dibuja DENTRO del diálogo:
+  // fuera de él la página es inerte y quedaría debajo de la capa superior.
+  const portalTarget = () => triggerRef.current?.closest('dialog') || document.body;
+
   const title = sheetTitle || label || ariaLabel || placeholder;
   const menu = !open
     ? null
@@ -307,7 +311,7 @@ export function Select({
               </ul>
             </div>
           </div>,
-          document.body
+          portalTarget()
         )
       : pos
         ? createPortal(
@@ -325,7 +329,7 @@ export function Select({
             >
               {renderOptions(false)}
             </ul>,
-            document.body
+            portalTarget()
           )
         : null;
 

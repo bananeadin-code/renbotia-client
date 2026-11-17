@@ -137,6 +137,10 @@ export default function Register() {
         {error && <Alert variant="error">{error}</Alert>}
         <Input
           label="Nombre"
+          name="name"
+          autoComplete="name"
+          enterKeyHint="next"
+          required
           value={f.values.name}
           onChange={f.setField('name')}
           error={f.errors.name}
@@ -145,6 +149,11 @@ export default function Register() {
         <Input
           label="Email"
           type="email"
+          name="email"
+          autoComplete="username"
+          spellCheck={false}
+          enterKeyHint="next"
+          required
           value={f.values.email}
           onChange={f.setField('email')}
           error={f.errors.email}
@@ -152,6 +161,10 @@ export default function Register() {
         />
         <PasswordInput
           label="Contraseña"
+          name="new-password"
+          autoComplete="new-password"
+          enterKeyHint="next"
+          required
           value={f.values.password}
           onChange={f.setField('password')}
           error={f.errors.password}
@@ -161,6 +174,10 @@ export default function Register() {
           <Input
             label="Repetir contraseña"
             type="password"
+            name="confirm-password"
+            autoComplete="new-password"
+            enterKeyHint="done"
+            required
             value={password2}
             onChange={(e) => setPassword2(e.target.value)}
             placeholder="Vuelve a escribir tu contraseña"

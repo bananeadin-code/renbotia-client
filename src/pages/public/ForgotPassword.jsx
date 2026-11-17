@@ -55,6 +55,9 @@ export default function ForgotPassword() {
               <Input
                 label="Email"
                 type="email"
+                name="email"
+                autoComplete="username"
+                spellCheck={false}
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

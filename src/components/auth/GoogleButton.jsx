@@ -46,7 +46,7 @@ export function GoogleButton({ onSuccess, onError }) {
           }
         },
       });
-      ref.current.innerHTML = '';
+      ref.current.replaceChildren();
       window.google.accounts.id.renderButton(ref.current, {
         type: 'standard',
         theme: isDark ? 'filled_black' : 'outline',

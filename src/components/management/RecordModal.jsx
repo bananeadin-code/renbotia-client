@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Button, Input, Textarea, Select, Spinner, Alert } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
+import { Modal } from '../ui/Modal.jsx';
 import { managementApi } from '../../api/endpoints.js';
 import { TYPE_META, STATUS_META, STATUS_ORDER } from '../../lib/managementMeta.js';
 
@@ -118,17 +119,18 @@ export function RecordModal({ open, onClose, onSaved, enabledTypes, record, pres
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4">
-      <div className="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-2xl border border-line bg-surface p-5 shadow-pop sm:rounded-2xl">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="flex items-center gap-2 text-lg font-bold text-fg">
-            <Icon name={meta.icon} size={20} className="text-brand-600" />
-            {editing ? 'Editar registro' : 'Nuevo registro'}
-          </h3>
-          <button onClick={onClose} className="rounded-lg p-1 text-muted hover:bg-surface2" aria-label="Cerrar">
-            <Icon name="close" size={20} />
-          </button>
-        </div>
+    // <Modal> = <dialog> nativo: Escape, foco encerrado y página inerte detrás.
+    <Modal
+      open
+      onClose={onClose}
+      size="lg"
+      title={
+        <span className="flex items-center gap-2">
+          <Icon name={meta.icon} size={20} className="text-brand-600" />
+          {editing ? 'Editar registro' : 'Nuevo registro'}
+        </span>
+      }
+    >
 
         {error && (
           <div className="mb-3">
@@ -260,7 +262,6 @@ export function RecordModal({ open, onClose, onSaved, enabledTypes, record, pres
             {editing ? 'Guardar' : 'Crear'}
           </Button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

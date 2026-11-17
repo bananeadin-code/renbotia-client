@@ -143,6 +143,11 @@ export default function Login() {
         <Input
           label="Email"
           type="email"
+          name="email"
+          autoComplete="username"
+          spellCheck={false}
+          enterKeyHint="next"
+          required
           value={f.values.email}
           onChange={f.setField('email')}
           error={f.errors.email}
@@ -150,6 +155,10 @@ export default function Login() {
         />
         <PasswordInput
           label="Contraseña"
+          name="password"
+          autoComplete="current-password"
+          enterKeyHint="done"
+          required
           value={f.values.password}
           onChange={f.setField('password')}
           error={f.errors.password}

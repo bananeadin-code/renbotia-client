@@ -349,7 +349,7 @@ export default function WidgetChat() {
               )}
               <Bubble mine={mine} color={color} fg={fg} time={timeOf(m.at)} faded={m.pending}>
                 {m.images?.map((img, k) => (
-                  <img key={k} src={img.url} alt={img.label || 'imagen'} className="mb-1 max-h-56 w-full rounded-md object-cover" />
+                  <img key={k} src={img.url} alt={img.label || 'imagen'} loading="lazy" decoding="async" className="mb-1 max-h-56 w-full rounded-md object-cover" />
                 ))}
                 {m.files?.map((f, k) => (
                   <span key={k} className="mb-1 flex items-center gap-1.5 rounded-md bg-black/10 px-2 py-1.5 text-xs font-medium">

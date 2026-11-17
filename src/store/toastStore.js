@@ -7,14 +7,17 @@ import { create } from 'zustand';
  */
 let seq = 0;
 
-export const useToastStore = create((set, get) => ({
+export const useToastStore = create((set) => ({
   toasts: [],
+  // Modales abiertos: mientras haya uno, los toasts se retienen (fuera del modal
+  // la página es inerte y el aviso se perdería) y se muestran al cerrarlo. El
+  // conteo de tiempo de cada toast empieza cuando se ve (ver Toaster).
+  modals: 0,
+  modalOpened: () => set((s) => ({ modals: s.modals + 1 })),
+  modalClosed: () => set((s) => ({ modals: Math.max(0, s.modals - 1) })),
   push: ({ type = 'success', message, duration = 3800 }) => {
     const id = ++seq;
-    set((s) => ({ toasts: [...s.toasts, { id, type, message }] }));
-    if (duration > 0) {
-      setTimeout(() => get().remove(id), duration);
-    }
+    set((s) => ({ toasts: [...s.toasts, { id, type, message, duration }] }));
     return id;
   },
   remove: (id) => set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),

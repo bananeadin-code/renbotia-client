@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PastDueBanner } from '../dashboard/PastDueBanner.jsx';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore.js';
@@ -54,6 +54,54 @@ export function DashboardLayout() {
   const { hasBusiness, business, subscription, role, access, load } = useBusinessStore();
   const [checking, setChecking] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // ── Menú lateral: en escritorio es una barra fija; en móvil (< md) es un
+  // cajón modal. Como el mismo <aside> cumple ambos papeles no puede ser un
+  // <dialog>; hacemos a mano lo que un modal hace solo (guía navigation-drawer):
+  // role="dialog" + aria-modal mientras está abierto, resto de la página inerte,
+  // Escape para cerrar, foco al botón Cerrar al abrir y de vuelta al botón de
+  // menú al cerrar. Cerrado en móvil queda inerte (Tab no entra a enlaces ocultos).
+  const [isDrawer, setIsDrawer] = useState(() => !window.matchMedia('(min-width: 768px)').matches);
+  const menuBtnRef = useRef(null);
+  const closeBtnRef = useRef(null);
+  const headerRef = useRef(null);
+  const mainRef = useRef(null);
+  const wasOpen = useRef(false);
+
+  useEffect(() => {
+    const mql = window.matchMedia('(min-width: 768px)');
+    const onChange = () => {
+      setIsDrawer(!mql.matches);
+      if (mql.matches) setMenuOpen(false);
+    };
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
+  }, []);
+
+  const drawerOpen = isDrawer && menuOpen;
+  useEffect(() => {
+    if (!drawerOpen) {
+      if (wasOpen.current) menuBtnRef.current?.focus({ preventScroll: true });
+      wasOpen.current = false;
+      return undefined;
+    }
+    wasOpen.current = true;
+    const outside = [headerRef.current, mainRef.current].filter(Boolean);
+    outside.forEach((el) => {
+      el.inert = true;
+    });
+    closeBtnRef.current?.focus({ preventScroll: true });
+    const onKey = (e) => {
+      if (e.key === 'Escape') setMenuOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => {
+      outside.forEach((el) => {
+        el.inert = false;
+      });
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [drawerOpen]);
 
   // Título de pestaña por ruta del panel (evita heredar el <title> de una página
   // pública como "Precios…"). El panel no se indexa, pero mantiene coherencia.
@@ -127,8 +175,12 @@ export function DashboardLayout() {
   return (
     <div className="min-h-screen bg-canvas">
       {/* Topbar (móvil) */}
-      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-surface/70 backdrop-blur-xl px-4 py-3 md:hidden">
+      <header ref={headerRef} className="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-surface/70 backdrop-blur-xl px-4 py-3 md:hidden">
         <button
+          ref={menuBtnRef}
+          type="button"
+          aria-expanded={menuOpen}
+          aria-controls="panel-menu"
           onClick={() => setMenuOpen(true)}
           className="rounded-lg p-1 text-fg hover:bg-surface2"
           aria-label="Abrir menú"
@@ -148,6 +200,11 @@ export function DashboardLayout() {
           />
         )}
         <aside
+          id="panel-menu"
+          role={isDrawer ? 'dialog' : undefined}
+          aria-modal={drawerOpen ? 'true' : undefined}
+          aria-label={isDrawer ? 'Menú' : undefined}
+          inert={isDrawer && !menuOpen ? '' : undefined}
           className={`fixed z-40 h-full w-64 transform overflow-y-auto border-r border-line bg-surface/70 backdrop-blur-xl p-4 transition-transform md:sticky md:top-0 md:z-0 md:h-screen md:translate-x-0 ${
             menuOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
@@ -155,6 +212,8 @@ export function DashboardLayout() {
           <div className="mb-6 flex items-center justify-between">
             <Logo size={28} />
             <button
+              ref={closeBtnRef}
+              type="button"
               className="rounded-lg p-1 text-muted hover:bg-surface2 md:hidden"
               onClick={() => setMenuOpen(false)}
               aria-label="Cerrar menú"
@@ -238,7 +297,7 @@ export function DashboardLayout() {
         {/* Contenido: el sidebar queda pegado al borde; solo el módulo se
             centra y se limita en ancho (evita que la barra se "desprenda"
             en pantallas anchas o al alejar el zoom). */}
-        <main className="min-h-screen min-w-0 flex-1 p-4 md:p-8">
+        <main ref={mainRef} className="min-h-screen min-w-0 flex-1 p-4 md:p-8">
           <div className="mx-auto max-w-6xl">
             <PastDueBanner />
             <Outlet />

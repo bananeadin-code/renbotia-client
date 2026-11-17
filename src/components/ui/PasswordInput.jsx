@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import clsx from 'clsx';
 import { Icon } from './Icon.jsx';
+import { useFieldError } from './fieldError.js';
 
 /**
  * Campo de contraseña con "ver al mantener presionado": mientras el usuario deja
@@ -8,7 +9,8 @@ import { Icon } from './Icon.jsx';
  * claro; al soltar, vuelve a ocultarse. Mismo estilo que <Input>. No se usa en el
  * campo de "confirmar/repetir contraseña" (ahí no aporta).
  */
-export function PasswordInput({ label, error, className = '', ...props }) {
+export function PasswordInput({ label, error, className = '', 'aria-describedby': describedBy, ...props }) {
+  const { errorId, fieldProps } = useFieldError(error, describedBy);
   const [reveal, setReveal] = useState(false);
   const show = () => setReveal(true);
   const hide = () => setReveal(false);
@@ -25,6 +27,7 @@ export function PasswordInput({ label, error, className = '', ...props }) {
             error ? 'border-red-400' : 'border-line',
             className
           )}
+          {...fieldProps}
           {...props}
         />
         <button
@@ -53,7 +56,11 @@ export function PasswordInput({ label, error, className = '', ...props }) {
           <Icon name={reveal ? 'eyeOff' : 'eye'} size={18} />
         </button>
       </div>
-      {error && <span className="mt-1 block text-xs text-red-600">{error}</span>}
+      {error && (
+        <span id={errorId} className="mt-1 block text-xs text-red-600 dark:text-red-400">
+          {error}
+        </span>
+      )}
     </label>
   );
 }

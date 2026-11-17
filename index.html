@@ -25,6 +25,9 @@
     <meta name="robots" content="index, follow" />
     <meta name="author" content="RenBotIA" />
     <meta name="theme-color" content="#059669" />
+    <!-- Temas que soporta el sitio: el navegador pinta el lienzo inicial y los
+         controles nativos acorde antes de cargar CSS (evita destello blanco). -->
+    <meta name="color-scheme" content="light dark" />
 
     <!-- Señales geográficas (sutiles): país México y región Durango -->
     <meta name="geo.region" content="MX-DGO" />
@@ -156,6 +159,9 @@
     </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <!-- Los archivos de fuente vienen de otro dominio y se piden en modo CORS:
+         sin `crossorigin` la conexión anticipada no se reutiliza. -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
       rel="stylesheet"

@@ -79,6 +79,8 @@ export default function ResetPassword() {
               <Input
                 label="Nueva contraseña"
                 type="password"
+                name="new-password"
+                autoComplete="new-password"
                 required
                 minLength={8}
                 value={password}
@@ -89,6 +91,8 @@ export default function ResetPassword() {
                 <Input
                   label="Repetir contraseña"
                   type="password"
+                  name="confirm-password"
+                  autoComplete="new-password"
                   required
                   minLength={8}
                   value={password2}

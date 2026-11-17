@@ -405,7 +405,7 @@ function LeadDetail({ lead, onClose, onSaved }) {
           <h3 className="text-sm font-semibold text-fg">Notas</h3>
           <div className="mt-2 max-h-56 space-y-2 overflow-y-auto">
             {notes.length ? (
-              [...notes].reverse().map((n) => (
+              notes.toReversed().map((n) => (
                 <div key={n._id || n.at} className="rounded-lg bg-surface2 p-3 text-sm">
                   <div className="whitespace-pre-wrap text-fg">{n.text}</div>
                   <div className="mt-1 text-xs text-subtle">

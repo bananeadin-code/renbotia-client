@@ -31,10 +31,12 @@ export function ConfirmDialog() {
         <p className="pt-1.5 text-sm leading-relaxed text-muted">{o.message}</p>
       </div>
       <div className="mt-6 flex justify-end gap-2">
-        <Button variant="ghost" onClick={() => resolve(false)}>
+        {/* En acciones destructivas el foco inicial va a la opción segura
+            (Cancelar): un Enter accidental no borra nada. */}
+        <Button autoFocus={danger} variant="ghost" onClick={() => resolve(false)}>
           {o.cancelLabel || 'Cancelar'}
         </Button>
-        <Button autoFocus variant={danger ? 'danger' : 'primary'} onClick={() => resolve(true)}>
+        <Button autoFocus={!danger} variant={danger ? 'danger' : 'primary'} onClick={() => resolve(true)}>
           {o.confirmLabel || 'Confirmar'}
         </Button>
       </div>

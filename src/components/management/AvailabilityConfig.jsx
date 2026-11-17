@@ -87,7 +87,7 @@ export function AvailabilityConfig({ config, onSaved }) {
   }
 
   // Ordena los días empezando en lunes (1..6, luego 0=domingo).
-  const orderedDays = [...form.schedule].sort((a, b) => ((a.day + 6) % 7) - ((b.day + 6) % 7));
+  const orderedDays = form.schedule.toSorted((a, b) => ((a.day + 6) % 7) - ((b.day + 6) % 7));
 
   return (
     <div className="space-y-4">

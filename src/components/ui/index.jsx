@@ -3,6 +3,7 @@
  * Consumen tokens del design system (skill ui-ux-pro-max).
  */
 import { clsx } from './clsx.js';
+import { useFieldError } from './fieldError.js';
 import { Icon } from './Icon.jsx';
 import { BotLoader, Dots } from './Loader.jsx';
 
@@ -36,7 +37,11 @@ export function Button({
   );
 }
 
-export function Input({ label, error, className = '', ...props }) {
+
+export { useFieldError } from './fieldError.js';
+
+export function Input({ label, error, className = '', 'aria-describedby': describedBy, ...props }) {
+  const { errorId, fieldProps } = useFieldError(error, describedBy);
   return (
     <label className="block">
       {label && <span className="mb-1 block text-sm font-medium text-fg">{label}</span>}
@@ -47,14 +52,20 @@ export function Input({ label, error, className = '', ...props }) {
           error ? 'border-red-400' : 'border-line',
           className
         )}
+        {...fieldProps}
         {...props}
       />
-      {error && <span className="mt-1 block text-xs text-red-600">{error}</span>}
+      {error && (
+        <span id={errorId} className="mt-1 block text-xs text-red-600 dark:text-red-400">
+          {error}
+        </span>
+      )}
     </label>
   );
 }
 
-export function Textarea({ label, error, className = '', ...props }) {
+export function Textarea({ label, error, className = '', 'aria-describedby': describedBy, ...props }) {
+  const { errorId, fieldProps } = useFieldError(error, describedBy);
   return (
     <label className="block">
       {label && <span className="mb-1 block text-sm font-medium text-fg">{label}</span>}
@@ -65,9 +76,14 @@ export function Textarea({ label, error, className = '', ...props }) {
           error ? 'border-red-400' : 'border-line',
           className
         )}
+        {...fieldProps}
         {...props}
       />
-      {error && <span className="mt-1 block text-xs text-red-600">{error}</span>}
+      {error && (
+        <span id={errorId} className="mt-1 block text-xs text-red-600 dark:text-red-400">
+          {error}
+        </span>
+      )}
     </label>
   );
 }

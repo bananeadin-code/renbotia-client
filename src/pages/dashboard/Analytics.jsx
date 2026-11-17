@@ -268,8 +268,7 @@ export default function Analytics() {
               ) : (
                 <div className="space-y-3">
                   {recordsByType
-                    .slice()
-                    .sort((a, b) => b.count - a.count)
+                    .toSorted((a, b) => b.count - a.count)
                     .map((r) => (
                       <BreakdownBar key={r.type} label={r.label} count={r.count} total={totalRecords} />
                     ))}
@@ -285,8 +284,7 @@ export default function Analytics() {
               ) : (
                 <div className="space-y-3">
                   {channels
-                    .slice()
-                    .sort((a, b) => b.count - a.count)
+                    .toSorted((a, b) => b.count - a.count)
                     .map((c) => (
                       <BreakdownBar
                         key={c.channel}

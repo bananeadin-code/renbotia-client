@@ -1002,7 +1002,7 @@ export default function BotTraining() {
                   {/* Miniatura / preview */}
                   <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-line bg-surface2">
                     {img.url ? (
-                      <img src={img.url} alt={img.label || 'preview'} className="h-full w-full object-cover" />
+                      <img src={img.url} alt={img.label || 'preview'} loading="lazy" decoding="async" className="h-full w-full object-cover" />
                     ) : (
                       <Icon name="tag" size={22} className="text-subtle" />
                     )}

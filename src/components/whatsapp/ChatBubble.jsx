@@ -24,6 +24,8 @@ export function ChatBubble({ content, time, mine, images, files }) {
                 <img
                   src={img.url}
                   alt={img.label || 'imagen'}
+                  loading="lazy"
+                  decoding="async"
                   className="max-h-72 w-full rounded-md bg-black/5 object-contain"
                 />
                 {img.label && (
