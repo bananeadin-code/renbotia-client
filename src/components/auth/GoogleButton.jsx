@@ -84,7 +84,10 @@ export function GoogleButton({ onSuccess, onError }) {
   return (
     <div className="my-4">
       <div className="flex justify-center">
-        <div ref={ref} />
+        {/* El iframe de Google declara tema claro; si su contenedor hereda
+            color-scheme: dark, el navegador le pinta un fondo blanco opaco
+            (recuadro blanco alrededor del botón en modo oscuro). */}
+        <div ref={ref} style={{ colorScheme: 'light' }} />
       </div>
       <div className="mt-4 flex items-center gap-3 text-xs text-subtle">
         <span className="h-px flex-1 bg-line" />
