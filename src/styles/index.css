@@ -72,9 +72,11 @@
       radial-gradient(48% 42% at 100% 4%, rgb(111 224 182 / 0.12), transparent 60%),
       radial-gradient(45% 40% at 50% 110%, rgb(18 169 127 / 0.07), transparent 60%);
   }
-  /* En oscuro, sin resplandor verde de fondo: el lienzo queda plano y limpio. */
   .dark body::before {
-    background: none;
+    background:
+      radial-gradient(55% 45% at 6% -6%, rgb(var(--glow) / 0.16), transparent 60%),
+      radial-gradient(48% 42% at 100% 4%, rgb(18 169 127 / 0.12), transparent 60%),
+      radial-gradient(45% 40% at 50% 110%, rgb(52 201 154 / 0.08), transparent 60%);
   }
   /* Display (Sora) solo en títulos grandes; los pequeños (h3) en Inter, que se
      lee mejor a tamaño chico. */
@@ -218,9 +220,9 @@
   animation: aurora-float 16s ease-in-out infinite;
   will-change: transform;
 }
-/* En oscuro las manchas difuminadas se ven neón/fantasmales: se ocultan. */
 .dark .aurora-blob {
-  display: none;
+  opacity: 0.22;
+  filter: blur(80px);
 }
 @keyframes aurora-float {
   0%,
@@ -446,4 +448,45 @@
   .rb-loader-float, .rb-loader-twinkle, .rb-loader-ring, .rb-loader-msg { animation: none; }
   .rb-loader-ring { opacity: 0.25; }
   .rb-dot { animation-duration: 2.4s; transform: none; }
+}
+
+/* ── Tintes de marca en oscuro: SÓLIDOS, no translúcidos ──
+   En claro, bg-brand-500/10 da un verde pálido limpio con texto oscuro. En
+   oscuro ese mismo 10 % sobre casi-negro se ve "fantasma" y el texto menta
+   parece neón. Aquí se vuelven un verde profundo sólido, con borde definido y
+   texto claro (el equivalente invertido del modo claro). */
+.dark .bg-brand-500\/10,
+.dark .bg-brand-500\/15,
+.dark .hover\:bg-brand-500\/10:hover {
+  background-color: #103a30;
+}
+.dark .bg-brand-500\/5,
+.dark .bg-brand-500\/\[0\.04\],
+.dark .bg-brand-500\/\[0\.05\],
+.dark .bg-brand-500\/\[0\.06\],
+.dark .bg-brand-500\/\[0\.07\] {
+  background-color: #14292a;
+}
+.dark .border-brand-400\/30,
+.dark .border-brand-400\/40,
+.dark .border-brand-400\/60,
+.dark .border-brand-500\/25,
+.dark .border-brand-500\/30,
+.dark .border-brand-500\/40,
+.dark .border-brand-500\/50 {
+  border-color: #1f5c4b;
+}
+.dark .bg-brand-500\/10.dark\:text-brand-400,
+.dark .bg-brand-500\/15.dark\:text-brand-400 {
+  color: #d1fae7; /* brand-100: claro y legible, sin brillo neón */
+}
+.dark .bg-emerald-500\/10,
+.dark .bg-emerald-500\/15 {
+  background-color: #103a30;
+}
+.dark .bg-emerald-500\/10.dark\:text-emerald-300,
+.dark .bg-emerald-500\/15.dark\:text-emerald-300,
+.dark .bg-emerald-500\/10.dark\:text-emerald-400,
+.dark .bg-emerald-500\/15.dark\:text-emerald-400 {
+  color: #d1fae7;
 }

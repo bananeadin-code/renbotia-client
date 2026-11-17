@@ -76,7 +76,7 @@ export default function Landing() {
       <PublicNav />
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-brand-500/[0.06] via-canvas to-canvas dark:bg-none">
+      <section className="relative overflow-hidden bg-gradient-to-b from-brand-500/[0.06] via-canvas to-canvas">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-grid" />
         <AuroraBackground />
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:py-24 lg:grid-cols-2">
