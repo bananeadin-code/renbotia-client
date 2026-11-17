@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore.js';
 import { Button } from '../ui/index.jsx';
 import { Logo } from '../ui/Logo.jsx';
@@ -34,13 +34,11 @@ export function PublicNav() {
         {/* Desktop */}
         <div className="hidden items-center gap-1 sm:flex sm:gap-2">
           {NAV_LINKS.map((l) => (
-            <Link
-              key={l.to}
-              to={l.to}
-              className="rounded-lg px-3.5 py-2 text-[15px] font-medium text-muted transition-colors hover:text-fg"
-            >
+            // NavLink marca la sección actual con aria-current="page" (también en
+            // subpáginas: /soluciones/..., /blog/...). El subrayado vive en .nav-link.
+            <NavLink key={l.to} to={l.to} className="nav-link">
               {l.label}
-            </Link>
+            </NavLink>
           ))}
           {isAuthenticated ? (
             <Link to="/dashboard">
@@ -48,12 +46,9 @@ export function PublicNav() {
             </Link>
           ) : (
             <>
-              <Link
-                to="/login"
-                className="rounded-lg px-3.5 py-2 text-[15px] font-medium text-muted transition-colors hover:text-fg"
-              >
+              <NavLink to="/login" className="nav-link">
                 Entrar
-              </Link>
+              </NavLink>
               <Link to="/registro">
                 <Button>Crear cuenta</Button>
               </Link>
@@ -83,14 +78,9 @@ export function PublicNav() {
         <div className="border-t border-line bg-surface px-4 py-3 sm:hidden">
           <div className="flex flex-col gap-1">
             {NAV_LINKS.map((l) => (
-              <Link
-                key={l.to}
-                to={l.to}
-                onClick={close}
-                className="rounded-lg px-3 py-2.5 text-sm font-medium text-fg hover:bg-surface2"
-              >
+              <NavLink key={l.to} to={l.to} onClick={close} className="nav-link-mobile">
                 {l.label}
-              </Link>
+              </NavLink>
             ))}
           </div>
           <div className="mt-3 flex flex-col gap-2 border-t border-line pt-3">

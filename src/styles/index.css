@@ -177,6 +177,49 @@
   }
 }
 
+@layer components {
+  /* ── Navegación pública ──
+     Al pasar el cursor (o con foco de teclado) un subrayado de marca crece de
+     izquierda a derecha; en la sección actual (aria-current="page") queda fijo y
+     el texto se oscurece. El subrayado es el indicador (no solo el color). */
+  .nav-link {
+    @apply relative rounded-lg px-3.5 py-2 text-[15px] font-medium text-muted transition-colors duration-200 hover:text-fg;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0.875rem;
+    right: 0.875rem;
+    bottom: 0.25rem;
+    height: 2px;
+    border-radius: 9999px;
+    @apply bg-brand-600 dark:bg-brand-400;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .nav-link:hover::after,
+  .nav-link:focus-visible::after,
+  .nav-link[aria-current='page']::after {
+    transform: scaleX(1);
+  }
+  .nav-link[aria-current='page'] {
+    @apply text-fg;
+  }
+  /* Menú móvil: la sección actual lleva fondo y barra lateral de marca. */
+  .nav-link-mobile {
+    @apply rounded-lg border-l-2 border-transparent px-3 py-2.5 text-sm font-medium text-fg transition-colors hover:bg-surface2;
+  }
+  .nav-link-mobile[aria-current='page'] {
+    @apply border-brand-600 bg-surface2 dark:border-brand-400;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nav-link::after {
+      transition: none;
+    }
+  }
+}
+
 @layer utilities {
   /* Números de métricas/dashboards alineados */
   .tabular {
