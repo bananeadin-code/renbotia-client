@@ -282,7 +282,7 @@ export default function Billing() {
       : undefined;
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-fg">Facturación</h1>
         <p className="text-sm text-muted">Gestiona tu plan y tus créditos.</p>

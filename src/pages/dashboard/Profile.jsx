@@ -222,7 +222,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="space-y-6">
       <h1 className="text-2xl font-bold text-fg">Perfil</h1>
 
       {/* Datos personales */}

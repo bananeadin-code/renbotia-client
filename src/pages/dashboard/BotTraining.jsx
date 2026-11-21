@@ -537,7 +537,7 @@ export default function BotTraining() {
   const planName = planKey.charAt(0).toUpperCase() + planKey.slice(1);
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <h1 className="text-2xl font-bold text-fg">Entrenamiento del bot</h1>

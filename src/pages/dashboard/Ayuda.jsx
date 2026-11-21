@@ -96,7 +96,7 @@ export default function Ayuda() {
   }
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-fg">Ayuda</h1>
         <p className="text-sm text-muted">Te acompañamos a dejar tu bot funcionando y resolvemos tus dudas.</p>
