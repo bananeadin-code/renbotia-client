@@ -29,8 +29,9 @@ export default function Profile() {
   const { business } = useBusinessStore();
   const navigate = useNavigate();
 
-  // Datos personales (nombre editable)
+  // Datos personales (nombre y apellido editables)
   const [name, setName] = useState(user?.name || '');
+  const [lastName, setLastName] = useState(user?.lastName || '');
   const [nameErr, setNameErr] = useState('');
   const [savingName, setSavingName] = useState(false);
 
@@ -41,9 +42,9 @@ export default function Profile() {
     if (msg) return;
     setSavingName(true);
     try {
-      const { user: updated } = await authApi.updateProfile(name.trim());
-      updateUser({ name: updated.name });
-      toast.success('Nombre actualizado.');
+      const { user: updated } = await authApi.updateProfile({ name: name.trim(), lastName: lastName.trim() });
+      updateUser({ name: updated.name, lastName: updated.lastName || '' });
+      toast.success('Datos actualizados.');
     } catch (err) {
       toast.error(err.response?.data?.message || 'No se pudo actualizar.');
     } finally {
@@ -229,23 +230,37 @@ export default function Profile() {
       <Card>
         <h2 className="mb-4 font-semibold text-fg">Datos personales</h2>
         <form onSubmit={saveName} noValidate className="space-y-4">
-          <Input
-            label="Nombre"
-            value={name}
-            onChange={(e) => {
-              setName(e.target.value);
-              if (nameErr) setNameErr('');
-            }}
-            error={nameErr}
-            maxLength={80}
-          />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input
+              label="Nombre"
+              value={name}
+              autoComplete="given-name"
+              onChange={(e) => {
+                setName(e.target.value);
+                if (nameErr) setNameErr('');
+              }}
+              error={nameErr}
+              maxLength={80}
+            />
+            <Input
+              label="Apellido"
+              value={lastName}
+              autoComplete="family-name"
+              onChange={(e) => setLastName(e.target.value)}
+              maxLength={80}
+            />
+          </div>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-xs text-subtle">
               Rol: <span className="font-medium">{user?.role}</span>.
             </p>
             <Button
               type="submit"
-              disabled={savingName || !name.trim() || name.trim() === (user?.name || '')}
+              disabled={
+                savingName ||
+                !name.trim() ||
+                (name.trim() === (user?.name || '') && lastName.trim() === (user?.lastName || ''))
+              }
             >
               {savingName ? 'Guardando…' : 'Guardar'}
             </Button>
