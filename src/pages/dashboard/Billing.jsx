@@ -439,7 +439,7 @@ export default function Billing() {
           </div>
           <div>
             <div className="text-muted">Conversaciones disponibles</div>
-            <div className="font-medium tabular text-brand-700 dark:text-brand-400">
+            <div className="font-medium tabular text-brand-700 dark:text-brand-300">
               {balance ? `${fmtConversations(balance.available)}` : '—'}
             </div>
             <div className="text-[11px] text-subtle">

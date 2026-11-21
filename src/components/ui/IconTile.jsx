@@ -15,11 +15,11 @@ export function IconTile({ icon, label, to, className = '' }) {
       <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-fg text-canvas shadow-card transition duration-200 group-hover:-translate-y-0.5 group-hover:shadow-pop">
         <Icon name={icon} size={30} />
       </span>
-      <span className="text-base font-semibold text-brand-700 group-hover:underline dark:text-brand-400 sm:text-lg">{label}</span>
+      <span className="text-base font-semibold text-brand-700 group-hover:underline dark:text-brand-300 sm:text-lg">{label}</span>
       <Icon
         name="arrowRight"
         size={22}
-        className="shrink-0 text-brand-700 transition-transform duration-200 group-hover:translate-x-1 dark:text-brand-400"
+        className="shrink-0 text-brand-700 transition-transform duration-200 group-hover:translate-x-1 dark:text-brand-300"
       />
     </Link>
   );

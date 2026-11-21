@@ -192,7 +192,7 @@ export function CheckoutDialog({ open, onClose, kind, planKey, cycle = 'mensual'
             <button
               type="button"
               onClick={() => setStep('card')}
-              className="text-xs font-semibold text-brand-700 hover:underline dark:text-brand-400"
+              className="text-xs font-semibold text-brand-700 hover:underline dark:text-brand-300"
             >
               Cambiar
             </button>

@@ -217,7 +217,7 @@ export default function Team() {
           {data.members.map((m) => (
             <li key={m.userId} className="py-3">
               <div className="flex items-center gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-500/15 text-sm font-bold text-brand-700 dark:text-brand-400">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-500/15 text-sm font-bold text-brand-700 dark:text-brand-300">
                 {(m.name || m.email).charAt(0).toUpperCase()}
               </span>
               <div className="min-w-0 flex-1">

@@ -423,7 +423,7 @@ function FilterChip({ active, onClick, icon, children }) {
       onClick={onClick}
       className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition ${
         active
-          ? 'border-brand-500 bg-brand-500/10 text-brand-700 dark:text-brand-400'
+          ? 'border-brand-500 bg-brand-500/10 text-brand-700 dark:text-brand-300'
           : 'border-line text-muted hover:bg-surface2'
       }`}
     >
@@ -534,7 +534,7 @@ function RecordRow({ rec, onStatus, onEdit, onDelete, readOnly = false }) {
 
 const REMINDER_META = {
   sent: ['Recordatorio enviado', 'bg-surface2 text-muted', 'clock'],
-  confirmed: ['Confirmó', 'bg-brand-500/10 text-brand-700 dark:text-brand-400', 'check'],
+  confirmed: ['Confirmó', 'bg-brand-500/10 text-brand-700 dark:text-brand-300', 'check'],
   cancelled: ['Canceló', 'bg-red-500/10 text-red-600 dark:text-red-400', 'x'],
   reschedule: ['Quiere cambiarla', 'bg-amber-500/15 text-amber-700 dark:text-amber-300', 'alert'],
   skipped: ['Sin recordatorio', 'bg-surface2 text-subtle', 'clock'],

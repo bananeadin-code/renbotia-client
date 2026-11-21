@@ -5,19 +5,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Marca (emerald-teal refinado) — funciona en claro y oscuro
-        brand: {
-          50: '#ecfdf6',
-          100: '#d1fae7',
-          200: '#a7f0d1',
-          300: '#6fe0b6',
-          400: '#34c99a',
-          500: '#12a97f',
-          600: '#0e8a68',
-          700: '#0c6f55',
-          800: '#0d5844',
-          900: '#0b4638',
-        },
+        // Marca (emerald-teal refinado). Cada tono es una variable CSS (index.css)
+        // para que el modo oscuro use una versión más suave sin tocar componentes.
+        brand: Object.fromEntries(
+          [50, 100, 200, 300, 400, 500, 600, 700, 800, 900].map((n) => [n, `rgb(var(--brand-${n}) / <alpha-value>)`]),
+        ),
         // Tokens semánticos (cambian con el tema vía variables CSS en index.css)
         canvas: 'rgb(var(--canvas) / <alpha-value>)', // fondo de página
         surface: 'rgb(var(--surface) / <alpha-value>)', // cards/paneles

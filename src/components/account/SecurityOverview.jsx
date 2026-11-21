@@ -5,8 +5,8 @@ import { Card } from '../ui/index.jsx';
 import { Icon } from '../ui/Icon.jsx';
 
 const LEVEL_STYLE = {
-  muy_buena: { bar: 'bg-brand-500', text: 'text-brand-700 dark:text-brand-400', msg: 'Tu cuenta está muy bien protegida.' },
-  buena: { bar: 'bg-brand-500', text: 'text-brand-700 dark:text-brand-400', msg: 'Tu cuenta está bien protegida. Puedes reforzarla si quieres.' },
+  muy_buena: { bar: 'bg-brand-500', text: 'text-brand-700 dark:text-brand-300', msg: 'Tu cuenta está muy bien protegida.' },
+  buena: { bar: 'bg-brand-500', text: 'text-brand-700 dark:text-brand-300', msg: 'Tu cuenta está bien protegida. Puedes reforzarla si quieres.' },
   basica: { bar: 'bg-amber-500', text: 'text-amber-700 dark:text-amber-300', msg: 'Te recomendamos un paso más para proteger tu negocio.' },
 };
 

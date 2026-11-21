@@ -239,7 +239,7 @@ function Seguimiento({ range, isAdmin, me }) {
                       · orientación hecha
                     </span>
                   )}
-                  {isAdmin && l.revenueMXN > 0 && <span className="ml-2 text-xs font-medium text-brand-700 dark:text-brand-400">{money(l.revenueMXN)}</span>}
+                  {isAdmin && l.revenueMXN > 0 && <span className="ml-2 text-xs font-medium text-brand-700 dark:text-brand-300">{money(l.revenueMXN)}</span>}
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2">

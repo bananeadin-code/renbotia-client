@@ -14,7 +14,7 @@ function ProjectAvatar({ project, size = 'md' }) {
     <span
       className={`flex ${dim} shrink-0 items-center justify-center overflow-hidden rounded-lg font-bold ${
         owner
-          ? 'bg-brand-500/15 text-brand-700 dark:text-brand-400'
+          ? 'bg-brand-500/15 text-brand-700 dark:text-brand-300'
           : 'bg-sky-500/15 text-sky-700 dark:text-sky-300'
       }`}
       aria-hidden="true"
@@ -35,7 +35,7 @@ function RoleChip({ project }) {
     <span
       className={`shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${
         owner
-          ? 'bg-brand-500/10 text-brand-600 dark:text-brand-400'
+          ? 'bg-brand-500/10 text-brand-600 dark:text-brand-300'
           : 'bg-sky-500/10 text-sky-600 dark:text-sky-300'
       }`}
     >

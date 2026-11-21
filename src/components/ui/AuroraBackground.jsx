@@ -15,7 +15,7 @@ export function AuroraBackground({ className = '' }) {
         style={{ width: 380, height: 380, top: -60, right: -60, animationDelay: '3s' }}
       />
       <div
-        className="aurora-blob bg-emerald-100"
+        className="aurora-blob bg-brand-100"
         style={{ width: 460, height: 460, bottom: -220, left: '35%', animationDelay: '6s' }}
       />
     </div>

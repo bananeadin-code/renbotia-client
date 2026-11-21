@@ -201,7 +201,7 @@ export function RecordModal({ open, onClose, onSaved, enabledTypes, record, pres
                 type="button"
                 onClick={loadSlots}
                 disabled={!form.date || loadingSlots}
-                className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-brand-700 hover:underline disabled:opacity-50 dark:text-brand-400"
+                className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-brand-700 hover:underline disabled:opacity-50 dark:text-brand-300"
               >
                 {loadingSlots ? <Spinner size={14} /> : <Icon name="clock" size={14} />}
                 Ver horarios libres
@@ -218,7 +218,7 @@ export function RecordModal({ open, onClose, onSaved, enabledTypes, record, pres
                         onClick={() => set({ time: s.time })}
                         className={`rounded-lg border px-2 py-1 text-xs font-medium transition ${
                           form.time === s.time
-                            ? 'border-brand-500 bg-brand-500/10 text-brand-700 dark:text-brand-400'
+                            ? 'border-brand-500 bg-brand-500/10 text-brand-700 dark:text-brand-300'
                             : 'border-line text-muted hover:bg-surface'
                         }`}
                       >

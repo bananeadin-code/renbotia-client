@@ -112,7 +112,7 @@ function ChannelSwitcher({ active, onSelect, data, widget }) {
             <span className="min-w-0 max-w-full sm:flex-1">
               <span
                 className={`block truncate text-[11px] font-semibold sm:text-sm ${
-                  selected ? 'text-brand-700 dark:text-brand-400 sm:text-fg' : 'text-muted sm:text-fg/90'
+                  selected ? 'text-brand-700 dark:text-brand-300 sm:text-fg' : 'text-muted sm:text-fg/90'
                 }`}
               >
                 {c.label}
@@ -449,7 +449,7 @@ Se abrirá una ventana segura de Meta para iniciar sesión y verificar tu númer
               },
             ].map((s, i) => (
               <li key={i} className="flex gap-3">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-sm font-bold text-brand-700 dark:text-brand-400">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-sm font-bold text-brand-700 dark:text-brand-300">
                   {i + 1}
                 </span>
                 <div className="min-w-0">

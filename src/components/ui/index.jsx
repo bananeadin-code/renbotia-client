@@ -102,7 +102,7 @@ export function Card({ children, className = '', ...rest }) {
 export function Badge({ children, color = 'slate' }) {
   const colors = {
     slate: 'bg-surface2 text-muted',
-    green: 'bg-brand-500/15 text-brand-700 dark:text-brand-400',
+    green: 'bg-brand-500/15 text-brand-700 dark:text-brand-300',
     amber: 'bg-amber-500/15 text-amber-700 dark:text-amber-300',
     red: 'bg-red-500/15 text-red-700 dark:text-red-300',
   };
