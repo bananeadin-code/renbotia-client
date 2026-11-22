@@ -10,7 +10,7 @@ export const LEGAL = {
   privacidad: {
     slug: 'privacidad',
     title: 'Aviso de Privacidad',
-    updated: '4 de noviembre de 2026',
+    updated: '22 de noviembre de 2026',
     description:
       'Aviso de Privacidad de RenBotIA: qué datos recabamos, para qué, con quién los compartimos y cómo ejercer tus derechos ARCO.',
     intro:
@@ -26,7 +26,7 @@ export const LEGAL = {
         h: '2. Qué datos recabamos',
         p: ['Tratamos dos tipos de datos:'],
         ul: [
-          'De la cuenta: tu nombre, correo electrónico, una contraseña (que guardamos cifrada) y los datos de tu negocio (nombre, giro, número de WhatsApp). Los datos de tu tarjeta los procesa y resguarda directamente nuestro proveedor de pagos (Stripe); RenBotIA no almacena el número de tu tarjeta, solo su marca, los últimos 4 dígitos y su vencimiento para que puedas identificarla.',
+          'De la cuenta: tu nombre y apellido, correo electrónico, una contraseña (que guardamos cifrada) y los datos de tu negocio (nombre, giro, número de WhatsApp). Los datos de tu tarjeta los procesa y resguarda directamente nuestro proveedor de pagos (Stripe); RenBotIA no almacena el número de tu tarjeta, solo su marca, los últimos 4 dígitos y su vencimiento para que puedas identificarla.',
           'Del funcionamiento del bot: el contenido de las conversaciones que tu bot atiende, que puede incluir datos que tus propios clientes proporcionen. Respecto de esos datos de terceros, tú eres el responsable y RenBotIA actúa como encargado que los trata por tu cuenta y siguiendo tus instrucciones.',
           'De las conexiones con Meta: si conectas WhatsApp Business, tu Página de Facebook (Messenger) o tu cuenta profesional de Instagram, guardamos los identificadores de esa cuenta o Página y el token de acceso que Meta nos otorga para recibir y responder los mensajes que tus clientes envían. De quienes escriben a tu Página o a tu Instagram guardamos el identificador que Meta asigna para esa cuenta, su nombre público y el contenido de sus mensajes, únicamente para que tu bot les responda y puedas ver la conversación en tu panel.',
           'No recabamos de forma deliberada datos personales sensibles.',
