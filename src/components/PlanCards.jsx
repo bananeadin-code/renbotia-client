@@ -23,8 +23,10 @@ const HIGHLIGHT = 'pro'; // plan destacado
  * @param {boolean} [paidPlansLive] - fuerza el estado; si se omite, se consulta.
  * @param {'mensual'|'anual'} [cycle] - con 'anual' muestra el precio anual (plan.annual).
  * @param {function} [secondaryFor] - acción secundaria por plan: ({ label, onClick, disabled }) o null.
+ * @param {boolean} [showTokens] - muestra el detalle en tokens (solo en el panel,
+ *   Facturación). En el sitio público y el onboarding se habla solo de conversaciones.
  */
-export function PlanCards({ plans, selectedKey, onSelect, ctaLabel = 'Elegir plan', ctaFor, paidPlansLive, cycle = 'mensual', secondaryFor }) {
+export function PlanCards({ plans, selectedKey, onSelect, ctaLabel = 'Elegir plan', ctaFor, paidPlansLive, cycle = 'mensual', secondaryFor, showTokens = false }) {
   const [fetchedLive, setFetchedLive] = useState(null);
   useEffect(() => {
     if (typeof paidPlansLive === 'boolean') return; // ya lo pasaron
@@ -99,11 +101,13 @@ export function PlanCards({ plans, selectedKey, onSelect, ctaLabel = 'Elegir pla
               {fmtConversations(plan.monthlyTokenLimit)} conversaciones al mes
             </p>
             <p className="mt-0.5 text-xs text-subtle">
-              Aproximado; equivale a {plan.monthlyTokenLimit.toLocaleString('es-MX')} tokens de IA
+              {showTokens
+                ? `Aproximado; equivale a ${plan.monthlyTokenLimit.toLocaleString('es-MX')} tokens de IA`
+                : 'Aproximado, según la extensión de cada conversación'}
             </p>
 
             <ul className="mt-4 flex-1 space-y-2 text-sm text-fg">
-              {(plan.highlights || []).map((h) => (
+              {(plan.highlights || []).filter((h) => showTokens || !/\btokens?\b/i.test(h)).map((h) => (
                 <li key={h} className="flex items-start gap-2">
                   <Icon name="check" size={16} className="mt-0.5 shrink-0 text-brand-600" />
                   {h}

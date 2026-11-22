@@ -32,7 +32,7 @@ export const SOLUTIONS = [
     ],
     benefits: [
       'Responde al instante las consultas frecuentes con la información y el tono de tu despacho.',
-      'Agenda la consulta inicial revisando tu disponibilidad real, sin choques de horario.',
+      'Agenda la consulta inicial revisando tu disponibilidad real, sin choques de horario (plan Elite).',
       'Capta y organiza a los interesados para que tú solo confirmes y des seguimiento.',
     ],
     example: {
@@ -67,7 +67,7 @@ export const SOLUTIONS = [
     benefits: [
       'Contesta al momento las dudas frecuentes con la información de tu despacho.',
       'Explica qué documentos hacen falta para cada trámite sin que intervengas.',
-      'Agenda citas y capta prospectos para que tu equipo se enfoque en los números.',
+      'Agenda citas y capta prospectos para que tu equipo se enfoque en los números (plan Elite).',
     ],
     example: {
       user: '¿Qué necesito para mi declaración anual?',
@@ -100,7 +100,7 @@ export const SOLUTIONS = [
     ],
     benefits: [
       'Explica tus servicios, enfoque y precios con tu propio tono, al instante.',
-      'Agenda la llamada de diagnóstico revisando tu disponibilidad real.',
+      'Agenda la llamada de diagnóstico revisando tu disponibilidad real (plan Elite).',
       'Registra a cada interesado para que hagas seguimiento sin que se pierda ninguno.',
     ],
     example: {
@@ -135,7 +135,7 @@ export const SOLUTIONS = [
     benefits: [
       'Responde al instante sobre tus servicios, paquetes y casos, con la voz de tu marca.',
       'Filtra y califica al lead antes de pasarlo a una llamada con tu equipo.',
-      'Agenda la reunión de venta y registra al prospecto automáticamente.',
+      'Agenda la reunión de venta y registra al prospecto automáticamente (plan Elite).',
     ],
     example: {
       user: '¿Manejan campañas de Ads y cuánto cuesta?',
@@ -168,8 +168,8 @@ export const SOLUTIONS = [
     ],
     benefits: [
       'Responde al instante menú, horarios, ubicación y formas de pago.',
-      'Toma reservaciones con criterio real de cupo y horario, sin sobre-agendar.',
-      'Capta pedidos y los deja organizados para que tú solo confirmes.',
+      'Toma reservaciones con criterio real de cupo y horario, sin sobre-agendar (plan Elite).',
+      'Capta pedidos y los deja organizados para que tú solo confirmes (plan Elite).',
     ],
     example: {
       user: '¿Tienen mesa para 4 el viernes en la noche?',
@@ -202,7 +202,7 @@ export const SOLUTIONS = [
     ],
     benefits: [
       'Contesta precios, tratamientos, formas de pago y ubicación con la información de tu consultorio.',
-      'Agenda citas según tu horario real y deja anotado el motivo de la consulta.',
+      'Agenda citas según tu horario real y deja anotado el motivo de la consulta (plan Elite).',
       'Detecta pacientes listos para agendar y te avisa para que les des seguimiento prioritario.',
     ],
     example: {
@@ -236,7 +236,7 @@ export const SOLUTIONS = [
     ],
     benefits: [
       'Responde especialidades, costos, preparación para estudios y horarios con la información de tu clínica.',
-      'Agenda consultas por especialidad y deja los datos del paciente listos para confirmar.',
+      'Agenda consultas por especialidad y deja los datos del paciente listos para confirmar (plan Elite).',
       'Pide ayuda a una persona cuando el caso lo requiere, en lugar de improvisar.',
     ],
     example: {
@@ -270,7 +270,7 @@ export const SOLUTIONS = [
     ],
     benefits: [
       'Responde precios, servicios, promociones y ubicación con tu forma de hablar.',
-      'Agenda citas sin cruces y te deja la lista del día organizada.',
+      'Agenda citas sin cruces y te deja la lista del día organizada (plan Elite).',
       INSTAGRAM_LIVE
         ? 'Atiende también los mensajes directos de Instagram, donde te descubren tus clientes.'
         : `Atiende también ${MESSENGER_LIVE ? 'Messenger y ' : ''}el chat de tu sitio web, y muy pronto los mensajes directos de Instagram.`,
@@ -307,7 +307,7 @@ export const SOLUTIONS = [
     benefits: [
       'Responde precio, ubicación, metros, requisitos y formas de pago de cada propiedad.',
       'Pregunta presupuesto, zona y tipo de crédito, y te marca los prospectos calientes.',
-      'Agenda visitas con tu disponibilidad y te deja los datos del interesado.',
+      'Agenda visitas con tu disponibilidad y te deja los datos del interesado (plan Elite).',
     ],
     example: {
       user: 'Hola, ¿sigue disponible la casa de 3 recámaras? ¿Aceptan Infonavit?',
@@ -374,7 +374,7 @@ export const SOLUTIONS = [
     ],
     benefits: [
       'Responde colegiaturas, requisitos, horarios, becas y fechas de inicio.',
-      'Agenda visitas o clases muestra y registra a los interesados.',
+      'Agenda visitas o clases muestra y registra a los interesados (plan Elite).',
       'Marca como prioridad a quienes están listos para inscribirse.',
     ],
     example: {
@@ -408,7 +408,7 @@ export const SOLUTIONS = [
     ],
     benefits: [
       'Responde catálogo, precios, tallas, envíos y métodos de pago con tu información.',
-      'Toma pedidos y los deja organizados en tu panel para que solo confirmes.',
+      'Toma pedidos y los deja organizados en tu panel para que solo confirmes (plan Elite).',
       `Atiende ${CHANNELS_LONG} desde una sola bandeja.`,
     ],
     example: {

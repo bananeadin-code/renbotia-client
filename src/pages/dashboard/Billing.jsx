@@ -510,6 +510,7 @@ export default function Billing() {
                 onSelect={onSelectPlan}
                 ctaFor={ctaFor}
                 secondaryFor={secondaryFor}
+                showTokens
                 paidPlansLive={paidPlansLive}
                 cycle={shownCycle}
               />

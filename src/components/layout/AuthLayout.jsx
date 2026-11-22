@@ -6,7 +6,7 @@ import { ThemeToggle } from '../ui/ThemeToggle.jsx';
 const BENEFITS = [
   { icon: 'bot', text: 'Entrenado con la información de tu negocio' },
   { icon: 'clock', text: 'Responde a tus clientes 24/7, sin esperas' },
-  { icon: 'calendarCheck', text: 'Agenda citas y capta clientes solo' },
+  { icon: 'calendarCheck', text: 'Detecta clientes listos para comprar' },
   { icon: 'message', text: 'Pruébalo en un simulador antes de conectarlo' },
 ];
 

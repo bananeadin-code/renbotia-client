@@ -171,8 +171,8 @@ export function PublicFooter() {
           <div className="max-w-xs">
             <Logo size={30} />
             <p className="mt-4 text-sm leading-relaxed text-muted">
-              Asistentes de WhatsApp con IA para profesionistas y negocios de México. Atienden,
-              agendan y captan clientes las 24 horas.
+              Asistentes de WhatsApp con IA para profesionistas y negocios de México. Atienden y
+              captan clientes las 24 horas.
             </p>
             <Link
               to="/registro"
