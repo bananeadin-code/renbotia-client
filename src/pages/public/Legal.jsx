@@ -15,7 +15,7 @@ export default function Legal({ slug }) {
     title: doc ? `${doc.title} | RenBotIA` : 'Documento no encontrado | RenBotIA',
     description: doc?.description,
     path: `/${slug}`,
-    image: `${SITE_URL}/og-cover.png`,
+    image: `${SITE_URL}/og-cover-v2.png`,
   });
 
   if (!doc) {

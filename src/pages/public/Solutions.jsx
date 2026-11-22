@@ -13,7 +13,7 @@ import { PAGE_SEO } from '../../content/pages.js';
 export default function Solutions() {
   useSeo({
     ...PAGE_SEO.soluciones,
-    image: `${SITE_URL}/og-cover.png`,
+    image: `${SITE_URL}/og-cover-v2.png`,
   });
 
   return (

@@ -8,7 +8,7 @@ export const PAGE_SEO = {
     path: '/',
     title: 'RenBotIA — Bot de WhatsApp con IA para negocios en México',
     description:
-      'Automatiza la atención por WhatsApp de tu negocio con un asistente de IA entrenado con tu información. Responde dudas, agenda citas y capta clientes 24/7. Empieza gratis.',
+      'Automatiza la atención por WhatsApp de tu negocio con un asistente de IA entrenado con tu información. Responde dudas, detecta a los clientes listos para comprar y atiende 24/7. Empieza gratis.',
   },
   precios: {
     path: '/precios',
@@ -55,7 +55,7 @@ export const PAGE_SEO = {
  * los trae de la API). Debe coincidir con server/src/config/constants.js.
  */
 export const PRICE_SUMMARY = [
-  { name: 'Free', price: 0, detail: '50,000 tokens de IA al mes, sin tarjeta y sin límite de días.' },
-  { name: 'Pro', price: 479, detail: '1,000,000 de tokens de IA al mes, tono personalizable, colaboradores, chat para tu sitio web y seguimiento automático.' },
-  { name: 'Elite', price: 999, detail: '5,000,000 de tokens de IA al mes, gestión de citas, pedidos y prospectos, imágenes y documentos de contexto.' },
+  { name: 'Free', price: 0, detail: '~10 conversaciones al mes y hasta 5 preguntas frecuentes, sin tarjeta y sin límite de días.' },
+  { name: 'Pro', price: 479, detail: '~200 conversaciones al mes, hasta 20 preguntas frecuentes, tono personalizable, colaboradores, chat para tu sitio web y seguimiento automático.' },
+  { name: 'Elite', price: 999, detail: '~1,000 conversaciones al mes, preguntas frecuentes ilimitadas, agenda de citas, pedidos y prospectos, imágenes y documentos de contexto.' },
 ];

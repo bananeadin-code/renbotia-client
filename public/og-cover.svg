@@ -30,7 +30,7 @@
   <text x="206" y="192" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="52" font-weight="800" fill="#ffffff">RenBotIA</text>
   <text x="90" y="330" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="66" font-weight="800" fill="#ffffff">Tu asistente de WhatsApp</text>
   <text x="90" y="408" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="66" font-weight="800" fill="#ffffff">con inteligencia artificial</text>
-  <text x="90" y="486" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="34" font-weight="500" fill="#d1fae5">Responde, agenda y capta clientes 24/7 · Hecho en México</text>
+  <text x="90" y="486" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="34" font-weight="500" fill="#d1fae5">Responde y capta clientes 24/7 · Hecho en México</text>
   <g transform="translate(90,520)">
     <rect x="0" y="0" width="230" height="58" rx="29" fill="#ffffff"/>
     <text x="115" y="38" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#059669" text-anchor="middle">renbotia.com</text>

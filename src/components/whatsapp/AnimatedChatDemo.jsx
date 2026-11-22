@@ -19,13 +19,13 @@ const SCRIPT = [
   {
     mine: false,
     content:
-      'La consulta inicial cuesta $500 MXN, deducible si contratas nuestros servicios. ¿Quieres agendar una cita?',
+      'La consulta inicial cuesta $500 MXN, deducible si contratas nuestros servicios. ¿Te comparto los requisitos?',
     time: '10:24',
   },
-  { mine: true, content: 'Sí, para el jueves por la tarde.', time: '10:25' },
+  { mine: true, content: 'Sí, por favor.', time: '10:25' },
   {
     mine: false,
-    content: 'Perfecto, te agendo el jueves a las 5 pm. ¿Me confirmas tu nombre?',
+    content: 'Claro: tu identificación y los documentos de tu caso. ¿Me compartes tu nombre para que un abogado te contacte?',
     time: '10:25',
   },
 ];

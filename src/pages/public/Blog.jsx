@@ -19,7 +19,7 @@ const fmtDate = (iso) =>
 export default function Blog() {
   useSeo({
     ...PAGE_SEO.blog,
-    image: `${SITE_URL}/og-cover.png`,
+    image: `${SITE_URL}/og-cover-v2.png`,
     jsonLd: {
       '@context': 'https://schema.org',
       '@type': 'Blog',

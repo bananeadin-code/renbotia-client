@@ -66,7 +66,7 @@ const STEPS = [
 export default function Landing() {
   useSeo({
     ...PAGE_SEO.home,
-    image: `${SITE_URL}/og-cover.png`,
+    image: `${SITE_URL}/og-cover-v2.png`,
     jsonLd: FAQ_JSONLD,
   });
 

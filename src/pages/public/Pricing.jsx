@@ -28,7 +28,7 @@ export default function Pricing() {
 
   useSeo({
     ...PAGE_SEO.precios,
-    image: `${SITE_URL}/og-cover.png`,
+    image: `${SITE_URL}/og-cover-v2.png`,
   });
 
   useEffect(() => {

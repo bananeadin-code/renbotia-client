@@ -28,7 +28,7 @@ export default function Solution() {
     title: notFound ? 'Solución no encontrada | RenBotIA' : local?.title || sol.title,
     description: local?.description || sol?.description,
     path,
-    image: `${SITE_URL}/og-cover.png`,
+    image: `${SITE_URL}/og-cover-v2.png`,
     noindex: notFound,
     jsonLd: notFound
       ? undefined

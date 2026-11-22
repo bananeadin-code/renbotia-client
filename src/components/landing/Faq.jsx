@@ -28,7 +28,7 @@ export const FAQS = [
   },
   {
     q: '¿Hay un plan gratis?',
-    a: 'Sí. El plan Free te alcanza para alrededor de 10 conversaciones al mes (50,000 tokens de IA), sin tarjeta ni límite de días. Cuando lo necesites, subes a Pro o Elite, o compras paquetes de créditos extra.',
+    a: 'Sí. El plan Free te alcanza para alrededor de 10 conversaciones al mes, sin tarjeta ni límite de días. Cuando lo necesites, subes a Pro o Elite, o compras paquetes de créditos extra.',
   },
   {
     q: '¿En cuánto tiempo queda listo mi bot?',

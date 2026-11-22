@@ -27,7 +27,7 @@ export default function BlogPost() {
     description: post?.description,
     path: post ? `/blog/${post.slug}` : '/blog',
     type: 'article',
-    image: `${SITE_URL}/og-cover.png`,
+    image: `${SITE_URL}/og-cover-v2.png`,
     jsonLd: post
       ? {
           '@context': 'https://schema.org',
@@ -38,12 +38,12 @@ export default function BlogPost() {
           dateModified: post.date,
           inLanguage: 'es-MX',
           mainEntityOfPage: `${SITE_URL}/blog/${post.slug}`,
-          image: `${SITE_URL}/og-cover.png`,
+          image: `${SITE_URL}/og-cover-v2.png`,
           author: { '@type': 'Organization', name: 'RenBotIA' },
           publisher: {
             '@type': 'Organization',
             name: 'RenBotIA',
-            logo: { '@type': 'ImageObject', url: `${SITE_URL}/og-cover.png` },
+            logo: { '@type': 'ImageObject', url: `${SITE_URL}/og-cover-v2.png` },
           },
         }
       : undefined,

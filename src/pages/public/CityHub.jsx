@@ -28,7 +28,7 @@ export default function CityHub() {
       ? `Atiende a tus clientes de ${city.name}, ${city.state} por ${CHANNELS_SHORT} las 24 horas con un asistente de IA entrenado con tu negocio. Pruébalo gratis.`
       : undefined,
     path,
-    image: `${SITE_URL}/og-cover.png`,
+    image: `${SITE_URL}/og-cover-v2.png`,
     noindex: !city,
     jsonLd: city
       ? {
