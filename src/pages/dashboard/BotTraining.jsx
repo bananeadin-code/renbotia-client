@@ -218,6 +218,7 @@ export default function BotTraining() {
           documents: c.documents || [],
           quickReplies: c.quickReplies?.length ? c.quickReplies : [''],
           schedule: defaultSchedule(c.schedule),
+          handoffCheckIn: c.handoffCheckIn !== false,
           followUp: {
             enabled: Boolean(c.followUp?.enabled),
             delayHours: c.followUp?.delayHours || 4,
@@ -484,6 +485,7 @@ export default function BotTraining() {
         images: cfg.images.filter((img) => img.label.trim() && img.url.trim()),
         documents: (cfg.documents || []).filter((d) => d.text?.trim()),
         quickReplies: (cfg.quickReplies || []).map((s) => s.trim()).filter(Boolean),
+        handoffCheckIn: cfg.handoffCheckIn,
         followUp: {
           ...cfg.followUp,
           message: cfg.followUp.message.trim(),
@@ -1235,6 +1237,42 @@ Solo un seguimiento por conversación mientras el cliente no conteste. No se env
             />
           </div>
         )}
+      </Card>
+
+      {/* Aviso al cliente cuando el caso pasó a una persona y nadie lo atiende (todos los planes) */}
+      <Card>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-fg text-canvas shadow-card">
+              <Icon name="clock" size={18} />
+            </span>
+            <div>
+              <h2 className="font-semibold text-fg">Avisar al cliente que su caso sigue en proceso</h2>
+              <p className="mt-0.5 text-xs text-muted">
+                Si el bot pasó un caso a tu equipo (lead caliente o algo que requiere atención) y a las 4 horas nadie le ha
+                respondido, le escribe una sola vez: “Solo para confirmar: el equipo ya tiene este caso y se pondrá en
+                contacto en cuanto pueda. ¡Gracias por la paciencia!”. Solo en tu horario de atención, en WhatsApp,
+                Messenger e Instagram, y no si tomaste el control en modo manual. Es un mensaje fijo: no gasta tokens.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={cfg.handoffCheckIn}
+            aria-label="Avisar al cliente que su caso sigue en proceso"
+            onClick={() => set('handoffCheckIn', !cfg.handoffCheckIn)}
+            className={`relative mt-1 h-6 w-11 shrink-0 rounded-md transition ${
+              cfg.handoffCheckIn ? 'bg-brand-600' : 'bg-surface2 ring-1 ring-inset ring-line'
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 h-5 w-5 rounded bg-white shadow transition-all ${
+                cfg.handoffCheckIn ? 'left-[22px]' : 'left-0.5'
+              }`}
+            />
+          </button>
+        </div>
       </Card>
 
       {/* Respuestas rápidas (para el agente en Conversaciones) */}

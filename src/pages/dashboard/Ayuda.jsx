@@ -30,6 +30,19 @@ const GENERAL_FAQ = [
     ),
   },
   {
+    q: '¿Qué pasa si el bot pasa un caso a mi equipo y nadie lo atiende?',
+    a: (
+      <>
+        Te llega un correo en el momento, otro a las 2 horas si sigue sin respuesta y un resumen diario si hay clientes
+        esperando desde ayer, siempre en tu horario de atención. A las 4 horas, el bot le escribe una vez al cliente para
+        decirle que el equipo ya tiene su caso, para que no se enfríe. Ese mensaje lo puedes apagar en{' '}
+        <Link to="/dashboard/entrenamiento" className="font-medium text-brand-700 underline dark:text-brand-300">Entrenamiento</Link>{' '}
+        (“Avisar al cliente que su caso sigue en proceso”). Los avisos se detienen en cuanto respondes desde
+        Conversaciones o marcas el caso como atendido.
+      </>
+    ),
+  },
+  {
     q: '¿Quién cobra las conversaciones de WhatsApp?',
     a: 'Meta las cobra directamente a tu cuenta de WhatsApp Business según sus tarifas (incluyen un volumen mensual gratuito). Es independiente de tu plan de RenBotIA.',
   },
