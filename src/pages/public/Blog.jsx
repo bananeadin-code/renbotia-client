@@ -41,7 +41,7 @@ export default function Blog() {
       <PublicNav />
       <section className="relative overflow-hidden">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-grid" />
-        <div className="relative mx-auto max-w-3xl px-4 pb-2 pt-12 sm:pt-16">
+        <div className="relative site-container pb-2 pt-12 sm:pt-16">
           <h1 className="text-4xl font-extrabold tracking-tight text-fg sm:text-5xl">
             Recursos para atender mejor por WhatsApp
           </h1>
@@ -52,12 +52,12 @@ export default function Blog() {
         </div>
       </section>
 
-      <main className="mx-auto max-w-3xl px-4 pb-16 pt-8">
-        <div className="space-y-4">
+      <main className="site-container pb-16 pt-8">
+        <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3 xl:mr-[12%]">
           {POSTS.map((post, i) => (
-            <Reveal as="div" key={post.slug} delay={i * 60}>
-              <Link to={`/blog/${post.slug}`} className="block">
-              <SpotlightCard className="group p-6">
+            <Reveal as="div" key={post.slug} delay={i * 60} className="h-full">
+              <Link to={`/blog/${post.slug}`} className="block h-full">
+              <SpotlightCard className="group h-full p-6">
                 <div className="relative z-[2]">
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-subtle">
                     <span>{fmtDate(post.date)}</span>

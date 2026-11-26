@@ -82,7 +82,7 @@ export default function Solution() {
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-grid" />
-        <div className="relative mx-auto max-w-4xl px-4 pb-4 pt-14 sm:pt-20">
+        <div className="relative site-container pb-4 pt-14 sm:pt-20">
           <Breadcrumbs
             items={[
               { name: 'Inicio', to: '/' },
@@ -93,7 +93,7 @@ export default function Solution() {
               ...(city ? [{ name: city.name }] : []),
             ]}
           />
-          <h1 className="mt-3 max-w-3xl text-3xl font-extrabold leading-[1.08] tracking-tight text-fg sm:text-5xl">
+          <h1 className="mt-3 max-w-4xl text-3xl font-extrabold leading-[1.08] tracking-tight text-fg sm:text-5xl">
             {local?.h1 || sol.h1}
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-muted">{local?.lede || sol.lede}</p>
@@ -112,7 +112,7 @@ export default function Solution() {
         </div>
       </section>
 
-      <main className="mx-auto max-w-4xl px-4 py-16">
+      <main className="site-container py-16">
         {/* Dolores → Beneficios */}
         <Reveal className="grid gap-6 md:grid-cols-2">
           <div>

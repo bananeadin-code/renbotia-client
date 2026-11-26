@@ -65,7 +65,7 @@ export default function CityHub() {
       <PublicNav />
       <section className="relative overflow-hidden">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-grid" />
-        <div className="relative mx-auto max-w-4xl px-4 pb-4 pt-14 sm:pt-20">
+        <div className="relative site-container pb-4 pt-14 sm:pt-20">
           <Breadcrumbs
             items={[
               { name: 'Inicio', to: '/' },
@@ -73,11 +73,11 @@ export default function CityHub() {
               { name: city.name },
             ]}
           />
-          <h1 className="mt-3 max-w-3xl text-3xl font-extrabold leading-[1.08] tracking-tight text-fg sm:text-5xl">
+          <h1 className="mt-3 max-w-4xl text-3xl font-extrabold leading-[1.08] tracking-tight text-fg sm:text-5xl">
             Tu asistente de WhatsApp con IA en {city.name}
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-muted">
-            Responde al instante a tus clientes de {city.name}, {city.state}: precios, horarios, citas y pedidos por
+            Responde al instante a tus clientes de {city.name}, {city.state}: precios, horarios, citas y pedidos por{' '}
             {CHANNELS_LONG}, las 24 horas y con la información de tu negocio.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -95,10 +95,10 @@ export default function CityHub() {
         </div>
       </section>
 
-      <main className="mx-auto max-w-4xl px-4 py-14">
+      <main className="site-container py-14">
         <Reveal>
           <h2 className="text-xl font-bold text-fg sm:text-2xl">Para cada tipo de negocio en {city.name}</h2>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
             {SOLUTIONS.map((s) => (
               <Link key={s.slug} to={`/soluciones/${s.slug}/${city.slug}`}>
                 <SpotlightCard className="group h-full p-4">
