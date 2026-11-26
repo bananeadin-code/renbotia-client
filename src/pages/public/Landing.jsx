@@ -187,10 +187,14 @@ export default function Landing() {
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             {STEPS.map((s, i) => (
               <Reveal key={s.n} delay={i * 90}>
-                <div className="h-full rounded-xl border border-line bg-surface p-6 shadow-card">
-                  <span className="text-sm font-extrabold tracking-widest text-brand-500">{s.n}</span>
-                  <h3 className="mt-3 font-semibold text-fg">{s.title}</h3>
-                  <p className="mt-2 text-sm text-muted">{s.desc}</p>
+                <div className="relative h-full overflow-hidden rounded-2xl border border-line bg-surface p-7 shadow-card sm:p-8">
+                  {/* Número grande con degradado de marca y una línea que lo subraya */}
+                  <span className="relative block bg-gradient-to-br from-brand-400 to-brand-700 bg-clip-text font-display text-5xl font-extrabold leading-none tracking-tight text-transparent">
+                    {s.n}
+                  </span>
+                  <span aria-hidden="true" className="relative mt-4 block h-1 w-10 rounded-full bg-gradient-to-r from-brand-400 to-brand-600" />
+                  <h3 className="relative mt-5 text-lg font-semibold text-fg">{s.title}</h3>
+                  <p className="relative mt-2 text-sm leading-relaxed text-muted sm:text-[15px]">{s.desc}</p>
                 </div>
               </Reveal>
             ))}

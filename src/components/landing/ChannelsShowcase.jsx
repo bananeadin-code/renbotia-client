@@ -44,12 +44,12 @@ const CHANNELS = [
 function ChannelCard({ c }) {
   const body = (
     <>
-      <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-surface ${c.color} shadow-card`}>
-        <Icon name={c.icon} size={28} />
+      <span className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-surface ${c.color} shadow-card sm:h-16 sm:w-16`}>
+        <Icon name={c.icon} size={32} />
       </span>
       <span className="min-w-0 flex-1 text-left">
         <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span className="text-lg font-semibold text-fg">{c.name}</span>
+          <span className="text-lg font-semibold text-fg sm:text-xl">{c.name}</span>
           {c.available ? (
             <span className="rounded-md bg-brand-500/10 px-2 py-0.5 text-[11px] font-semibold text-brand-700 dark:text-brand-300">
               Disponible
@@ -60,14 +60,14 @@ function ChannelCard({ c }) {
             </span>
           )}
         </span>
-        <span className="mt-0.5 block text-sm text-muted">{c.desc}</span>
+        <span className="mt-1.5 block text-sm text-muted sm:text-base">{c.desc}</span>
       </span>
       {c.available && (
         <Icon name="arrowRight" size={22} className="shrink-0 text-fg transition-transform duration-200 group-hover:translate-x-1" />
       )}
     </>
   );
-  const base = 'flex items-center gap-4 rounded-2xl bg-surface2 px-5 py-5 ring-1 ring-line sm:px-6';
+  const base = 'flex items-center gap-5 rounded-2xl bg-surface2 px-5 py-7 ring-1 ring-line sm:px-8 sm:py-9';
   return c.available ? (
     <Link
       to="/registro"
