@@ -100,7 +100,7 @@ export function AnimatedChatDemo({ botName = 'Asistente Legal' }) {
   }, []);
 
   return (
-    <div className="mx-auto w-[24rem] max-w-full overflow-hidden rounded-2xl 2xl:w-[30rem] border border-line bg-surface shadow-pop">
+    <div className="mx-auto w-full max-w-[24rem] overflow-hidden rounded-2xl lg:w-[24rem] 2xl:w-[30rem] 2xl:max-w-[30rem] border border-line bg-surface shadow-pop">
       <ChatHeader botName={botName} typing={typing} />
       {/* Alto fijo; la columna se alinea abajo y lo que sobra arriba se difumina. */}
       <div

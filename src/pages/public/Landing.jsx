@@ -79,7 +79,7 @@ export default function Landing() {
       <section className="relative overflow-hidden bg-gradient-to-b from-brand-500/[0.06] via-canvas to-canvas">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-grid" />
         <AuroraBackground />
-        <div className="relative site-container grid items-center gap-12 py-16 sm:py-24 lg:grid-cols-2">
+        <div className="relative site-container grid items-center gap-12 py-16 sm:py-24 lg:grid-cols-2 [&>*]:min-w-0">
           <div className="animate-fade-up">
             <span className="mb-5 inline-flex items-center gap-1.5 rounded-md border border-brand-500/30 bg-brand-500/10 px-3 py-1 text-xs font-semibold text-brand-700 dark:text-brand-300">
               <Icon name="sparkles" size={14} />
