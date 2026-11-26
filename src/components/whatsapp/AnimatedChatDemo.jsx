@@ -1,13 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChatHeader } from './ChatHeader.jsx';
 import { ChatBubble } from './ChatBubble.jsx';
 import { TypingIndicator } from './TypingIndicator.jsx';
 
 /**
  * Mockup animado del chat para el hero: reproduce una conversación en loop
- * (aparecen mensajes uno a uno, con indicador "escribiendo…" antes de las
- * respuestas del bot), luego se reinicia. Es como un GIF pero nítido, ligero y
- * adaptado al tema (claro/oscuro estilo WhatsApp).
+ * (aparecen mensajes uno a uno, con "escribiendo…" antes de cada respuesta del
+ * bot), luego se desvanece y vuelve a empezar. Es como un GIF pero nítido,
+ * ligero y adaptado al tema (claro/oscuro estilo WhatsApp).
+ *
+ * Tamaño FIJO: los mensajes se apilan desde abajo, como en WhatsApp; cada uno
+ * nuevo abre su espacio poco a poco (.chat-msg-in) y empuja a los anteriores
+ * hacia arriba, donde se difuminan. Nada cambia de tamaño ni brinca.
  *
  * Respeta prefers-reduced-motion: si el usuario lo pide, muestra todo estático.
  *
@@ -28,22 +32,31 @@ const SCRIPT = [
     content: 'Claro: tu identificación y los documentos de tu caso. ¿Me compartes tu nombre para que un abogado te contacte?',
     time: '10:25',
   },
+  { mine: true, content: 'Alexander Gaytan', time: '10:26' },
+  {
+    mine: false,
+    content: 'Gracias, Alexander. Un abogado del equipo te escribe hoy por aquí para confirmar tu cita. 🙌',
+    time: '10:26',
+  },
 ];
 
-const TYPING_MS = 1300; // duración del "escribiendo…" antes de una respuesta
-const AFTER_USER_MS = 1000; // pausa tras un mensaje del usuario
-const AFTER_REPLY_MS = 800; // pausa tras una respuesta del bot
-const LOOP_PAUSE_MS = 3200; // pausa antes de reiniciar el loop
-const START_MS = 600;
+const START_MS = 700;
+const AFTER_USER_MS = 650; // el bot "lee" antes de empezar a escribir
+const AFTER_REPLY_MS = 1900; // tiempo para leer la respuesta antes del siguiente mensaje
+const LOOP_HOLD_MS = 3800; // la conversación completa se queda a la vista
+const FADE_MS = 500; // desvanecido antes de reiniciar (igual que la transición CSS)
+
+/** "Escribiendo…" proporcional al largo de la respuesta, como una persona. */
+const typingMs = (text) => Math.min(2600, Math.max(1100, 700 + text.length * 14));
 
 export function AnimatedChatDemo({ botName = 'Asistente Legal' }) {
   const [shown, setShown] = useState(0);
   const [typing, setTyping] = useState(false);
-  const scrollRef = useRef(null);
+  const [fading, setFading] = useState(false);
+  const [round, setRound] = useState(0); // cambia la key para que las animaciones de entrada se repitan
 
   useEffect(() => {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setShown(SCRIPT.length);
       return;
     }
@@ -53,27 +66,30 @@ export function AnimatedChatDemo({ botName = 'Asistente Legal' }) {
     const wait = (fn, ms) => timers.push(setTimeout(() => !cancelled && fn(), ms));
 
     const step = (i) => {
-      if (cancelled) return;
       if (i >= SCRIPT.length) {
         wait(() => {
-          setShown(0);
-          setTyping(false);
-          step(0);
-        }, LOOP_PAUSE_MS);
+          setFading(true);
+          wait(() => {
+            setShown(0);
+            setRound((r) => r + 1);
+            setFading(false);
+            wait(() => step(0), START_MS);
+          }, FADE_MS);
+        }, LOOP_HOLD_MS);
         return;
       }
       const msg = SCRIPT[i];
       if (msg.mine) {
         setShown(i + 1);
         wait(() => step(i + 1), AFTER_USER_MS);
-      } else {
-        setTyping(true);
-        wait(() => {
-          setTyping(false);
-          setShown(i + 1);
-          wait(() => step(i + 1), AFTER_REPLY_MS);
-        }, TYPING_MS);
+        return;
       }
+      setTyping(true);
+      wait(() => {
+        setTyping(false);
+        setShown(i + 1);
+        wait(() => step(i + 1), AFTER_REPLY_MS);
+      }, typingMs(msg.content));
     };
 
     wait(() => step(0), START_MS);
@@ -83,18 +99,39 @@ export function AnimatedChatDemo({ botName = 'Asistente Legal' }) {
     };
   }, []);
 
-  useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
-  }, [shown, typing]);
-
   return (
-    <div className="mx-auto w-full max-w-sm overflow-hidden rounded-2xl border border-line bg-surface shadow-pop">
+    <div className="mx-auto w-full max-w-sm overflow-hidden rounded-2xl 2xl:max-w-[30rem] border border-line bg-surface shadow-pop">
       <ChatHeader botName={botName} typing={typing} />
-      <div ref={scrollRef} className="wa-chat-bg h-[22rem] space-y-2 overflow-hidden p-4">
-        {SCRIPT.slice(0, shown).map((m, i) => (
-          <ChatBubble key={i} content={m.content} time={m.time} mine={m.mine} />
-        ))}
-        {typing && <TypingIndicator />}
+      {/* Alto fijo; la columna se alinea abajo y lo que sobra arriba se difumina. */}
+      <div
+        className="wa-chat-bg relative flex h-[24rem] flex-col 2xl:h-[30rem] justify-end overflow-hidden px-4 pb-4"
+        style={{
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0, #000 3.5rem)',
+          maskImage: 'linear-gradient(to bottom, transparent 0, #000 3.5rem)',
+        }}
+        aria-label="Ejemplo de conversación con el asistente"
+        role="img"
+      >
+        <div
+          key={round}
+          className="transition-opacity ease-out"
+          style={{ opacity: fading ? 0 : 1, transitionDuration: `${FADE_MS}ms` }}
+        >
+          {/* El "escribiendo…" ocupa el mismo lugar (misma key) que la respuesta que
+              lo sustituye: la burbuja cambia de contenido sin que nada brinque. */}
+          {SCRIPT.slice(0, shown).map((m, i) => (
+            <div key={i} className="chat-msg-in pt-2">
+              <div className={m.mine ? undefined : 'animate-fade-up'}>
+                <ChatBubble content={m.content} time={m.time} mine={m.mine} />
+              </div>
+            </div>
+          ))}
+          {typing && (
+            <div key={shown} className="chat-msg-in pt-2">
+              <TypingIndicator />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

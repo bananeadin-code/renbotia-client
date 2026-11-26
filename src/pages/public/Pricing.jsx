@@ -48,7 +48,7 @@ export default function Pricing() {
       {/* Encabezado */}
       <section className="relative overflow-hidden">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-grid" />
-        <div className="relative mx-auto max-w-6xl px-4 pb-4 pt-16 text-center sm:pt-20">
+        <div className="relative site-container pb-4 pt-16 text-center sm:pt-20">
           <h1 className="text-4xl font-extrabold tracking-tight text-fg sm:text-6xl">
             Planes simples y transparentes
           </h1>
@@ -59,7 +59,7 @@ export default function Pricing() {
         </div>
       </section>
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-16">
+      <main className="site-container flex-1 pb-16">
         <Reveal className="mt-8">
           {loading ? (
             <div className="flex justify-center py-16">

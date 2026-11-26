@@ -239,6 +239,17 @@
   }
 }
 
+@layer components {
+  /* Contenedor del sitio público: aprovecha la pantalla (como Render) con
+     márgenes laterales proporcionales: ~16 px en celular, ~100 px en 1920 px. */
+  .site-container {
+    width: 100%;
+    max-width: 120rem;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 5vw, 6.25rem);
+  }
+}
+
 @layer utilities {
   /* Números de métricas/dashboards alineados */
   .tabular {
@@ -497,4 +508,60 @@
   .rb-loader-float, .rb-loader-twinkle, .rb-loader-ring, .rb-loader-msg { animation: none; }
   .rb-loader-ring { opacity: 0.25; }
   .rb-dot { animation-duration: 2.4s; transform: none; }
+}
+
+/* ── Chat estilo WhatsApp: "escribiendo…" y entrada de mensajes ──
+   Tres puntos que suben y bajan en ola (TypingIndicator: hero, simulador y demo). */
+.typing-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background-color: rgb(100 116 139);
+  animation: typing-wave 1.2s ease-in-out infinite;
+}
+.dark .typing-dot {
+  background-color: rgb(134 150 160);
+}
+.typing-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.typing-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes typing-wave {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+/* Un mensaje nuevo "abre" su espacio poco a poco (sin brinco de los anteriores)
+   y aparece con un leve desliz. El espacio entre mensajes va dentro (padding),
+   para que también crezca suave. */
+.chat-msg-in {
+  overflow: hidden;
+  animation: chat-msg-in 0.45s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+@keyframes chat-msg-in {
+  from {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    max-height: 14rem;
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .typing-dot,
+  .chat-msg-in {
+    animation: none;
+  }
 }

@@ -298,7 +298,7 @@ export function DashboardLayout() {
             centra y se limita en ancho (evita que la barra se "desprenda"
             en pantallas anchas o al alejar el zoom). */}
         <main ref={mainRef} className="min-h-screen min-w-0 flex-1 p-4 md:p-8">
-          <div className="mx-auto max-w-6xl">
+          <div className="mx-auto max-w-[100rem]">
             <PastDueBanner />
             <Outlet />
           </div>

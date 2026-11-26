@@ -26,7 +26,7 @@ export function PublicNav() {
 
   return (
     <header className="sticky top-0 z-30 border-b border-line/70 bg-surface/80 backdrop-blur-md">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
+      <nav className="site-container flex items-center justify-between py-4">
         <Link to="/" aria-label="RenBotIA — inicio" onClick={close}>
           <Logo size={40} />
         </Link>
@@ -165,7 +165,7 @@ function FooterLink({ link }) {
 export function PublicFooter() {
   return (
     <footer className="mt-16 border-t border-line bg-surface">
-      <div className="mx-auto max-w-6xl px-4 py-14">
+      <div className="site-container py-14">
         <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
           {/* Marca */}
           <div className="max-w-xs">

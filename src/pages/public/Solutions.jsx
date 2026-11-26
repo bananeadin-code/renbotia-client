@@ -22,7 +22,7 @@ export default function Solutions() {
 
       <section className="relative overflow-hidden">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-grid" />
-        <div className="relative mx-auto max-w-5xl px-4 pb-2 pt-14 text-center sm:pt-20">
+        <div className="relative site-container pb-2 pt-14 text-center sm:pt-20">
           <h1 className="text-4xl font-extrabold tracking-tight text-fg sm:text-6xl">
             Un bot para tu sector
           </h1>
@@ -33,8 +33,8 @@ export default function Solutions() {
         </div>
       </section>
 
-      <main className="mx-auto max-w-5xl px-4 pb-16 pt-10">
-        <div className="grid gap-4 sm:grid-cols-2">
+      <main className="site-container pb-16 pt-10">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {SOLUTIONS.map((s, i) => (
             <Reveal as="div" key={s.slug} delay={(i % 2) * 80}>
               <Link to={`/soluciones/${s.slug}`}>

@@ -84,7 +84,7 @@ function ChannelCard({ c }) {
 
 export function ChannelsShowcase() {
   return (
-    <section className="mx-auto w-full max-w-5xl px-4 py-20 text-center">
+    <section className="site-container py-20 text-center">
       <h2 className="text-4xl font-bold tracking-tight text-fg sm:text-5xl">Atiende donde ya te escriben</h2>
       <p className="mx-auto mt-3 max-w-2xl text-muted">
         Un solo bot, entrenado una vez, responde en todos tus canales con la misma información.

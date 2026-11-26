@@ -79,16 +79,16 @@ export default function Landing() {
       <section className="relative overflow-hidden bg-gradient-to-b from-brand-500/[0.06] via-canvas to-canvas">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-grid" />
         <AuroraBackground />
-        <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:py-24 lg:grid-cols-2">
+        <div className="relative site-container grid items-center gap-12 py-16 sm:py-24 lg:grid-cols-2">
           <div className="animate-fade-up">
             <span className="mb-5 inline-flex items-center gap-1.5 rounded-md border border-brand-500/30 bg-brand-500/10 px-3 py-1 text-xs font-semibold text-brand-700 dark:text-brand-300">
               <Icon name="sparkles" size={14} />
               Atención por WhatsApp con IA
             </span>
-            <h1 className="text-5xl font-extrabold leading-[1.05] tracking-tight text-fg sm:text-6xl">
+            <h1 className="text-5xl font-extrabold leading-[1.05] tracking-tight text-fg sm:text-6xl 2xl:text-7xl">
               El asistente de WhatsApp que tu despacho no tiene tiempo de ser
             </h1>
-            <p className="mt-5 max-w-xl text-lg text-muted">
+            <p className="mt-5 max-w-xl text-lg text-muted 2xl:max-w-2xl 2xl:text-xl">
               Automatiza la atención y las preguntas frecuentes de tus clientes. Entrena al bot con
               la información de tu negocio y deja que responda por ti, con tu tono, las 24 horas.
             </p>
@@ -140,7 +140,7 @@ export default function Landing() {
       </section>
 
       {/* Características (bento con glow que sigue el cursor) */}
-      <section className="mx-auto w-full max-w-6xl px-4 py-20">
+      <section className="site-container py-20">
         <Reveal className="mx-auto max-w-2xl text-center">
           <h2 className="text-4xl font-bold tracking-tight text-fg sm:text-5xl">Todo lo que tu bot necesita</h2>
           <p className="mt-3 text-muted">
@@ -179,7 +179,7 @@ export default function Landing() {
 
       {/* Cómo funciona */}
       <section className="border-y border-line bg-surface2/60">
-        <div className="mx-auto max-w-6xl px-4 py-20">
+        <div className="site-container py-20">
           <Reveal className="mx-auto max-w-2xl text-center">
             <h2 className="text-4xl font-bold tracking-tight text-fg sm:text-5xl">En marcha en minutos</h2>
             <p className="mt-3 text-muted">Tres pasos y tu bot está atendiendo.</p>
@@ -204,12 +204,12 @@ export default function Landing() {
       </Reveal>
 
       {/* Sectores */}
-      <Reveal as="section" className="mx-auto w-full max-w-6xl px-4 py-20 text-center">
+      <Reveal as="section" className="site-container py-20 text-center">
         <h2 className="text-4xl font-bold tracking-tight text-fg sm:text-5xl">Pensado para tu sector</h2>
         <p className="mt-3 text-muted">
           Ideal para negocios de servicios profesionales que reciben muchas consultas repetidas.
         </p>
-        <div className="mx-auto mt-10 flex max-w-6xl flex-wrap justify-center gap-x-8 gap-y-6">
+        <div className="mt-10 flex flex-wrap justify-center gap-x-8 gap-y-6">
           {SECTORS.map((s) => (
             <IconTile key={s.slug} icon={s.icon} label={s.label} to={`/soluciones/${s.slug}`} />
           ))}
@@ -227,8 +227,8 @@ export default function Landing() {
       </Reveal>
 
       {/* CTA final */}
-      <section className="px-4 py-20">
-        <Reveal className="relative mx-auto max-w-5xl overflow-hidden rounded-3xl bg-gradient-to-br from-brand-500 via-brand-600 to-brand-800 px-6 py-16 text-center shadow-pop">
+      <section className="site-container py-20">
+        <Reveal className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-500 via-brand-600 to-brand-800 px-6 py-16 text-center shadow-pop">
           {/* Glow radial + textura de puntos */}
           <div
             aria-hidden="true"
